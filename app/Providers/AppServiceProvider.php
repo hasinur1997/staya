@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Models\Fund;
 use App\Models\LedgerEntry;
+use App\Models\Member;
+use App\Models\MemberStay;
 use App\Models\MessSetting;
 use App\Models\MonthClosure;
 use App\Models\Permission;
@@ -49,6 +51,8 @@ class AppServiceProvider extends ServiceProvider
             'fund' => Fund::class,
             'ledger_entry' => LedgerEntry::class,
             'month_closure' => MonthClosure::class,
+            'member' => Member::class,
+            'member_stay' => MemberStay::class,
         ]);
     }
 

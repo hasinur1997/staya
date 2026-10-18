@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\MemberStatus;
 use App\Models\Fund;
+use App\Models\Member;
 use App\Models\MessSetting;
 use App\Models\Permission;
 use Illuminate\Http\Request;
@@ -55,7 +57,7 @@ class HandleInertiaRequests extends Middleware
             // unless the user holds the permission it belongs to.
             'nav' => [
                 'counts' => [
-                    'pendingApprovals' => null,
+                    'pendingApprovals' => fn (): ?int => $this->pendingApprovals($request),
                     'openPayables' => null,
                 ],
             ],
@@ -71,6 +73,19 @@ class HandleInertiaRequests extends Middleware
                     : null,
             ],
         ];
+    }
+
+    /**
+     * Registrations waiting for a decision, for reviewers. Pending deposits
+     * join this count when the deposit queue ships.
+     */
+    protected function pendingApprovals(Request $request): ?int
+    {
+        if (! $request->user()?->can('viewAnyRegistrations', Member::class)) {
+            return null;
+        }
+
+        return Member::query()->where('status', MemberStatus::Pending)->count();
     }
 
     /**

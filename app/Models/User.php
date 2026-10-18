@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\MemberStatus;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -31,6 +33,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read Member|null $member
  */
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
@@ -38,6 +41,16 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasRoles, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
+
+    /**
+     * Defaults matching the columns, so a model fresh from create() is
+     * already active.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'is_active' => true,
+    ];
 
     /**
      * Get the attributes that should be cast.
@@ -64,6 +77,33 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     protected function active(Builder $query): void
     {
         $query->where('is_active', true);
+    }
+
+    /**
+     * The member profile; staff-only accounts have none.
+     *
+     * @return HasOne<Member, $this>
+     */
+    public function member(): HasOne
+    {
+        return $this->hasOne(Member::class);
+    }
+
+    /**
+     * Whether the user's member profile is currently active. Inactive members
+     * may sign in and read, but not create purchases or deposits.
+     */
+    public function isActiveMember(): bool
+    {
+        return $this->member?->status === MemberStatus::Active;
+    }
+
+    /**
+     * Whether the user is an applicant (pending or rejected) with no access.
+     */
+    public function isApplicant(): bool
+    {
+        return $this->member?->status->isApplicant() ?? false;
     }
 
     /**

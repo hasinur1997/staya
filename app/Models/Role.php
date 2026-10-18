@@ -39,6 +39,17 @@ class Role extends SpatieRole
             ->firstOrFail();
     }
 
+    /**
+     * The seeded Member role, given to every approved member.
+     */
+    public static function member(): self
+    {
+        return static::query()
+            ->where('is_system', true)
+            ->where('name', SystemRole::Member->value)
+            ->firstOrFail();
+    }
+
     public function isAdmin(): bool
     {
         return $this->is_system && $this->name === SystemRole::Admin->value;

@@ -38,6 +38,17 @@ return [
             'report' => false,
         ],
 
+        // NID copies, member photos and receipts. Private: files are served
+        // only through authorized download routes, never by URL.
+        'uploads' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private/uploads'),
+            'visibility' => 'private',
+            'serve' => false,
+            'throw' => true,
+            'report' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

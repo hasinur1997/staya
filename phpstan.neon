@@ -11,9 +11,3 @@ parameters:
         - routes/
 
     level: 7
-
-    ignoreErrors:
-        # Shared upload rules; their first user is the member NID upload (Phase 4).
-        -
-            identifier: trait.unused
-            path: app/Concerns/UploadValidationRules.php

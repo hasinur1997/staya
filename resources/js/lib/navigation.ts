@@ -13,7 +13,9 @@ import {
     Wallet,
 } from 'lucide-react';
 import { dashboard, upcoming } from '@/routes';
+import { index as approvals } from '@/routes/approvals';
 import { index as ledger } from '@/routes/ledger';
+import { index as members } from '@/routes/members';
 import { edit as messSettings } from '@/routes/mess-settings';
 import { index as roles } from '@/routes/roles';
 import { index as users } from '@/routes/users';
@@ -62,13 +64,13 @@ export const appNavigation: AppNavSection[] = [
         items: [
             {
                 title: 'Members',
-                href: upcoming('members'),
+                href: members(),
                 icon: Users,
                 permissions: ['member.view'],
             },
             {
                 title: 'Pending approvals',
-                href: upcoming('approvals'),
+                href: approvals(),
                 icon: ClipboardCheck,
                 permissions: ['deposit.approve', 'member.approve_registration'],
                 count: 'pendingApprovals',

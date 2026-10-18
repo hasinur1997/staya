@@ -70,6 +70,25 @@ class MonthClosure extends Model
     }
 
     /**
+     * Refuse to continue when the month of the given business date, or any
+     * later month, is closed. Used for changes that reach forward in time,
+     * such as stay dates, which decide who shares each later month.
+     *
+     * @throws MonthClosed
+     */
+    public static function assertOpenFrom(string|DateTimeInterface $date, string $field): void
+    {
+        $closed = static::query()->closed()
+            ->where('month', '>=', self::monthOf($date)->toDateString())
+            ->orderBy('month')
+            ->first();
+
+        if ($closed !== null) {
+            throw MonthClosed::for($closed->month, $field);
+        }
+    }
+
+    /**
      * The first day of the month a business date falls in.
      */
     public static function monthOf(string|DateTimeInterface $date): CarbonImmutable

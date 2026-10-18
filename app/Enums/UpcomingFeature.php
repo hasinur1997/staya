@@ -11,7 +11,6 @@ enum UpcomingFeature: string
     case Grocery = 'grocery';
     case Deposits = 'deposits';
     case Reports = 'reports';
-    case Members = 'members';
     case Approvals = 'approvals';
     case Payables = 'payables';
     case AuditLog = 'audit-log';
@@ -22,7 +21,6 @@ enum UpcomingFeature: string
             self::Grocery => __('Grocery purchases'),
             self::Deposits => __('Deposits'),
             self::Reports => __('Reports'),
-            self::Members => __('Members'),
             self::Approvals => __('Pending approvals'),
             self::Payables => __('Payables'),
             self::AuditLog => __('Audit log'),
@@ -35,8 +33,7 @@ enum UpcomingFeature: string
             self::Grocery => __('Record multi-item grocery purchases with totals worked out for you.'),
             self::Deposits => __('Submit cash deposits and follow them from pending to approved.'),
             self::Reports => __('Monthly summaries of spending, deposits and each member’s due or credit.'),
-            self::Members => __('Member profiles, stays and registration approval.'),
-            self::Approvals => __('One queue for deposits and registrations waiting for a decision.'),
+            self::Approvals => __('Deposits waiting for a decision.'),
             self::Payables => __('Money the fund owes buyers, and the reimbursements that settle it.'),
             self::AuditLog => __('A read-only history of every financial and access change.'),
         };
@@ -65,14 +62,9 @@ enum UpcomingFeature: string
                 __('Equal share, deposits and due or credit for every member'),
                 __('Close a month so its figures can no longer change'),
             ],
-            self::Members => [
-                __('Member profiles with contact details and stays'),
-                __('Self-registration that an admin approves or rejects'),
-                __('NID details visible only to people allowed to see them'),
-            ],
             self::Approvals => [
                 __('Approve or reject pending deposits with a reason'),
-                __('Approve or reject new member registrations'),
+                __('Each approval posts to the ledger exactly once'),
                 __('A count in the sidebar shows what is waiting'),
             ],
             self::Payables => [
@@ -100,8 +92,8 @@ enum UpcomingFeature: string
             self::Grocery => [Permission::GroceryView],
             self::Deposits => [Permission::DepositViewOwn, Permission::DepositViewAll],
             self::Reports => [Permission::ReportViewOwn, Permission::ReportViewAll],
-            self::Members => [Permission::MemberView],
-            self::Approvals => [Permission::DepositApprove, Permission::MemberApproveRegistration],
+            // Registration reviewers already have their queue (ApprovalController).
+            self::Approvals => [Permission::DepositApprove],
             self::Payables => [Permission::LedgerReimburse],
             self::AuditLog => [Permission::AuditView],
         };

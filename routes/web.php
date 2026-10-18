@@ -1,15 +1,26 @@
 <?php
 
 use App\Enums\UpcomingFeature;
+use App\Http\Controllers\Approvals\ApprovalController;
+use App\Http\Controllers\Approvals\RegistrationController;
+use App\Http\Controllers\Auth\RegistrationStatusController;
 use App\Http\Controllers\Dev\LayoutPreviewController;
 use App\Http\Controllers\Ledger\AdjustmentController;
 use App\Http\Controllers\Ledger\LedgerController;
+use App\Http\Controllers\Members\MemberController;
+use App\Http\Controllers\Members\MemberFileController;
 use App\Http\Controllers\Roles\RoleController;
 use App\Http\Controllers\UpcomingFeatureController;
 use App\Http\Controllers\Users\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
+
+// Applicants wait here until their registration is decided; the
+// registration gate sends them nowhere else.
+Route::get('registration/status', RegistrationStatusController::class)
+    ->middleware('auth')
+    ->name('registration.status');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
@@ -20,6 +31,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('users/{user}/reactivate', [UserController::class, 'reactivate'])->name('users.reactivate');
 
     Route::resource('roles', RoleController::class)->except(['show']);
+
+    // Hard delete is refused for members with financial records.
+    Route::resource('members', MemberController::class);
+    Route::post('members/{member}/deactivate', [MemberController::class, 'deactivate'])->name('members.deactivate');
+    Route::post('members/{member}/reactivate', [MemberController::class, 'reactivate'])->name('members.reactivate');
+    Route::get('members/{member}/nid', [MemberFileController::class, 'nid'])->name('members.nid');
+    Route::get('members/{member}/photo', [MemberFileController::class, 'photo'])->name('members.photo');
+
+    Route::get('approvals', ApprovalController::class)->name('approvals.index');
+    Route::get('approvals/registrations', [RegistrationController::class, 'index'])->name('approvals.registrations.index');
+    Route::get('approvals/registrations/{member}', [RegistrationController::class, 'show'])->name('approvals.registrations.show');
+    Route::post('approvals/registrations/{member}/approve', [RegistrationController::class, 'approve'])->name('approvals.registrations.approve');
+    Route::post('approvals/registrations/{member}/reject', [RegistrationController::class, 'reject'])->name('approvals.registrations.reject');
 
     // Ledger entries are append-only: there is no edit or delete route.
     Route::get('ledger', [LedgerController::class, 'index'])->name('ledger.index');
