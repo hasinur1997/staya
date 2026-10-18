@@ -12,7 +12,7 @@ import {
     Users,
     Wallet,
 } from 'lucide-react';
-import { dashboard } from '@/routes';
+import { dashboard, upcoming } from '@/routes';
 import { index as ledger } from '@/routes/ledger';
 import { edit as messSettings } from '@/routes/mess-settings';
 import { index as roles } from '@/routes/roles';
@@ -21,9 +21,9 @@ import type { AppNavSection, NavProps } from '@/types';
 
 /*
  * The sidebar, from docs/layout.md (layer 2). Items declare the permissions
- * that show them; nothing here checks a role. Paths for screens that are not
- * built yet are plain strings; switch each to its Wayfinder route when the
- * route exists.
+ * that show them; nothing here checks a role. Screens that are not built yet
+ * link to the "coming soon" page (App\Enums\UpcomingFeature); switch each to
+ * its own Wayfinder route when it ships.
  */
 export const appNavigation: AppNavSection[] = [
     {
@@ -38,19 +38,19 @@ export const appNavigation: AppNavSection[] = [
             },
             {
                 title: 'Grocery purchases',
-                href: '/grocery',
+                href: upcoming('grocery'),
                 icon: ShoppingBasket,
                 permissions: ['grocery.view'],
             },
             {
                 title: 'Deposits',
-                href: '/deposits',
+                href: upcoming('deposits'),
                 icon: Wallet,
                 permissions: ['deposit.view_own', 'deposit.view_all'],
             },
             {
                 title: 'Reports',
-                href: '/reports',
+                href: upcoming('reports'),
                 icon: ChartColumn,
                 permissions: ['report.view_own', 'report.view_all'],
             },
@@ -62,13 +62,13 @@ export const appNavigation: AppNavSection[] = [
         items: [
             {
                 title: 'Members',
-                href: '/members',
+                href: upcoming('members'),
                 icon: Users,
                 permissions: ['member.view'],
             },
             {
                 title: 'Pending approvals',
-                href: '/approvals',
+                href: upcoming('approvals'),
                 icon: ClipboardCheck,
                 permissions: ['deposit.approve', 'member.approve_registration'],
                 count: 'pendingApprovals',
@@ -82,7 +82,7 @@ export const appNavigation: AppNavSection[] = [
             },
             {
                 title: 'Payables',
-                href: '/payables',
+                href: upcoming('payables'),
                 icon: HandCoins,
                 permissions: ['ledger.reimburse'],
                 count: 'openPayables',
@@ -115,7 +115,7 @@ export const appNavigation: AppNavSection[] = [
             },
             {
                 title: 'Audit log',
-                href: '/audit-log',
+                href: upcoming('audit-log'),
                 icon: ScrollText,
                 permissions: ['audit.view'],
             },

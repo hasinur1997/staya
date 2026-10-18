@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatMoney } from '@/lib/money';
 import { cn } from '@/lib/utils';
-import { dashboard, layoutPreview } from '@/routes';
+import { dashboard, layoutPreview, upcoming } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 
 // Temporary page for checking docs/layout.md: the shell and each template
@@ -149,20 +149,20 @@ const titles: Record<Template, string> = {
 
 const breadcrumbsFor: Record<Template, BreadcrumbItem[]> = {
     dashboard: [{ title: 'Dashboard', href: dashboard() }],
-    list: [{ title: 'Grocery purchases', href: '#' }],
+    list: [{ title: 'Grocery purchases', href: upcoming('grocery') }],
     detail: [
-        { title: 'Grocery purchases', href: '#' },
-        { title: 'October', href: '#' },
-        { title: 'Purchase #41', href: '#' },
+        { title: 'Grocery purchases', href: upcoming('grocery') },
+        { title: 'October', href: upcoming('grocery') },
+        { title: 'Purchase #41', href: upcoming('grocery') },
     ],
     form: [
-        { title: 'Grocery purchases', href: '#' },
-        { title: 'Purchase #41', href: '#' },
-        { title: 'Edit', href: '#' },
+        { title: 'Grocery purchases', href: upcoming('grocery') },
+        { title: 'Purchase #41', href: upcoming('grocery') },
+        { title: 'Edit', href: upcoming('grocery') },
     ],
     report: [
-        { title: 'Reports', href: '#' },
-        { title: 'October 2026', href: '#' },
+        { title: 'Reports', href: upcoming('reports') },
+        { title: 'October 2026', href: upcoming('reports') },
     ],
 };
 
@@ -255,7 +255,7 @@ function PurchaseTable() {
             columns={purchaseColumns}
             rows={purchases}
             rowKey={(row) => row.id}
-            rowHref={() => '#'}
+            rowHref={() => upcoming('grocery')}
             card={(row) => ({
                 title: row.date,
                 value: formatMoney(row.total),
@@ -291,9 +291,17 @@ function DashboardPreview() {
             header={{
                 title: 'Good evening, Rahim',
                 description: 'October 2026',
-                primaryAction: { label: 'Add purchase', icon: Plus, href: '#' },
+                primaryAction: {
+                    label: 'Add purchase',
+                    icon: Plus,
+                    href: upcoming('grocery'),
+                },
                 secondaryActions: [
-                    { label: 'Submit deposit', icon: Wallet, href: '#' },
+                    {
+                        label: 'Submit deposit',
+                        icon: Wallet,
+                        href: upcoming('deposits'),
+                    },
                 ],
             }}
             stats={[
@@ -391,7 +399,11 @@ function ListPreview() {
             header={{
                 title: 'Grocery purchases',
                 description: 'Every purchase paid from the shared fund',
-                primaryAction: { label: 'Add purchase', icon: Plus, href: '#' },
+                primaryAction: {
+                    label: 'Add purchase',
+                    icon: Plus,
+                    href: upcoming('grocery'),
+                },
             }}
             filters={
                 <div className="flex flex-col gap-1">
@@ -449,10 +461,14 @@ function DetailPreview() {
                 primaryAction: {
                     label: 'Edit purchase',
                     icon: Pencil,
-                    href: '#',
+                    href: upcoming('grocery'),
                 },
                 secondaryActions: [
-                    { label: 'View receipt', icon: Receipt, href: '#' },
+                    {
+                        label: 'View receipt',
+                        icon: Receipt,
+                        href: upcoming('grocery'),
+                    },
                 ],
                 menuActions: [
                     {
@@ -569,7 +585,7 @@ function FormPreview() {
             }}
             formId="preview-form"
             submitLabel="Save purchase"
-            cancelHref="#"
+            cancelHref={upcoming('grocery')}
             aside={
                 <Card>
                     <CardHeader>

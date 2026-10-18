@@ -1,9 +1,11 @@
 <?php
 
+use App\Enums\UpcomingFeature;
 use App\Http\Controllers\Dev\LayoutPreviewController;
 use App\Http\Controllers\Ledger\AdjustmentController;
 use App\Http\Controllers\Ledger\LedgerController;
 use App\Http\Controllers\Roles\RoleController;
+use App\Http\Controllers\UpcomingFeatureController;
 use App\Http\Controllers\Users\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +25,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('ledger', [LedgerController::class, 'index'])->name('ledger.index');
     Route::get('ledger/adjustments/create', [AdjustmentController::class, 'create'])->name('ledger.adjustments.create');
     Route::post('ledger/adjustments', [AdjustmentController::class, 'store'])->name('ledger.adjustments.store');
+
+    // Sidebar screens not built yet show a "coming soon" page.
+    Route::get('{feature}', UpcomingFeatureController::class)
+        ->whereIn('feature', array_column(UpcomingFeature::cases(), 'value'))
+        ->name('upcoming');
 
     // Temporary: the app shell and page templates with placeholder content.
     // The controller returns 404 outside the local environment.

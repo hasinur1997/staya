@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
+import { index as ledger } from '@/routes/ledger';
 
 // Temporary page for checking docs/design-system.md visually. Delete once the
 // design system has been signed off.
@@ -233,7 +234,10 @@ function ThemePanel({ theme }: { theme: 'light' | 'dark' }) {
                         placeholder="Amount"
                         className="rounded-md border border-border bg-surface px-4 py-2 text-body outline-none"
                     />
-                    <a href="#" className="text-label text-primary underline">
+                    <a
+                        href={ledger().url}
+                        className="text-label text-primary underline"
+                    >
                         View ledger
                     </a>
                 </div>
