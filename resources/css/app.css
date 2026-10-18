@@ -1,0 +1,357 @@
+@import 'tailwindcss';
+
+@import 'tw-animate-css';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+/*
+ * Staya design system — values come from docs/design-system.md. Do not edit
+ * them here without updating the doc.
+ *
+ * Theme: light by default, dark on [data-theme="dark"], and dark from the OS
+ * preference when no data-theme is set ("system" appearance).
+ */
+@custom-variant dark {
+    &:where([data-theme='dark'], [data-theme='dark'] *) {
+        @slot;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        &:where(:root:not([data-theme]), :root:not([data-theme]) *) {
+            @slot;
+        }
+    }
+}
+
+/*
+ * `inline` makes utilities reference the token directly (bg-surface →
+ * var(--surface)), so a nested [data-theme] element re-themes its subtree.
+ */
+@theme inline {
+    /* Hind Siliguri covers Bangla text and the ৳ sign. */
+    --font-sans: 'Source Sans 3', 'Hind Siliguri', system-ui, sans-serif;
+    --font-display: 'Playfair Display', 'Hind Siliguri', Georgia, serif;
+    --font-mono: 'Fira Code', ui-monospace, monospace;
+
+    /*
+     * Only design-system colours exist; Tailwind's palette is removed.
+     * Doc name → utility: Text Primary → ink, Text Secondary → ink-muted,
+     * Accent (amber) → highlight (`accent` is the shadcn hover alias below).
+     */
+    --color-*: initial;
+    --color-background: var(--background);
+    --color-surface: var(--surface);
+    --color-surface-raised: var(--surface-raised);
+    --color-border: var(--border);
+    --color-ink: var(--ink);
+    --color-ink-muted: var(--ink-muted);
+    --color-neutral: var(--neutral);
+    --color-primary: var(--primary);
+    --color-primary-hover: var(--primary-hover);
+    --color-on-primary: var(--on-primary);
+    --color-highlight: var(--highlight);
+    --color-success: var(--success);
+    --color-warning: var(--warning);
+    --color-error: var(--error);
+    --color-focus-ring: var(--focus-ring);
+    --color-transparent: transparent;
+    --color-current: currentColor;
+
+    /* Tints for active items and status backgrounds, derived per element. */
+    --color-primary-soft: color-mix(in srgb, var(--primary) 10%, transparent);
+    --color-success-soft: color-mix(in srgb, var(--success) 12%, transparent);
+    --color-warning-soft: color-mix(in srgb, var(--warning) 12%, transparent);
+    --color-error-soft: color-mix(in srgb, var(--error) 12%, transparent);
+
+    /*
+     * Legacy aliases for the starter kit's shadcn components. They point at
+     * design-system tokens so existing screens stay on-brand. Use the names
+     * above in new code; remove these as screens are migrated.
+     */
+    --color-foreground: var(--ink);
+    --color-card: var(--surface);
+    --color-card-foreground: var(--ink);
+    --color-popover: var(--surface);
+    --color-popover-foreground: var(--ink);
+    --color-primary-foreground: var(--on-primary);
+    --color-secondary: var(--surface);
+    --color-secondary-foreground: var(--ink);
+    --color-muted: var(--surface-raised);
+    --color-muted-foreground: var(--ink-muted);
+    --color-accent: var(--surface-raised);
+    --color-accent-foreground: var(--ink);
+    --color-destructive: var(--error);
+    --color-destructive-foreground: var(--error);
+    --color-input: var(--border);
+    --color-ring: var(--focus-ring);
+    --color-sidebar: var(--background);
+    --color-sidebar-foreground: var(--ink);
+    --color-sidebar-primary: var(--primary);
+    --color-sidebar-primary-foreground: var(--on-primary);
+    --color-sidebar-accent: color-mix(in srgb, var(--primary) 10%, transparent);
+    --color-sidebar-accent-foreground: var(--ink);
+    --color-sidebar-border: var(--border);
+    --color-sidebar-ring: var(--focus-ring);
+
+    /* p-1 … p-20 read the 4px-grid spacing tokens directly. */
+    --spacing-1: var(--space-1);
+    --spacing-2: var(--space-2);
+    --spacing-3: var(--space-3);
+    --spacing-4: var(--space-4);
+    --spacing-5: var(--space-5);
+    --spacing-6: var(--space-6);
+    --spacing-8: var(--space-8);
+    --spacing-10: var(--space-10);
+    --spacing-12: var(--space-12);
+    --spacing-16: var(--space-16);
+    --spacing-20: var(--space-20);
+
+    /* max-w-content */
+    --container-content: 1200px;
+
+    --radius-*: initial;
+    --shadow-*: initial;
+}
+
+/*
+ * rounded-sm/md/lg/pill and shadow-card/glow/modal/focus read the tokens of
+ * the same name, which are defined below (rounded-none and rounded-full are
+ * built in).
+ */
+@theme inline reference {
+    --radius-sm: var(--radius-sm);
+    --radius-md: var(--radius-md);
+    --radius-lg: var(--radius-lg);
+    --radius-pill: var(--radius-pill);
+    --shadow-card: var(--shadow-card);
+    --shadow-glow: var(--shadow-glow);
+    --shadow-modal: var(--shadow-modal);
+    --shadow-focus: var(--shadow-focus);
+}
+
+:root,
+[data-theme='light'] {
+    --background: #fafaf9;
+    --surface: #f5f5f4;
+    --surface-raised: #e7e5e4;
+    --border: #d6d3d1;
+    --ink: #1c1917;
+    --ink-muted: #57534e;
+    --neutral: #78716c;
+    --primary: #c2410c;
+    --primary-hover: #9a3412;
+    --on-primary: #fafaf9;
+    --highlight: #f59e0b;
+    --success: #16a34a;
+    --warning: #d97706;
+    --error: #dc2626;
+    --focus-ring: var(--primary);
+
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+    --space-20: 80px;
+
+    /* sm: inline code, small badges · md: buttons, inputs · lg: cards, modals */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-pill: 9999px;
+
+    /* Cards rest flat; shadow-card is their hover state. */
+    --shadow-card: 0 4px 16px rgba(28, 25, 23, 0.06);
+    --shadow-glow: 0 4px 12px rgba(194, 65, 12, 0.25);
+    --shadow-modal: 0 24px 48px rgba(28, 25, 23, 0.12);
+    --shadow-focus: 0 0 0 3px rgba(194, 65, 12, 0.12);
+
+    color-scheme: light;
+}
+
+/*
+ * The doc gives no dark values; these keep the same warm stone family and
+ * lift primary so it stays legible on dark surfaces.
+ */
+[data-theme='dark'] {
+    --background: #1c1917;
+    --surface: #292524;
+    --surface-raised: #44403c;
+    --border: #57534e;
+    --ink: #fafaf9;
+    --ink-muted: #d6d3d1;
+    --neutral: #a8a29e;
+    --primary: #f97316;
+    --primary-hover: #fb923c;
+    --on-primary: #1c1917;
+    --highlight: #fbbf24;
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --error: #f87171;
+    --focus-ring: var(--primary);
+
+    --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.3);
+    --shadow-glow: 0 4px 12px rgba(249, 115, 22, 0.25);
+    --shadow-modal: 0 24px 48px rgba(0, 0, 0, 0.5);
+    --shadow-focus: 0 0 0 3px rgba(249, 115, 22, 0.2);
+
+    color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+        --background: #1c1917;
+        --surface: #292524;
+        --surface-raised: #44403c;
+        --border: #57534e;
+        --ink: #fafaf9;
+        --ink-muted: #d6d3d1;
+        --neutral: #a8a29e;
+        --primary: #f97316;
+        --primary-hover: #fb923c;
+        --on-primary: #1c1917;
+        --highlight: #fbbf24;
+        --success: #4ade80;
+        --warning: #fbbf24;
+        --error: #f87171;
+        --focus-ring: var(--primary);
+
+        --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.3);
+        --shadow-glow: 0 4px 12px rgba(249, 115, 22, 0.25);
+        --shadow-modal: 0 24px 48px rgba(0, 0, 0, 0.5);
+        --shadow-focus: 0 0 0 3px rgba(249, 115, 22, 0.2);
+
+        color-scheme: dark;
+    }
+}
+
+/*
+ * Type styles. Display, headline and heading use Playfair Display bold;
+ * everything else uses Source Sans 3 at regular or semibold only.
+ */
+@utility text-display {
+    font-family: var(--font-display);
+    font-size: 64px;
+    line-height: 72px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+@utility text-headline {
+    font-family: var(--font-display);
+    font-size: 48px;
+    line-height: 56px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+@utility text-heading {
+    font-family: var(--font-display);
+    font-size: 28px;
+    line-height: 36px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+@utility text-subhead {
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 600;
+}
+
+@utility text-body {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+}
+
+@utility text-small {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+}
+
+@utility text-label {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+}
+
+@utility text-caption {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 400;
+}
+
+@utility text-overline {
+    font-size: 11px;
+    line-height: 16px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+@utility text-money {
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background font-sans text-body text-ink;
+    }
+
+    code,
+    kbd,
+    pre,
+    samp {
+        @apply font-mono;
+    }
+}
+
+/*
+ * Global focus ring. Deliberately unlayered so it wins over Tailwind's
+ * outline-none / outline-hidden utilities on every focusable control.
+ */
+:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+/* The skip link focuses <main>; it needs no ring of its own. */
+#main-content:focus-visible {
+    outline: none;
+}
+
+/*
+ * Keep focused fields clear of the sticky top bar and, on mobile, of the
+ * sticky bottom action bar (docs/layout.md, accessibility).
+ */
+html {
+    scroll-padding-top: var(--space-20);
+}
+
+@media (max-width: 767px) {
+    html {
+        scroll-padding-bottom: calc(var(--space-20) + var(--space-4));
+    }
+
+    /* Room for the sticky bottom action bar (48px button + 2 × 16px). */
+    #main-content:has([data-slot='sticky-action-bar']) {
+        padding-bottom: calc(
+            var(--space-20) + var(--space-6) + env(safe-area-inset-bottom)
+        );
+    }
+}
