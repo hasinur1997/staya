@@ -13,6 +13,7 @@ import {
     Wallet,
 } from 'lucide-react';
 import { dashboard } from '@/routes';
+import { index as ledger } from '@/routes/ledger';
 import { edit as messSettings } from '@/routes/mess-settings';
 import { index as roles } from '@/routes/roles';
 import { index as users } from '@/routes/users';
@@ -75,7 +76,7 @@ export const appNavigation: AppNavSection[] = [
             },
             {
                 title: 'Ledger',
-                href: '/ledger',
+                href: ledger(),
                 icon: BookOpen,
                 permissions: ['ledger.view_transactions'],
             },

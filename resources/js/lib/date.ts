@@ -16,3 +16,18 @@ const dateTime = new Intl.DateTimeFormat('en-GB', {
 export function formatDateTime(iso: string): string {
     return dateTime.format(new Date(iso));
 }
+
+const businessDate = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'UTC',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+});
+
+/**
+ * "18 Oct 2026" for a Y-m-d business date. It is already a Dhaka calendar
+ * day, so it is formatted as-is, with no timezone shift.
+ */
+export function formatBusinessDate(date: string): string {
+    return businessDate.format(new Date(`${date}T00:00:00Z`));
+}

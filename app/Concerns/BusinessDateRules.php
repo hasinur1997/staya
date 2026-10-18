@@ -2,16 +2,20 @@
 
 namespace App\Concerns;
 
+use App\Exceptions\MonthClosed;
 use App\Models\MessSetting;
+use App\Models\MonthClosure;
+use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 trait BusinessDateRules
 {
     /**
      * Rules for a business date (Y-m-d): not later than today in
-     * Asia/Dhaka and, once it is set, not before the fund start date.
+     * Asia/Dhaka, not before the fund start date once it is set, and not in
+     * a closed month.
      *
-     * @return array<int, ValidationRule|array<mixed>|string>
+     * @return array<int, ValidationRule|Closure|array<mixed>|string>
      */
     protected function businessDateRules(): array
     {
@@ -21,7 +25,25 @@ trait BusinessDateRules
             'required',
             ...$this->notInTheFutureRules(),
             ...($fundStartDate ? ['after_or_equal:'.$fundStartDate->toDateString()] : []),
+            $this->notInClosedMonthRule(),
         ];
+    }
+
+    /**
+     * Fails when the date falls in a closed month. Actions check again
+     * inside their transaction; this gives the form a field error first.
+     */
+    protected function notInClosedMonthRule(): Closure
+    {
+        return function (string $attribute, mixed $value, Closure $fail): void {
+            if (! is_string($value) || preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) !== 1 || ! strtotime($value)) {
+                return;
+            }
+
+            if (MonthClosure::isClosed($value)) {
+                $fail(MonthClosed::message(MonthClosure::monthOf($value)));
+            }
+        };
     }
 
     /**

@@ -3,7 +3,9 @@
 namespace App\Http\Requests\Settings;
 
 use App\Concerns\BusinessDateRules;
+use App\Concerns\MoneyRules;
 use App\Models\MessSetting;
+use Closure;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -11,7 +13,7 @@ use Illuminate\Support\Facades\Gate;
 
 class UpdateMessSettingsRequest extends FormRequest
 {
-    use BusinessDateRules;
+    use BusinessDateRules, MoneyRules;
 
     /**
      * Determine if the user is authorized to make this request.
@@ -24,16 +26,16 @@ class UpdateMessSettingsRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|Closure|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
             'mess_name' => ['nullable', 'string', 'max:150'],
             'mess_address' => ['nullable', 'string', 'max:1000'],
-            // A plain decimal string that fits DECIMAL(12,2); never parsed as a float.
-            'opening_balance' => ['required', 'string', 'regex:/^\d{1,10}(\.\d{1,2})?$/'],
-            'fund_start_date' => ['nullable', ...$this->notInTheFutureRules()],
+            'opening_balance' => $this->moneyRules(),
+            // The opening-balance ledger entry is dated at the fund start.
+            'fund_start_date' => ['nullable', 'required_unless:opening_balance,0,0.0,0.00', ...$this->notInTheFutureRules()],
             'grocery_edit_window_minutes' => ['required', 'integer', 'min:1', 'max:1440'],
             'members_can_view_balance' => ['required', 'boolean'],
             'max_upload_kb' => ['required', 'integer', 'min:100', 'max:20480'],
@@ -49,7 +51,8 @@ class UpdateMessSettingsRequest extends FormRequest
     {
         return [
             ...$this->businessDateMessages('fund_start_date'),
-            'opening_balance.regex' => __('Enter an amount of zero or more with at most two decimal places.'),
+            ...$this->moneyMessages('opening_balance'),
+            'fund_start_date.required_unless' => __('Set the fund start date to record an opening balance.'),
         ];
     }
 

@@ -19,7 +19,7 @@ type Props = {
     settings: MessSettings;
     /** Today in Asia/Dhaka (Y-m-d); the latest allowed fund start date. */
     today: string;
-    can: { update: boolean };
+    can: { update: boolean; changeOpeningBalance: boolean };
 };
 
 export default function MessSettingsEdit({ settings, today, can }: Props) {
@@ -57,6 +57,10 @@ export default function MessSettingsEdit({ settings, today, can }: Props) {
                       'Mess-wide rules for the fund, grocery purchases and uploads',
                   ),
     };
+
+    const fundLockedHelp = __(
+        'Locked because the ledger has activity. Correct the fund with a manual adjustment.',
+    );
 
     const fields = (
         <>
@@ -121,9 +125,15 @@ export default function MessSettingsEdit({ settings, today, can }: Props) {
                     <Field
                         id="opening_balance"
                         label={__('Opening balance (৳)')}
-                        help={__('Currently :amount.', {
-                            amount: formatMoney(settings.opening_balance),
-                        })}
+                        help={
+                            can.changeOpeningBalance
+                                ? __('Currently :amount.', {
+                                      amount: formatMoney(
+                                          settings.opening_balance,
+                                      ),
+                                  })
+                                : fundLockedHelp
+                        }
                         error={form.errors.opening_balance}
                     >
                         <Input
@@ -137,21 +147,27 @@ export default function MessSettingsEdit({ settings, today, can }: Props) {
                                 )
                             }
                             className="text-right tabular-nums"
+                            readOnly={!can.changeOpeningBalance}
                             required
                         />
                     </Field>
                     <Field
                         id="fund_start_date"
                         label={__('Fund start date')}
-                        help={__(
-                            'No purchase or deposit can be dated before it.',
-                        )}
+                        help={
+                            can.changeOpeningBalance
+                                ? __(
+                                      'No purchase or deposit can be dated before it.',
+                                  )
+                                : fundLockedHelp
+                        }
                         error={form.errors.fund_start_date}
                     >
                         <Input
                             id="fund_start_date"
                             type="date"
                             max={today}
+                            readOnly={!can.changeOpeningBalance}
                             value={form.data.fund_start_date}
                             onChange={(event) =>
                                 form.setData(

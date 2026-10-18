@@ -6,6 +6,7 @@ use App\Actions\Settings\UpdateMessSettings;
 use App\Concerns\BusinessCalendar;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\UpdateMessSettingsRequest;
+use App\Models\LedgerEntry;
 use App\Models\MessSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -41,6 +42,8 @@ class MessSettingsController extends Controller
             'today' => BusinessCalendar::today()->toDateString(),
             'can' => [
                 'update' => $request->user()->can('update', $settings),
+                // Locked once the ledger holds more than the opening balance.
+                'changeOpeningBalance' => ! LedgerEntry::hasActivityBeyondOpeningBalance(),
             ],
         ]);
     }

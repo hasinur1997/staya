@@ -10,4 +10,5 @@ enum AuditLog: string
     case Auth = 'auth';
     case Access = 'access';
     case Settings = 'settings';
+    case Ledger = 'ledger';
 }

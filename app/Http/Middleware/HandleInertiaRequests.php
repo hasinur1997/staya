@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Fund;
 use App\Models\MessSetting;
 use App\Models\Permission;
 use Illuminate\Http\Request;
@@ -65,7 +66,9 @@ class HandleInertiaRequests extends Middleware
             ],
             // Decimal string, or null when the user may not see the balance.
             'fund' => [
-                'balance' => null,
+                'balance' => fn (): ?string => $request->user()?->can('viewBalance', Fund::class)
+                    ? Fund::current()->balance
+                    : null,
             ],
         ];
     }
