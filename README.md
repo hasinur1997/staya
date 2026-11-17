@@ -279,7 +279,14 @@ QUEUE_CONNECTION=database
 CACHE_STORE=database
 
 MAIL_MAILER=smtp   # then your cPanel mailbox settings
+
+# First Admin: created on deploy only while no Admin exists (min 8 characters).
+STAYA_OWNER_NAME=Your Name
+STAYA_OWNER_EMAIL=you@example.com
+STAYA_OWNER_PASSWORD=...
 ```
+
+After the first login, remove `STAYA_OWNER_PASSWORD` from `ENV_FILE`. Changing these values later does not reset an existing account.
 
 Variables, unlike secrets, can be read by anyone with write access to the repository, and the database password and `APP_KEY` are in this file. Keep the repository private and limit who can write to it. If `ENV_FILE` is empty, the deploy keeps whatever `.env` is already on the server. Never change `APP_KEY` after launch: it would invalidate the encrypted NID numbers and every session.
 

@@ -29,6 +29,12 @@ artisan down --retry=60 --refresh=15 || true
 
 artisan migrate --force
 
+# Roles, permissions and the settings row (idempotent), then the first Admin
+# from STAYA_OWNER_* in .env. The owner is only created while no Admin exists.
+artisan db:seed --class=AccessControlSeeder --force
+artisan db:seed --class=MessSettingsSeeder --force
+artisan staya:create-owner
+
 # Rebuild the config, route, event and view caches from the new code.
 artisan optimize:clear
 artisan optimize
