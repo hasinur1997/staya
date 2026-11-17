@@ -21,6 +21,14 @@ class ReportPolicy
     }
 
     /**
+     * Closing and reopening months.
+     */
+    public function closeMonth(User $actor, string $report = MonthlyReport::class): bool
+    {
+        return $actor->can(Permission::ReportCloseMonth->value);
+    }
+
+    /**
      * The per-member table with everyone's figures.
      */
     public function viewAll(User $actor, string $report = MonthlyReport::class): bool

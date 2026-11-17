@@ -8,13 +8,11 @@ namespace App\Enums;
  */
 enum UpcomingFeature: string
 {
-    case Reports = 'reports';
     case AuditLog = 'audit-log';
 
     public function title(): string
     {
         return match ($this) {
-            self::Reports => __('Reports'),
             self::AuditLog => __('Audit log'),
         };
     }
@@ -22,7 +20,6 @@ enum UpcomingFeature: string
     public function description(): string
     {
         return match ($this) {
-            self::Reports => __('Monthly summaries of spending, deposits and each member’s due or credit.'),
             self::AuditLog => __('A read-only history of every financial and access change.'),
         };
     }
@@ -35,11 +32,6 @@ enum UpcomingFeature: string
     public function highlights(): array
     {
         return match ($this) {
-            self::Reports => [
-                __('Totals for each month in Asia/Dhaka time'),
-                __('Equal share, deposits and due or credit for every member'),
-                __('Close a month so its figures can no longer change'),
-            ],
             self::AuditLog => [
                 __('Before and after values for every financial change'),
                 __('Who made each change, when and from which IP address'),
@@ -57,7 +49,6 @@ enum UpcomingFeature: string
     public function permissions(): array
     {
         return match ($this) {
-            self::Reports => [Permission::ReportViewOwn, Permission::ReportViewAll],
             self::AuditLog => [Permission::AuditView],
         };
     }

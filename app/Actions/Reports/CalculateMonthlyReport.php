@@ -8,6 +8,7 @@ use App\Enums\DepositStatus;
 use App\Models\Deposit;
 use App\Models\GroceryPurchase;
 use App\Models\Member;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Works out one month (evaluated in Asia/Dhaka) from the records dated in
@@ -25,6 +26,16 @@ class CalculateMonthlyReport
     {
         [$first, $last] = BusinessCalendar::monthDates($year, $month);
 
+        return $this->forRange($first, $last);
+    }
+
+    /**
+     * The same figures for any run of business dates (Y-m-d, inclusive).
+     * With a range the share is the range's expenses split between the
+     * members who lived in the mess on any day of it.
+     */
+    public function forRange(string $first, string $last): MonthlyReport
+    {
         $depositsByMember = [];
         $deposits = '0.00';
 
@@ -46,7 +57,7 @@ class CalculateMonthlyReport
         }
 
         $members = Member::query()
-            ->activeInMonth($year, $month)
+            ->whereHas('stays', fn (Builder $stays) => $stays->overlapping($first, $last))
             ->orderBy('first_name')
             ->orderBy('last_name')
             ->orderBy('id')
@@ -70,6 +81,6 @@ class CalculateMonthlyReport
             ];
         }
 
-        return new MonthlyReport($year, $month, $deposits, $expenses, $count, $share, $leftover, $rows);
+        return new MonthlyReport($first, $last, $deposits, $expenses, $count, $share, $leftover, $rows);
     }
 }

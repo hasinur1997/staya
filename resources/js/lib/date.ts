@@ -31,3 +31,14 @@ const businessDate = new Intl.DateTimeFormat('en-GB', {
 export function formatBusinessDate(date: string): string {
     return businessDate.format(new Date(`${date}T00:00:00Z`));
 }
+
+const monthName = new Intl.DateTimeFormat('en-GB', {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+});
+
+/** "October 2026" for a YYYY-MM month. */
+export function formatMonth(month: string): string {
+    return monthName.format(new Date(`${month}-01T00:00:00Z`));
+}

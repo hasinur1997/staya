@@ -15,6 +15,7 @@ use App\Http\Controllers\Ledger\AdjustmentController;
 use App\Http\Controllers\Ledger\LedgerController;
 use App\Http\Controllers\Members\MemberController;
 use App\Http\Controllers\Members\MemberFileController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Roles\RoleController;
 use App\Http\Controllers\UpcomingFeatureController;
 use App\Http\Controllers\Users\UserController;
@@ -30,6 +31,10 @@ Route::get('registration/status', RegistrationStatusController::class)
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
+
+    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::post('reports/close', [ReportController::class, 'close'])->name('reports.close');
+    Route::post('reports/reopen', [ReportController::class, 'reopen'])->name('reports.reopen');
 
     // Users are deactivated, never deleted.
     Route::resource('users', UserController::class)->except(['show', 'destroy']);

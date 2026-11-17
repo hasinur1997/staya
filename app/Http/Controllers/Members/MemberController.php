@@ -7,6 +7,8 @@ use App\Actions\Members\DeactivateMember;
 use App\Actions\Members\DeleteMember;
 use App\Actions\Members\ReactivateMember;
 use App\Actions\Members\UpdateMember;
+use App\Actions\Reports\CalculateMonthlyReport;
+use App\Actions\Reports\MonthlyReport;
 use App\Concerns\BusinessCalendar;
 use App\Concerns\PresentsDeposits;
 use App\Concerns\PresentsMembers;
@@ -132,6 +134,7 @@ class MemberController extends Controller
             ...$this->nidProp($member, $actor, 'profile'),
             'deposits' => $this->depositHistory($member, $actor),
             'purchases' => $this->purchaseHistory($member, $actor),
+            'monthly' => $this->monthlyHistory($member, $actor),
             'today' => BusinessCalendar::today()->toDateString(),
             'can' => [
                 'update' => $actor->can('update', $member),
@@ -142,6 +145,44 @@ class MemberController extends Controller
                 'viewAny' => $actor->can('viewAny', Member::class),
             ],
         ]);
+    }
+
+    /**
+     * The member's deposits, share and due or credit for the last six
+     * months they lived in the mess, newest first. Each month stands alone
+     * (no carry-forward). Null hides the section from viewers without
+     * `report.view_all` who are not looking at their own profile.
+     *
+     * @return array<int, array{month: string, deposits: string, share: string, due_credit: string}>|null
+     */
+    private function monthlyHistory(Member $member, User $viewer): ?array
+    {
+        $visible = Gate::forUser($viewer)->allows('viewAll', MonthlyReport::class)
+            || ($member->user_id === $viewer->id && Gate::forUser($viewer)->allows('viewOwn', MonthlyReport::class));
+
+        if (! $visible) {
+            return null;
+        }
+
+        $calculate = app(CalculateMonthlyReport::class);
+        $rows = [];
+        $cursor = BusinessCalendar::today()->startOfMonth();
+
+        for ($step = 0; $step < 6; $step++) {
+            $month = $cursor->subMonthsNoOverflow($step);
+            $row = $calculate->handle($month->year, $month->month)->rowFor($member->id);
+
+            if ($row !== null) {
+                $rows[] = [
+                    'month' => $month->format('Y-m'),
+                    'deposits' => $row['deposits'],
+                    'share' => $row['share'],
+                    'due_credit' => $row['due_credit'],
+                ];
+            }
+        }
+
+        return $rows;
     }
 
     /**

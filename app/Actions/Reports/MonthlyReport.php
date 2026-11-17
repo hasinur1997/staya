@@ -19,8 +19,8 @@ final readonly class MonthlyReport
      * @param  list<MemberRow>  $members  One row per member active in the month.
      */
     public function __construct(
-        public int $year,
-        public int $month,
+        public string $from,
+        public string $to,
         public string $deposits,
         public string $expenses,
         public int $activeMembers,

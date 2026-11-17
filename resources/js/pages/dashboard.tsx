@@ -10,7 +10,7 @@ import { DashboardTemplate } from '@/components/templates/dashboard-template';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MonthPicker } from '@/components/ui/month-picker';
-import { formatBusinessDate } from '@/lib/date';
+import { formatBusinessDate, formatMonth } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { dashboard } from '@/routes';
@@ -23,16 +23,6 @@ import {
 } from '@/routes/grocery';
 import { index as payables } from '@/routes/payables';
 import type { DashboardProps, MonthlyMemberRow } from '@/types';
-
-const monthName = new Intl.DateTimeFormat('en-GB', {
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC',
-});
-
-function formatMonth(month: string): string {
-    return monthName.format(new Date(`${month}-01T00:00:00Z`));
-}
 
 export default function Dashboard({
     month,

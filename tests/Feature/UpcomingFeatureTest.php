@@ -16,7 +16,7 @@ class UpcomingFeatureTest extends TestCase
 
     public function test_guests_are_redirected_to_the_login_page()
     {
-        $this->get(route('upcoming', UpcomingFeature::Reports))->assertRedirect(route('login'));
+        $this->get(route('upcoming', UpcomingFeature::AuditLog))->assertRedirect(route('login'));
     }
 
     public function test_every_upcoming_screen_shows_its_coming_soon_page_to_permitted_users()
@@ -46,7 +46,7 @@ class UpcomingFeatureTest extends TestCase
 
     public function test_unknown_paths_are_not_found()
     {
-        $this->actingAs(User::factory()->withPermissions(Permission::ReportViewOwn)->create())
+        $this->actingAs(User::factory()->withPermissions(Permission::AuditView)->create())
             ->get('/not-a-feature')
             ->assertNotFound();
     }

@@ -19,6 +19,7 @@ import { index as grocery } from '@/routes/grocery';
 import { index as ledger } from '@/routes/ledger';
 import { index as members } from '@/routes/members';
 import { index as payables } from '@/routes/payables';
+import { index as reports } from '@/routes/reports';
 import { edit as messSettings } from '@/routes/mess-settings';
 import { index as roles } from '@/routes/roles';
 import { index as users } from '@/routes/users';
@@ -55,7 +56,7 @@ export const appNavigation: AppNavSection[] = [
             },
             {
                 title: 'Reports',
-                href: upcoming('reports'),
+                href: reports(),
                 icon: ChartColumn,
                 permissions: ['report.view_own', 'report.view_all'],
             },
