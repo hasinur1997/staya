@@ -15,6 +15,7 @@ Staya is a mess management system for shared houses and hostels. It keeps member
 - [Tech stack](#tech-stack)
 - [Development installation](#development-installation)
 - [Everyday commands](#everyday-commands)
+- [Deployment to cPanel](#deployment-to-cpanel)
 - [Project layout](#project-layout)
 - [Documentation](#documentation)
 
@@ -212,6 +213,105 @@ Wayfinder writes `resources/js/actions`, `resources/js/routes` and `resources/js
 ```bash
 php artisan wayfinder:generate --with-form
 ```
+
+## Deployment to cPanel
+
+Every push to `main` that passes the `tests` workflow is deployed automatically by `.github/workflows/deploy.yml`. You can also run it by hand from the Actions tab (**deploy** → **Run workflow**).
+
+The server never installs or compiles anything. GitHub Actions installs the production Composer dependencies, builds the frontend, and sends the result over SSH with `rsync`. Only files whose content changed are uploaded, so a normal deploy moves a few hundred KB and takes about a minute, most of it spent building in CI. Then `deploy/post-deploy.sh` runs on the server: maintenance mode on, `migrate --force`, rebuild the caches, restart the queue worker, maintenance mode off.
+
+The server's `.env` is written from the `ENV_FILE` variable on every deploy (see GitHub setup). `storage/` (uploads, logs, sessions) is never touched.
+
+### One-time server setup
+
+1. **PHP 8.4.** In cPanel open **MultiPHP Manager** and set the domain to PHP 8.4. Enable `bcmath`, `mbstring`, `pdo_mysql`, `fileinfo`, `intl` and `gd` (or `imagick`) in **Select PHP Version → Extensions**.
+2. **Database.** Create a MySQL database and user in **MySQL Databases** and give the user all privileges.
+3. **SSH access.** Enable SSH for the account (**SSH Access**), then create a key pair for deploys on your own computer:
+
+    ```bash
+    ssh-keygen -t ed25519 -f staya-deploy -C "staya deploy" -N ""
+    ```
+
+    In cPanel go to **SSH Access → Import Key**, paste `staya-deploy.pub` as the public key, and **Authorize** it.
+
+4. **App folder.** Pick a folder outside `public_html`, for example `/home/USER/staya`, and create it. In **Domains → Manage**, set the domain's **Document Root** to `/home/USER/staya/public`. If your host does not allow that, keep the app folder as is and replace `public_html` with a symlink to `/home/USER/staya/public`.
+5. **Queue worker.** Invitation and notification emails are queued. In **Cron Jobs** add one job that runs every minute (use your PHP 8.4 path from step 6):
+
+    ```cron
+    * * * * * cd /home/USER/staya && /opt/cpanel/ea-php84/root/usr/bin/php artisan queue:work --stop-when-empty --tries=1 --max-time=55 >> /dev/null 2>&1
+    ```
+
+6. **Find the PHP path.** Over SSH, `ls /opt/cpanel/ | grep ea-php84` confirms it. The usual path is `/opt/cpanel/ea-php84/root/usr/bin/php`.
+
+### GitHub setup
+
+In the repository go to **Settings → Environments → New environment** and create `production`. Add **required reviewers** there if you want a manual approval before each deploy. Then add these to that environment:
+
+| Type     | Name              | Value                                                                                           |
+| -------- | ----------------- | ----------------------------------------------------------------------------------------------- |
+| Secret   | `SSH_HOST`        | Server hostname or IP                                                                           |
+| Secret   | `SSH_USER`        | cPanel username                                                                                 |
+| Secret   | `SSH_PORT`        | SSH port; leave out for 22 (many hosts use a custom one)                                        |
+| Secret   | `SSH_PRIVATE_KEY` | Contents of `staya-deploy` (the private key)                                                    |
+| Secret   | `SSH_KNOWN_HOSTS` | Output of `ssh-keyscan -p PORT HOST`                                                            |
+| Secret   | `DEPLOY_PATH`     | `/home/USER/staya`                                                                              |
+| Variable | `PHP_BIN`         | `/opt/cpanel/ea-php84/root/usr/bin/php` (the default `php` is often an older version on cPanel) |
+
+`ENV_FILE` is copied to `.env` on the server at every deploy, so edit the variable and deploy to change a setting. Start from `.env.example`:
+
+```dotenv
+APP_NAME=Staya
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://your-domain.example
+APP_KEY=base64:...   # run `php artisan key:generate --show` locally and paste the result
+
+DB_CONNECTION=mysql
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=cpaneluser_staya
+DB_USERNAME=cpaneluser_staya
+DB_PASSWORD=...
+
+SESSION_DRIVER=database
+SESSION_SECURE_COOKIE=true
+QUEUE_CONNECTION=database
+CACHE_STORE=database
+
+MAIL_MAILER=smtp   # then your cPanel mailbox settings
+```
+
+Variables, unlike secrets, can be read by anyone with write access to the repository, and the database password and `APP_KEY` are in this file. Keep the repository private and limit who can write to it. If `ENV_FILE` is empty, the deploy keeps whatever `.env` is already on the server. Never change `APP_KEY` after launch: it would invalidate the encrypted NID numbers and every session.
+
+`SSH_KNOWN_HOSTS` pins the server's host key, so the deploy refuses to connect to anything else. Get it from a network you trust.
+
+### First deploy
+
+1. Run the **deploy** workflow once (or push to `main`). It uploads the code and runs the migrations.
+2. Over SSH, load the roles and permissions and the default settings, and create the first Admin. These are not part of every deploy:
+
+    ```bash
+    cd /home/USER/staya
+    PHP=/opt/cpanel/ea-php84/root/usr/bin/php
+    $PHP artisan db:seed --class=AccessControlSeeder --force
+    $PHP artisan db:seed --class=MessSettingsSeeder --force
+    $PHP artisan tinker --execute '$u = App\Models\User::create(["name" => "Your name", "name_bn" => "আপনার নাম", "email" => "you@example.com", "password" => "a-long-password"]); $u->forceFill(["email_verified_at" => now()])->save(); $u->assignRole(App\Models\Role::admin());'
+    ```
+
+3. Sign in, change the password, and set the mess name, opening balance and fund start date in **Settings**.
+
+Do not run `php artisan db:seed` without `--class` on the server; it creates demo data.
+
+### Rolling back
+
+Re-run the **deploy** workflow from the last good commit (**Run workflow**, choose that commit's branch or revert on `main`). Migrations are not rolled back automatically, so write them to be backwards compatible, or run `php artisan migrate:rollback --step=1 --force` over SSH before redeploying.
+
+### If a deploy fails
+
+- The tests must pass first. A red `tests` run means no deploy starts.
+- If `migrate` fails, the site stays in maintenance mode on purpose, because the new code is live but the database is not ready for it. Fix the cause, then run `bash deploy/post-deploy.sh` on the server (with `PHP_BIN` set) or re-run the workflow.
+- `permission denied (publickey)`: the public key is not authorised in cPanel, or `SSH_PRIVATE_KEY` is missing its final newline or has extra characters.
+- `Host key verification failed`: `SSH_KNOWN_HOSTS` was made for a different host or port.
 
 ## Project layout
 

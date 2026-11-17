@@ -1,0 +1,136 @@
+name: deploy
+
+# Deploys to the cPanel server over SSH once the `tests` workflow has passed on
+# main. It can also be run by hand from the Actions tab.
+on:
+  workflow_run:
+    workflows: [tests]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deploy at a time; a newer push waits instead of cancelling a deploy that
+# is already running.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Add required reviewers to this environment in the repository settings if
+    # you want a manual approval before each deploy.
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: '8.4'
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+          cache: npm
+
+      # The server only receives finished files: production dependencies and
+      # the compiled frontend. Nothing is installed or compiled over there.
+      - name: Install PHP dependencies (production only)
+        run: |
+            cp .env.example .env
+          composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+          php artisan key:generate --no-interaction
+
+      - name: Build the frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Prepare SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      # --checksum sends only files whose content changed (a fresh build gives
+      # every file a new timestamp), so most deploys move a few hundred KB.
+      # Anything excluded is left alone on the server, including .env (written
+      # in the next step) and storage/ (uploads, logs, sessions).
+      - name: Sync files
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          rsync -rlz --checksum --delete --omit-dir-times --chmod=D755,F644 --stats \
+            -e "ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='node_modules/' \
+            --exclude='tests/' \
+            --exclude='docs/' \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            --exclude='/storage/' \
+            --exclude='/public/storage' \
+            --exclude='/public/hot' \
+            --exclude='/database/*.sqlite' \
+            ./ "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/"
+
+      # The server's .env comes from the ENV_FILE variable of the `production`
+      # environment, so changing a setting is a variable edit plus a deploy.
+      # If the variable is empty the .env already on the server is kept.
+      # Repository variables are readable by anyone with write access to the
+      # repository, unlike secrets.
+      - name: Write .env
+        env:
+          ENV_FILE: ${{ vars.ENV_FILE }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          if [ -z "${ENV_FILE}" ]; then
+            echo "ENV_FILE is not set; keeping the .env on the server."
+            exit 0
+          fi
+          umask 077
+          printf '%s\n' "${ENV_FILE}" > "${RUNNER_TEMP}/env.production"
+          rsync -z --chmod=F600 \
+            -e "ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
+            "${RUNNER_TEMP}/env.production" "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/.env"
+          rm -f "${RUNNER_TEMP}/env.production"
+
+      - name: Migrate and refresh caches
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          PHP_BIN: ${{ vars.PHP_BIN || 'php' }}
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT}" -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            "${SSH_USER}@${SSH_HOST}" \
+            "cd '${DEPLOY_PATH}' && PHP_BIN='${PHP_BIN}' bash deploy/post-deploy.sh"
