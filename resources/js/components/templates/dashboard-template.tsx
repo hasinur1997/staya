@@ -11,6 +11,8 @@ import {
 
 type Props = {
     header: PageHeaderProps;
+    /** The member's own account, shown first and largest: three StatCards. */
+    glance?: ReactNode[];
     /** Two to four StatCards. */
     stats?: ReactNode[];
     /** What needs doing: recent purchases, the per-member table, queues. */
@@ -19,10 +21,25 @@ type Props = {
     aside?: ReactNode;
 };
 
-export function DashboardTemplate({ header, stats, children, aside }: Props) {
+export function DashboardTemplate({
+    header,
+    glance,
+    stats,
+    children,
+    aside,
+}: Props) {
     return (
         <PageStack>
             <PageHeader {...header} />
+            {glance && glance.length > 0 && (
+                <PageGrid>
+                    {glance.map((card, index) => (
+                        <div key={index} className={span.aside}>
+                            {card}
+                        </div>
+                    ))}
+                </PageGrid>
+            )}
             {stats && stats.length > 0 && <StatGrid stats={stats} />}
             <PageGrid>
                 <RegionStack className={aside ? span.main : span.full}>

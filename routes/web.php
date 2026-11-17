@@ -14,6 +14,8 @@ use App\Http\Controllers\Grocery\PayableController;
 use App\Http\Controllers\Grocery\PurchaseToolsController;
 use App\Http\Controllers\Ledger\AdjustmentController;
 use App\Http\Controllers\Ledger\LedgerController;
+use App\Http\Controllers\Meals\MealController;
+use App\Http\Controllers\Meals\MealTypeController;
 use App\Http\Controllers\Members\InvitationController;
 use App\Http\Controllers\Members\MemberController;
 use App\Http\Controllers\Members\MemberFileController;
@@ -53,6 +55,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('members/invitations', [InvitationController::class, 'store'])->name('invitations.store');
     Route::post('members/invitations/{invitation}/resend', [InvitationController::class, 'resend'])->name('invitations.resend');
     Route::post('members/invitations/{invitation}/revoke', [InvitationController::class, 'revoke'])->name('invitations.revoke');
+
+    // Daily meals: entered per day for everyone, or viewed per month for oneself.
+    // Meal types are switched off, never deleted.
+    Route::get('meals', [MealController::class, 'index'])->name('meals.index');
+    Route::post('meals', [MealController::class, 'store'])->name('meals.store');
+    Route::get('meals/mine', [MealController::class, 'mine'])->name('meals.mine');
+    Route::get('meals/types', [MealTypeController::class, 'index'])->name('meal-types.index');
+    Route::post('meals/types', [MealTypeController::class, 'store'])->name('meal-types.store');
+    Route::put('meals/types/{mealType}', [MealTypeController::class, 'update'])->name('meal-types.update');
 
     // Hard delete is refused for members with financial records.
     Route::resource('members', MemberController::class);

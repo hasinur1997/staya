@@ -4,12 +4,14 @@ namespace App\Http\Requests\Settings;
 
 use App\Concerns\BusinessDateRules;
 use App\Concerns\MoneyRules;
+use App\Enums\CostSplit;
 use App\Models\MessSetting;
 use Closure;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class UpdateMessSettingsRequest extends FormRequest
 {
@@ -39,6 +41,7 @@ class UpdateMessSettingsRequest extends FormRequest
             'grocery_edit_window_minutes' => ['required', 'integer', 'min:1', 'max:1440'],
             'members_can_view_balance' => ['required', 'boolean'],
             'max_upload_kb' => ['required', 'integer', 'min:100', 'max:20480'],
+            'cost_split' => ['required', Rule::enum(CostSplit::class)],
         ];
     }
 
@@ -59,7 +62,7 @@ class UpdateMessSettingsRequest extends FormRequest
     /**
      * The validated settings, with the opening balance at scale 2.
      *
-     * @return array{mess_name: string|null, mess_address: string|null, opening_balance: string, fund_start_date: string|null, grocery_edit_window_minutes: int, members_can_view_balance: bool, max_upload_kb: int}
+     * @return array{mess_name: string|null, mess_address: string|null, opening_balance: string, fund_start_date: string|null, grocery_edit_window_minutes: int, members_can_view_balance: bool, max_upload_kb: int, cost_split: string}
      */
     public function settings(): array
     {
@@ -74,6 +77,7 @@ class UpdateMessSettingsRequest extends FormRequest
             'grocery_edit_window_minutes' => $this->integer('grocery_edit_window_minutes'),
             'members_can_view_balance' => $this->boolean('members_can_view_balance'),
             'max_upload_kb' => $this->integer('max_upload_kb'),
+            'cost_split' => $this->string('cost_split')->toString(),
         ];
     }
 }

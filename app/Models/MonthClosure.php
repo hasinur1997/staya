@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Casts\BusinessDate;
+use App\Enums\CostSplit;
 use App\Exceptions\MonthClosed;
 use Carbon\CarbonImmutable;
 use Database\Factories\MonthClosureFactory;
@@ -26,10 +27,11 @@ use InvalidArgumentException;
  * @property int|null $reopened_by
  * @property CarbonImmutable|null $reopened_at
  * @property string|null $reopen_reason
+ * @property CostSplit|null $cost_split
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  */
-#[Fillable(['month', 'closed_by', 'closed_at', 'reopened_by', 'reopened_at', 'reopen_reason'])]
+#[Fillable(['month', 'closed_by', 'closed_at', 'reopened_by', 'reopened_at', 'reopen_reason', 'cost_split'])]
 class MonthClosure extends Model
 {
     /** @use HasFactory<MonthClosureFactory> */
@@ -46,6 +48,7 @@ class MonthClosure extends Model
             'month' => BusinessDate::class,
             'closed_at' => 'immutable_datetime',
             'reopened_at' => 'immutable_datetime',
+            'cost_split' => CostSplit::class,
         ];
     }
 

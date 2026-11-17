@@ -6,6 +6,7 @@ export type MonthlyMemberRow = {
     member_id: number;
     name: string;
     deposits: string;
+    meals: number;
     share: string;
     /** Deposits minus share: positive is credit, negative is due. */
     due_credit: string;
@@ -14,6 +15,8 @@ export type MonthlyMemberRow = {
 export type MonthlyFigures = {
     deposits: string;
     expenses: string;
+    split: 'equal' | 'meals';
+    total_meals: number;
     active_members: number;
     share: string;
     /** Expenses the truncated shares leave uncovered. */
@@ -37,6 +40,13 @@ export type DashboardProps = {
     summary: MonthlyMemberRow | null;
     /** Everyone's figures; null without `report.view_all`. */
     report: MonthlyFigures | null;
+    /** The viewer's own totals; null without a member profile. */
+    account: {
+        /** Approved deposits; null without access to deposits. */
+        deposited: { total: string; month: string } | null;
+        /** Grocery bought by the viewer, voided ones excluded. */
+        bajar: { total: string; month: string } | null;
+    } | null;
     /** What the fund still owes the viewer; null without a member profile. */
     owed: string | null;
     recentDeposits: DepositRow[];

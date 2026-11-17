@@ -122,14 +122,22 @@ export default function ReportsIndex({
         />,
         <StatCard
             key="share"
-            label={__('Share per member')}
+            label={
+                report.figures.split === 'meals'
+                    ? __('Cost per meal')
+                    : __('Share per member')
+            }
             value={formatMoney(report.figures.share)}
             hint={
                 report.figures.leftover !== '0.00'
                     ? __(':amount left over', {
                           amount: formatMoney(report.figures.leftover),
                       })
-                    : undefined
+                    : report.figures.split === 'meals'
+                      ? __(':count meals', {
+                            count: report.figures.total_meals,
+                        })
+                      : undefined
             }
         />,
         ...(report.ledger
@@ -172,6 +180,16 @@ export default function ReportsIndex({
             align: 'right',
             cell: (row) => money(row.deposits),
         },
+        ...(report.figures.split === 'meals'
+            ? [
+                  {
+                      key: 'meals',
+                      header: __('Meals'),
+                      align: 'right' as const,
+                      cell: (row: MonthlyMemberRow) => String(row.meals),
+                  },
+              ]
+            : []),
         {
             key: 'share',
             header: __('Share'),

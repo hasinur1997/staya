@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Members\SummarizeMemberAccount;
 use App\Actions\Reports\CalculateMonthlyReport;
 use App\Actions\Reports\MonthlyReport;
 use App\Concerns\BusinessCalendar;
@@ -29,7 +30,7 @@ class DashboardController extends Controller
 {
     use PresentsDeposits, PresentsPurchases;
 
-    public function __invoke(Request $request, CalculateMonthlyReport $calculate): Response
+    public function __invoke(Request $request, CalculateMonthlyReport $calculate, SummarizeMemberAccount $summarizeAccount): Response
     {
         $actor = $request->user();
         $member = $actor->member;
@@ -41,6 +42,8 @@ class DashboardController extends Controller
             ? $calculate->handle((int) substr($month, 0, 4), (int) substr($month, 5, 2))
             : null;
         $viewAll = Gate::allows('viewAll', MonthlyReport::class);
+        [$monthFirst, $monthLast] = BusinessCalendar::monthDates((int) substr($month, 0, 4), (int) substr($month, 5, 2));
+        $account = $member !== null ? $summarizeAccount->handle($member, $monthFirst, $monthLast) : null;
 
         return Inertia::render('dashboard', [
             'month' => $month,
@@ -51,11 +54,17 @@ class DashboardController extends Controller
             'report' => $report !== null && $viewAll ? [
                 'deposits' => $report->deposits,
                 'expenses' => $report->expenses,
+                'split' => $report->split->value,
                 'active_members' => $report->activeMembers,
+                'total_meals' => $report->totalMeals,
                 'share' => $report->share,
                 'leftover' => $report->leftover,
                 'members' => $report->members,
             ] : null,
+            'account' => $account === null ? null : [
+                'deposited' => $actor->can('viewAny', Deposit::class) ? $account['deposited'] : null,
+                'bajar' => $actor->can('viewAny', GroceryPurchase::class) ? $account['bajar'] : null,
+            ],
             'owed' => $member !== null ? $this->owedTo($member) : null,
             'recentDeposits' => $member !== null && $actor->can('viewAny', Deposit::class)
                 ? Deposit::query()->where('member_id', $member->id)->with('member:id,first_name,last_name,user_id')

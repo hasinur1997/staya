@@ -50,6 +50,10 @@ enum Permission: string
     case RoleView = 'role.view';
     case RoleManage = 'role.manage';
 
+    case MealViewOwn = 'meal.view_own';
+    case MealViewAll = 'meal.view_all';
+    case MealRecord = 'meal.record';
+
     case SettingsView = 'settings.view';
     case SettingsUpdate = 'settings.update';
 
@@ -104,6 +108,9 @@ enum Permission: string
             self::UserDeactivate => __('Deactivate and reactivate users'),
             self::RoleView => __('View roles'),
             self::RoleManage => __('Create, edit and delete roles'),
+            self::MealViewOwn => __('View own meals'),
+            self::MealViewAll => __('View every member\'s meals'),
+            self::MealRecord => __('Record daily meals for members'),
             self::SettingsView => __('View mess settings'),
             self::SettingsUpdate => __('Change mess settings'),
             self::AuditView => __('View the audit log'),
@@ -120,6 +127,7 @@ enum Permission: string
             'grocery' => __('Grocery purchases'),
             'deposit' => __('Deposits'),
             'ledger' => __('Ledger'),
+            'meal' => __('Meals'),
             'report' => __('Reports'),
             'user' => __('Users'),
             'role' => __('Roles and permissions'),

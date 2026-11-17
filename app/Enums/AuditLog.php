@@ -15,6 +15,7 @@ enum AuditLog: string
     case Deposit = 'deposit';
     case Grocery = 'grocery';
     case Report = 'report';
+    case Meal = 'meal';
 
     public function label(): string
     {
@@ -27,6 +28,7 @@ enum AuditLog: string
             self::Deposit => __('Deposits'),
             self::Grocery => __('Grocery purchases'),
             self::Report => __('Reports'),
+            self::Meal => __('Meals'),
         };
     }
 }

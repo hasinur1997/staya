@@ -31,6 +31,7 @@ export default function Dashboard({
     memberStatus,
     summary,
     report,
+    account,
     owed,
     recentDeposits,
     recentPurchases,
@@ -51,58 +52,87 @@ export default function Dashboard({
             { preserveScroll: true },
         );
 
-    const stats = [
+    const glance = [
+        ...(account?.deposited
+            ? [
+                  <StatCard
+                      key="deposited"
+                      label={__('You have deposited')}
+                      value={formatMoney(account.deposited.total)}
+                      hint={__('Total so far. :amount in :month', {
+                          amount: formatMoney(account.deposited.month),
+                          month: formatMonth(month),
+                      })}
+                  />,
+              ]
+            : []),
+        ...(account?.bajar
+            ? [
+                  <StatCard
+                      key="bajar"
+                      label={__('You spent on bajar')}
+                      value={formatMoney(account.bajar.total)}
+                      hint={__('Total so far. :amount in :month', {
+                          amount: formatMoney(account.bajar.month),
+                          month: formatMonth(month),
+                      })}
+                  />,
+              ]
+            : []),
         ...(balance !== null
             ? [
                   <StatCard
                       key="balance"
-                      label={__('Fund balance')}
+                      label={__('Fund balance now')}
                       value={formatMoney(balance)}
-                  />,
-              ]
-            : []),
-        ...(summary
-            ? [
-                  <StatCard
-                      key="deposits"
-                      label={__('Your deposits')}
-                      value={formatMoney(summary.deposits)}
-                      hint={formatMonth(month)}
-                  />,
-                  <StatCard
-                      key="share"
-                      label={__('Your share')}
-                      value={formatMoney(summary.share)}
-                      hint={
-                          report
-                              ? __(':members share :amount', {
-                                    members: countMembers(
-                                        report.active_members,
-                                    ),
-                                    amount: formatMoney(report.expenses),
-                                })
-                              : undefined
-                      }
-                  />,
-                  <StatCard
-                      key="due"
-                      label={__('Due or credit')}
-                      value={
-                          <SignedMoney
-                              value={summary.due_credit}
-                              positiveLabel={__('credit')}
-                              negativeLabel={__('due')}
-                          />
-                      }
-                      hint={
-                          summary.due_credit.startsWith('-')
-                              ? __('Still to pay this month')
-                              : __('Covered this month')
-                      }
+                      hint={__('Money in the mess fund today')}
                   />,
               ]
             : []),
     ];
+
+    const stats = summary
+        ? [
+              <StatCard
+                  key="share"
+                  label={
+                      report?.split === 'meals'
+                          ? __('Your meal cost')
+                          : __('Your share')
+                  }
+                  value={formatMoney(summary.share)}
+                  hint={
+                      report?.split === 'meals'
+                          ? __(':meals of :total meals', {
+                                meals: summary.meals,
+                                total: report.total_meals,
+                            })
+                          : report
+                            ? __(':members share :amount', {
+                                  members: countMembers(report.active_members),
+                                  amount: formatMoney(report.expenses),
+                              })
+                            : undefined
+                  }
+              />,
+              <StatCard
+                  key="due"
+                  label={__('Due or credit')}
+                  value={
+                      <SignedMoney
+                          value={summary.due_credit}
+                          positiveLabel={__('credit')}
+                          negativeLabel={__('due')}
+                      />
+                  }
+                  hint={
+                      summary.due_credit.startsWith('-')
+                          ? __('Still to pay this month')
+                          : __('Covered this month')
+                  }
+              />,
+          ]
+        : [];
 
     const columns: ResponsiveColumn<MonthlyMemberRow>[] = [
         { key: 'name', header: __('Member'), cell: (row) => row.name },
@@ -192,6 +222,7 @@ export default function Dashboard({
                         </div>
                     ),
                 }}
+                glance={glance.length > 0 ? glance : undefined}
                 stats={stats.length > 0 ? stats : undefined}
                 aside={
                     <>

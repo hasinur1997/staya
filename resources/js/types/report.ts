@@ -21,7 +21,10 @@ export type Report = {
     figures: {
         deposits: string;
         expenses: string;
+        split: 'equal' | 'meals';
         active_members: number;
+        total_meals: number;
+        /** The equal share, or the cost of one meal when split by meals. */
         share: string;
         leftover: string;
     };

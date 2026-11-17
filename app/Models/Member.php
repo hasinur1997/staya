@@ -129,6 +129,14 @@ class Member extends Model
     }
 
     /**
+     * @return HasMany<Meal, $this>
+     */
+    public function meals(): HasMany
+    {
+        return $this->hasMany(Meal::class);
+    }
+
+    /**
      * @return HasMany<MemberStay, $this>
      */
     public function stays(): HasMany

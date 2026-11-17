@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Settings;
 
 use App\Actions\Settings\UpdateMessSettings;
 use App\Concerns\BusinessCalendar;
+use App\Enums\CostSplit;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\UpdateMessSettingsRequest;
 use App\Models\LedgerEntry;
@@ -36,9 +37,11 @@ class MessSettingsController extends Controller
                 'grocery_edit_window_minutes' => $settings->grocery_edit_window_minutes,
                 'members_can_view_balance' => $settings->members_can_view_balance,
                 'max_upload_kb' => $settings->max_upload_kb,
+                'cost_split' => $settings->cost_split->value,
                 'updated_at' => $settings->updated_at?->toIso8601String(),
                 'updated_by' => $settings->updatedBy?->name,
             ],
+            'costSplits' => CostSplit::options(),
             'today' => BusinessCalendar::today()->toDateString(),
             'can' => [
                 'update' => $request->user()->can('update', $settings),

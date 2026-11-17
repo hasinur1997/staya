@@ -30,6 +30,7 @@ enum SystemRole: string
             Permission::ReportViewOwn,
             Permission::ReportViewAll,
             Permission::LedgerViewBalance,
+            Permission::MealViewOwn,
         ];
 
         return match ($this) {
@@ -45,6 +46,8 @@ enum SystemRole: string
                 Permission::DepositCreateForOthers,
                 Permission::DepositApprove,
                 Permission::LedgerViewTransactions,
+                Permission::MealViewAll,
+                Permission::MealRecord,
             ],
         };
     }

@@ -31,6 +31,7 @@ class MessSettingsTest extends TestCase
             'grocery_edit_window_minutes' => 45,
             'members_can_view_balance' => false,
             'max_upload_kb' => 2048,
+            'cost_split' => 'equal',
             ...$overrides,
         ];
     }

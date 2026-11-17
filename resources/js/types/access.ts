@@ -68,6 +68,7 @@ export type MessSettings = {
     grocery_edit_window_minutes: number;
     members_can_view_balance: boolean;
     max_upload_kb: number;
+    cost_split: 'equal' | 'meals';
     /** ISO 8601, UTC. */
     updated_at: string | null;
     updated_by: string | null;

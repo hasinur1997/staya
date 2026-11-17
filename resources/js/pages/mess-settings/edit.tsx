@@ -6,6 +6,7 @@ import { DetailTemplate } from '@/components/templates/detail-template';
 import { FormTemplate } from '@/components/templates/form-template';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Combobox } from '@/components/ui/combobox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,10 +21,16 @@ type Props = {
     settings: MessSettings;
     /** Today in Asia/Dhaka (Y-m-d); the latest allowed fund start date. */
     today: string;
+    costSplits: { value: string; label: string }[];
     can: { update: boolean; changeOpeningBalance: boolean };
 };
 
-export default function MessSettingsEdit({ settings, today, can }: Props) {
+export default function MessSettingsEdit({
+    settings,
+    today,
+    costSplits,
+    can,
+}: Props) {
     const __ = useTranslate();
     const form = useForm({
         mess_name: settings.mess_name ?? '',
@@ -35,6 +42,7 @@ export default function MessSettingsEdit({ settings, today, can }: Props) {
         ),
         members_can_view_balance: settings.members_can_view_balance,
         max_upload_kb: String(settings.max_upload_kb),
+        cost_split: settings.cost_split as string,
     });
 
     setLayoutProps({
@@ -224,6 +232,41 @@ export default function MessSettingsEdit({ settings, today, can }: Props) {
                             message={form.errors.members_can_view_balance}
                         />
                     </div>
+                </div>
+            </Fieldset>
+
+            <Fieldset legend={__('Cost sharing')}>
+                <div className="md:max-w-md">
+                    <Field
+                        id="cost_split"
+                        label={__('How the monthly cost is shared')}
+                        help={
+                            form.data.cost_split === 'meals'
+                                ? __(
+                                      'Total cost is divided by the total meals; each member pays for their own meals.',
+                                  )
+                                : __(
+                                      'Total cost is divided equally between every member who lived in the mess.',
+                                  )
+                        }
+                        error={form.errors.cost_split}
+                    >
+                        <Combobox
+                            id="cost_split"
+                            value={form.data.cost_split}
+                            onValueChange={(value) =>
+                                form.setData('cost_split', value)
+                            }
+                            options={costSplits}
+                            searchPlaceholder={__('Search')}
+                            emptyText={__('Nothing found.')}
+                        />
+                    </Field>
+                    <p className="mt-2 text-small text-ink-muted">
+                        {__(
+                            'A closed month keeps the setting it was closed with. Changing this affects open months only.',
+                        )}
+                    </p>
                 </div>
             </Fieldset>
 

@@ -5,6 +5,7 @@ import {
     HandCoins,
     LayoutGrid,
     ScrollText,
+    Utensils,
     Settings,
     ShieldCheck,
     ShoppingBasket,
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 import { dashboard } from '@/routes';
 import { index as audit } from '@/routes/audit';
+import { index as meals } from '@/routes/meals';
 import { index as approvals } from '@/routes/approvals';
 import { index as deposits } from '@/routes/deposits';
 import { index as grocery } from '@/routes/grocery';
@@ -29,7 +31,7 @@ import type { AppNavSection, NavProps } from '@/types';
 /*
  * The sidebar, from docs/layout.md (layer 2). Items declare the permissions
  * that show them; nothing here checks a role. Screens that are not built yet
- * link to the "coming soon" page (App\Enums\UpcomingFeature); switch each to
+ * link to a placeholder while they are being built; switch each to
  * its own Wayfinder route when it ships.
  */
 export const appNavigation: AppNavSection[] = [
@@ -72,6 +74,12 @@ export const appNavigation: AppNavSection[] = [
                 href: members(),
                 icon: Users,
                 permissions: ['member.view'],
+            },
+            {
+                title: 'Meals',
+                href: meals(),
+                icon: Utensils,
+                permissions: ['meal.view_own', 'meal.view_all', 'meal.record'],
             },
             {
                 title: 'Pending approvals',

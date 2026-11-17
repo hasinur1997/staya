@@ -103,6 +103,7 @@ trait PresentsAudit
             'month_closure' => __('Month'),
             'member' => __('Member'),
             'member_stay' => __('Stay'),
+            'meal_type' => __('Meal type'),
             'member_invitation' => __('Invitation'),
             'deposit' => __('Deposit'),
             'grocery_purchase' => __('Grocery purchase'),

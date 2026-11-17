@@ -16,7 +16,7 @@ class UpdateMessSettings
      * Save the mess settings, keep the opening-balance ledger entry in step
      * and log what changed.
      *
-     * @param  array{mess_name: string|null, mess_address: string|null, opening_balance: string, fund_start_date: string|null, grocery_edit_window_minutes: int, members_can_view_balance: bool, max_upload_kb: int}  $values
+     * @param  array{mess_name: string|null, mess_address: string|null, opening_balance: string, fund_start_date: string|null, grocery_edit_window_minutes: int, members_can_view_balance: bool, max_upload_kb: int, cost_split: string}  $values
      */
     public function handle(User $actor, array $values): MessSetting
     {

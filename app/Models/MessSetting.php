@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CostSplit;
 use Carbon\CarbonImmutable;
 use Database\Factories\MessSettingFactory;
 use DateTimeInterface;
@@ -24,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $grocery_edit_window_minutes
  * @property bool $members_can_view_balance
  * @property int $max_upload_kb
+ * @property CostSplit $cost_split
  * @property int|null $updated_by
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
@@ -36,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'grocery_edit_window_minutes',
     'members_can_view_balance',
     'max_upload_kb',
+    'cost_split',
 ])]
 class MessSetting extends Model
 {
@@ -64,6 +67,7 @@ class MessSetting extends Model
             'grocery_edit_window_minutes' => 'integer',
             'members_can_view_balance' => 'boolean',
             'max_upload_kb' => 'integer',
+            'cost_split' => CostSplit::class,
         ];
     }
 
@@ -99,6 +103,7 @@ class MessSetting extends Model
             'grocery_edit_window_minutes' => $this->grocery_edit_window_minutes,
             'members_can_view_balance' => $this->members_can_view_balance,
             'max_upload_kb' => $this->max_upload_kb,
+            'cost_split' => $this->cost_split->value,
         ];
     }
 }

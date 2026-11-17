@@ -4,10 +4,14 @@ namespace App\Actions\Reports;
 
 use App\Concerns\BusinessCalendar;
 use App\Concerns\Money;
+use App\Enums\CostSplit;
 use App\Enums\DepositStatus;
 use App\Models\Deposit;
 use App\Models\GroceryPurchase;
+use App\Models\Meal;
 use App\Models\Member;
+use App\Models\MessSetting;
+use App\Models\MonthClosure;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -56,31 +60,78 @@ class CalculateMonthlyReport
             $expenses = bcadd($expenses, Money::numeric($total), Money::SCALE);
         }
 
+        $split = $this->splitFor($first, $last);
+
+        $mealsByMember = [];
+        $totalMeals = 0;
+
+        foreach (Meal::query()->whereBetween('meal_date', [$first, $last])->get(['member_id', 'count']) as $meal) {
+            $mealsByMember[$meal->member_id] = ($mealsByMember[$meal->member_id] ?? 0) + $meal->count;
+            $totalMeals += $meal->count;
+        }
+
         $members = Member::query()
-            ->whereHas('stays', fn (Builder $stays) => $stays->overlapping($first, $last))
+            ->where(fn (Builder $query) => $query
+                ->whereHas('stays', fn (Builder $stays) => $stays->overlapping($first, $last))
+                ->orWhereIn('id', array_keys($mealsByMember)))
             ->orderBy('first_name')
             ->orderBy('last_name')
             ->orderBy('id')
             ->get(['id', 'first_name', 'last_name']);
 
         $count = $members->count();
-        $share = $count > 0 ? bcdiv($expenses, (string) $count, Money::SCALE) : '0.00';
-        $leftover = $count > 0 ? bcsub($expenses, bcmul($share, (string) $count, Money::SCALE), Money::SCALE) : '0.00';
+
+        if ($split === CostSplit::Meals) {
+            $share = $totalMeals > 0 ? bcdiv($expenses, (string) $totalMeals, Money::SCALE) : '0.00';
+        } else {
+            $share = $count > 0 ? bcdiv($expenses, (string) $count, Money::SCALE) : '0.00';
+        }
 
         $rows = [];
+        $charged = '0.00';
 
         foreach ($members as $member) {
             $memberDeposits = $depositsByMember[$member->id] ?? '0.00';
+            $meals = $mealsByMember[$member->id] ?? 0;
+
+            // Each meal split share is expenses x meals / total meals,
+            // truncated once, so the paisa left over stays under one per member.
+            $memberShare = $split === CostSplit::Meals
+                ? ($totalMeals > 0 ? bcdiv(bcmul($expenses, (string) $meals, Money::SCALE), (string) $totalMeals, Money::SCALE) : '0.00')
+                : $share;
+            $charged = bcadd($charged, $memberShare, Money::SCALE);
 
             $rows[] = [
                 'member_id' => $member->id,
                 'name' => $member->full_name,
                 'deposits' => $memberDeposits,
-                'share' => $share,
-                'due_credit' => bcsub($memberDeposits, $share, Money::SCALE),
+                'meals' => $meals,
+                'share' => $memberShare,
+                'due_credit' => bcsub($memberDeposits, $memberShare, Money::SCALE),
             ];
         }
 
-        return new MonthlyReport($first, $last, $deposits, $expenses, $count, $share, $leftover, $rows);
+        $leftover = ($split === CostSplit::Meals ? $totalMeals > 0 : $count > 0)
+            ? bcsub($expenses, $charged, Money::SCALE)
+            : $expenses;
+
+        return new MonthlyReport($first, $last, $split, $deposits, $expenses, $count, $totalMeals, $share, $leftover, $rows);
+    }
+
+    /**
+     * The split for a period. A single month that is closed keeps the split
+     * it was closed with; anything else follows the current setting.
+     */
+    private function splitFor(string $first, string $last): CostSplit
+    {
+        if (substr($first, 0, 7) === substr($last, 0, 7)) {
+            $closure = MonthClosure::query()->closed()->where('month', MonthClosure::monthOf($first)->toDateString())->first();
+
+            if ($closure?->cost_split !== null) {
+                return $closure->cost_split;
+            }
+        }
+
+        return MessSetting::current()->cost_split;
     }
 }

@@ -4,6 +4,7 @@ namespace App\Actions\Reports;
 
 use App\Concerns\BusinessCalendar;
 use App\Enums\AuditLog;
+use App\Models\MessSetting;
 use App\Models\MonthClosure;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -45,6 +46,7 @@ class CloseMonth
                 'reopened_by' => null,
                 'reopened_at' => null,
                 'reopen_reason' => null,
+                'cost_split' => MessSetting::current()->cost_split,
             ])->save();
 
             activity()
@@ -67,6 +69,7 @@ class CloseMonth
             'month' => $closure->month->format('Y-m'),
             'status' => $closure->reopened_at === null ? 'closed' : 'reopened',
             'reopen_reason' => $closure->reopen_reason,
+            'cost_split' => $closure->cost_split?->value,
         ];
     }
 }

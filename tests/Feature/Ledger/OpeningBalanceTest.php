@@ -43,6 +43,7 @@ class OpeningBalanceTest extends TestCase
             'grocery_edit_window_minutes' => 30,
             'members_can_view_balance' => true,
             'max_upload_kb' => 5120,
+            'cost_split' => 'equal',
             ...$overrides,
         ];
     }

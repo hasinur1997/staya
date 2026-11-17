@@ -8,6 +8,7 @@ use App\Models\Deposit;
 use App\Models\Fund;
 use App\Models\GroceryPurchase;
 use App\Models\LedgerEntry;
+use App\Models\MealType;
 use App\Models\Member;
 use App\Models\MemberInvitation;
 use App\Models\MemberStay;
@@ -63,6 +64,7 @@ class AppServiceProvider extends ServiceProvider
             'month_closure' => MonthClosure::class,
             'member' => Member::class,
             'member_stay' => MemberStay::class,
+            'meal_type' => MealType::class,
             'member_invitation' => MemberInvitation::class,
             'deposit' => Deposit::class,
             'grocery_purchase' => GroceryPurchase::class,

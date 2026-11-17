@@ -24,6 +24,9 @@ enum AuditAction: string
     case InvitationSent = 'invitation_sent';
     case InvitationRevoked = 'invitation_revoked';
     case InvitationAccepted = 'invitation_accepted';
+    case MealsRecorded = 'meals_recorded';
+    case MealTypeCreated = 'meal_type_created';
+    case MealTypeUpdated = 'meal_type_updated';
     case MemberCreated = 'member_created';
     case MemberUpdated = 'member_updated';
     case MemberDeactivated = 'member_deactivated';
@@ -68,6 +71,9 @@ enum AuditAction: string
             self::InvitationSent => __('Invitation sent'),
             self::InvitationRevoked => __('Invitation cancelled'),
             self::InvitationAccepted => __('Invitation accepted'),
+            self::MealsRecorded => __('Meals recorded'),
+            self::MealTypeCreated => __('Meal type created'),
+            self::MealTypeUpdated => __('Meal type updated'),
             self::MemberCreated => __('Member created'),
             self::MemberUpdated => __('Member updated'),
             self::MemberDeactivated => __('Member deactivated'),

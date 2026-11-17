@@ -50,7 +50,9 @@ class BuildReport
             'figures' => [
                 'deposits' => $figures->deposits,
                 'expenses' => $figures->expenses,
+                'split' => $figures->split->value,
                 'active_members' => $figures->activeMembers,
+                'total_meals' => $figures->totalMeals,
                 'share' => $figures->share,
                 'leftover' => $figures->leftover,
             ],
