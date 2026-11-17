@@ -3,14 +3,21 @@ import * as React from "react"
 
 import { controlClass } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { intlLocale } from "@/lib/locale"
 import { cn } from "@/lib/utils"
 
-const short = new Intl.DateTimeFormat("en-GB", { month: "short", timeZone: "UTC" })
-const long = new Intl.DateTimeFormat("en-GB", {
-  month: "long",
-  year: "numeric",
-  timeZone: "UTC",
-})
+const short = {
+  format: (date: Date) =>
+    new Intl.DateTimeFormat(intlLocale(), { month: "short", timeZone: "UTC" }).format(date),
+}
+const long = {
+  format: (date: Date) =>
+    new Intl.DateTimeFormat(intlLocale(), {
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(date),
+}
 const MONTHS = Array.from({ length: 12 }, (_, index) => index)
 
 type MonthPickerProps = {

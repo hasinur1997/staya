@@ -14,6 +14,7 @@ use App\Http\Controllers\Grocery\PayableController;
 use App\Http\Controllers\Grocery\PurchaseToolsController;
 use App\Http\Controllers\Ledger\AdjustmentController;
 use App\Http\Controllers\Ledger\LedgerController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\Meals\MealController;
 use App\Http\Controllers\Meals\MealTypeController;
 use App\Http\Controllers\Members\InvitationController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\Users\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
+Route::post('locale', [LocaleController::class, 'update'])->name('locale.update');
 
 // Applicants wait here until their registration is decided; the
 // registration gate sends them nowhere else.

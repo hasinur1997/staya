@@ -11,6 +11,7 @@ import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 import PasskeyVerify from '@/components/passkey-verify';
+import { useTranslate } from '@/lib/i18n';
 
 type Props = {
     status?: string;
@@ -18,9 +19,10 @@ type Props = {
 };
 
 export default function Login({ status, canResetPassword }: Props) {
+    const __ = useTranslate();
     return (
         <>
-            <Head title="Log in" />
+            <Head title={__('Log in')} />
 
             <PasskeyVerify />
 
@@ -33,7 +35,9 @@ export default function Login({ status, canResetPassword }: Props) {
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Label htmlFor="email">
+                                    {__('Email address')}
+                                </Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -49,14 +53,16 @@ export default function Login({ status, canResetPassword }: Props) {
 
                             <div className="grid gap-2">
                                 <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
+                                    <Label htmlFor="password">
+                                        {__('Password')}
+                                    </Label>
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
                                             className="ml-auto text-small"
                                             tabIndex={5}
                                         >
-                                            Forgot your password?
+                                            {__('Forgot your password?')}
                                         </TextLink>
                                     )}
                                 </div>
@@ -66,7 +72,7 @@ export default function Login({ status, canResetPassword }: Props) {
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder="Password"
+                                    placeholder={__('Password')}
                                 />
                                 <InputError message={errors.password} />
                             </div>
@@ -77,7 +83,9 @@ export default function Login({ status, canResetPassword }: Props) {
                                     name="remember"
                                     tabIndex={3}
                                 />
-                                <Label htmlFor="remember">Remember me</Label>
+                                <Label htmlFor="remember">
+                                    {__('Remember me')}
+                                </Label>
                             </div>
 
                             <Button
@@ -88,14 +96,14 @@ export default function Login({ status, canResetPassword }: Props) {
                                 data-test="login-button"
                             >
                                 {processing && <Spinner />}
-                                Log in
+                                {__('Log in')}
                             </Button>
                         </div>
 
                         <div className="text-center text-small text-ink-muted">
-                            Don't have an account?{' '}
+                            {__("Don't have an account?")}{' '}
                             <TextLink href={register()} tabIndex={5}>
-                                Sign up
+                                {__('Sign up')}
                             </TextLink>
                         </div>
                     </>

@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/tooltip';
 import { useCan } from '@/hooks/use-can';
 import { useCurrentUrl } from '@/hooks/use-current-url';
+import { useTranslate } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { appNavigation, navCount, visibleNavigation } from '@/lib/navigation';
 import { cn, toUrl } from '@/lib/utils';
@@ -58,10 +59,14 @@ function useIsActive() {
         });
 }
 
-function accessibleName(item: AppNavItem, count: number | null): string {
+function accessibleName(
+    item: AppNavItem,
+    count: number | null,
+    __: (key: string) => string,
+): string {
     return count
-        ? `${item.title}, ${count} ${item.countLabel ?? ''}`.trim()
-        : item.title;
+        ? `${__(item.title)}, ${count} ${__(item.countLabel ?? '')}`.trim()
+        : __(item.title);
 }
 
 function NavLink({
@@ -75,6 +80,7 @@ function NavLink({
     active: boolean;
     count: number | null;
 }) {
+    const __ = useTranslate();
     const className = cn(
         'relative flex h-11 items-center rounded-md text-label text-ink-muted transition-[color,background-color] duration-150 hover:bg-surface-raised hover:text-ink',
         // 3px primary bar on the active item.
@@ -92,7 +98,7 @@ function NavLink({
                         prefetch
                         className={className}
                         aria-current={active ? 'page' : undefined}
-                        aria-label={accessibleName(item, count)}
+                        aria-label={accessibleName(item, count, __)}
                     >
                         <item.icon className="size-5" aria-hidden />
                         {count && (
@@ -106,7 +112,7 @@ function NavLink({
                         )}
                     </Link>
                 </TooltipTrigger>
-                <TooltipContent side="right">{item.title}</TooltipContent>
+                <TooltipContent side="right">{__(item.title)}</TooltipContent>
             </Tooltip>
         );
     }
@@ -117,10 +123,10 @@ function NavLink({
             prefetch
             className={className}
             aria-current={active ? 'page' : undefined}
-            aria-label={count ? accessibleName(item, count) : undefined}
+            aria-label={count ? accessibleName(item, count, __) : undefined}
         >
             <item.icon className="size-5 shrink-0" aria-hidden />
-            <span className="flex-1 truncate">{item.title}</span>
+            <span className="flex-1 truncate">{__(item.title)}</span>
             {count && (
                 <Badge variant="count" aria-hidden>
                     {count}
@@ -157,6 +163,7 @@ function NavItems({
 }
 
 function CollapsibleSection({ section }: { section: AppNavSection }) {
+    const __ = useTranslate();
     const isActive = useIsActive();
     const [collapsed, setCollapsed] = useState(() =>
         readCollapsed().includes(section.id),
@@ -173,7 +180,7 @@ function CollapsibleSection({ section }: { section: AppNavSection }) {
     return (
         <Collapsible open={open} onOpenChange={toggle}>
             <CollapsibleTrigger className="flex h-8 w-full items-center justify-between rounded-md px-3 text-overline text-neutral transition-[color,background-color] hover:bg-surface-raised">
-                {section.title}
+                {section.title ? __(section.title) : null}
                 <ChevronDown
                     className={cn(
                         'size-4 transition-transform duration-150',
@@ -190,12 +197,13 @@ function CollapsibleSection({ section }: { section: AppNavSection }) {
 }
 
 function SidebarNav({ variant }: { variant: Variant }) {
+    const __ = useTranslate();
     const can = useCan();
     const sections = visibleNavigation(appNavigation, can);
 
     return (
         <nav
-            aria-label="Main"
+            aria-label={__('Main')}
             className="flex flex-1 flex-col gap-4 overflow-y-auto px-3 py-4"
         >
             {sections.map((section, index) => {
@@ -231,7 +239,7 @@ function SidebarNav({ variant }: { variant: Variant }) {
                                 id={`nav-${section.id}`}
                                 className="flex h-8 items-center px-3 text-overline text-neutral"
                             >
-                                {section.title}
+                                {__(section.title)}
                             </h2>
                         )}
                         <NavItems section={section} variant="full" />

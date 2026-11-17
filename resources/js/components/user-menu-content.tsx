@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
+import { useTranslate } from '@/lib/i18n';
 import { logout } from '@/routes';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit } from '@/routes/profile';
@@ -25,6 +26,7 @@ const links = [
 ];
 
 export function UserMenuContent({ user }: Props) {
+    const __ = useTranslate();
     const cleanup = useMobileNavigation();
 
     const handleLogout = () => {
@@ -50,7 +52,7 @@ export function UserMenuContent({ user }: Props) {
                             onClick={cleanup}
                         >
                             <link.icon className="mr-2" />
-                            {link.title}
+                            {__(link.title)}
                         </Link>
                     </DropdownMenuItem>
                 ))}
@@ -65,7 +67,7 @@ export function UserMenuContent({ user }: Props) {
                     data-test="logout-button"
                 >
                     <LogOut className="mr-2" />
-                    Log out
+                    {__('Log out')}
                 </Link>
             </DropdownMenuItem>
         </>

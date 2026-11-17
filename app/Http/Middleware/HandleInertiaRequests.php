@@ -50,6 +50,7 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => $settings->mess_name ?? config('app.name'),
             'locale' => app()->getLocale(),
+            'locales' => config('app.supported_locales', []),
             // Sent once per visit; English strings are their own keys.
             'translations' => Inertia::once(fn (): array => $this->translations()),
             'auth' => [

@@ -1,3 +1,5 @@
+import { useTranslate } from '@/lib/i18n';
+
 export default function Heading({
     title,
     description,
@@ -7,6 +9,7 @@ export default function Heading({
     description?: string;
     variant?: 'default' | 'small';
 }) {
+    const __ = useTranslate();
     const Title = variant === 'small' ? 'h2' : 'h1';
 
     return (
@@ -16,10 +19,10 @@ export default function Heading({
                     variant === 'small' ? 'text-subhead' : 'text-heading'
                 }
             >
-                {title}
+                {__(title)}
             </Title>
             {description && (
-                <p className="text-small text-ink-muted">{description}</p>
+                <p className="text-small text-ink-muted">{__(description)}</p>
             )}
         </header>
     );

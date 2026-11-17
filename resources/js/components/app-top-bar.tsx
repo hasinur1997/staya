@@ -1,6 +1,8 @@
 import { Link, usePage } from '@inertiajs/react';
 import { Bell, Menu } from 'lucide-react';
 import { Fragment, useEffect, useState } from 'react';
+import { AppearanceMenu } from '@/components/appearance-menu';
+import { LanguageMenu } from '@/components/language-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -25,6 +27,7 @@ import { SheetTrigger } from '@/components/ui/sheet';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useCan } from '@/hooks/use-can';
 import { useInitials } from '@/hooks/use-initials';
+import { useTranslate } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { appNavigation, navCount, visibleNavigation } from '@/lib/navigation';
 import { cn } from '@/lib/utils';
@@ -38,6 +41,7 @@ function AppBreadcrumbs({
     collapse: boolean;
 }) {
     // Tablet keeps the last two levels; earlier ones fold into "…".
+    const __ = useTranslate();
     const hidden = collapse ? Math.max(breadcrumbs.length - 2, 0) : 0;
     const shown = breadcrumbs.slice(hidden);
 
@@ -60,7 +64,7 @@ function AppBreadcrumbs({
                             <BreadcrumbItem className="min-w-0">
                                 {isLast ? (
                                     <BreadcrumbPage className="truncate text-ink">
-                                        {item.title}
+                                        {__(item.title)}
                                     </BreadcrumbPage>
                                 ) : (
                                     <BreadcrumbLink asChild>
@@ -68,7 +72,7 @@ function AppBreadcrumbs({
                                             href={item.href}
                                             className="truncate hover:text-ink"
                                         >
-                                            {item.title}
+                                            {__(item.title)}
                                         </Link>
                                     </BreadcrumbLink>
                                 )}
@@ -87,6 +91,7 @@ function AppBreadcrumbs({
  * menu. There is no notifications store in v1 (docs/layout.md, question 1).
  */
 function WaitingMenu() {
+    const __ = useTranslate();
     const can = useCan();
     const { counts } = usePage().props.nav;
     const items = visibleNavigation(appNavigation, can)
@@ -107,7 +112,7 @@ function WaitingMenu() {
                     variant="ghost"
                     size="icon"
                     className="relative"
-                    aria-label={`Waiting for you, ${total} items`}
+                    aria-label={`${__('Waiting for you')}, ${total}`}
                 >
                     <Bell className="size-5" aria-hidden />
                     <Badge
@@ -120,7 +125,7 @@ function WaitingMenu() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">
-                <DropdownMenuLabel>Waiting for you</DropdownMenuLabel>
+                <DropdownMenuLabel>{__('Waiting for you')}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {items.map(({ item, count }) => (
                     <DropdownMenuItem key={item.title} asChild>
@@ -130,7 +135,7 @@ function WaitingMenu() {
                         >
                             <span className="flex items-center gap-2">
                                 <item.icon aria-hidden />
-                                {item.title}
+                                {__(item.title)}
                             </span>
                             <Badge variant="count">{count}</Badge>
                         </Link>
@@ -178,6 +183,7 @@ export function AppTopBar({
     title?: string;
     collapseBreadcrumbs: boolean;
 }) {
+    const __ = useTranslate();
     const { balance } = usePage().props.fund;
     const [scrolled, setScrolled] = useState(false);
     const mobileTitle = title ?? breadcrumbs.at(-1)?.title;
@@ -211,7 +217,7 @@ export function AppTopBar({
             <div className="min-w-0 flex-1">
                 {mobileTitle && (
                     <span className="block truncate text-label text-ink md:hidden">
-                        {mobileTitle}
+                        {__(mobileTitle)}
                     </span>
                 )}
                 <div className="hidden md:block">
@@ -224,7 +230,9 @@ export function AppTopBar({
 
             {balance !== null && (
                 <p className="hidden items-baseline gap-2 whitespace-nowrap md:flex">
-                    <span className="text-small text-ink-muted">Fund</span>
+                    <span className="text-small text-ink-muted">
+                        {__('Fund')}
+                    </span>
                     <span className="text-label text-ink tabular-nums">
                         {formatMoney(balance)}
                     </span>
@@ -233,6 +241,8 @@ export function AppTopBar({
 
             <div className="flex items-center gap-1">
                 <WaitingMenu />
+                <LanguageMenu />
+                <AppearanceMenu />
                 <UserMenu />
             </div>
         </header>

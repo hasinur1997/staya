@@ -82,6 +82,21 @@ return [
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Supported Locales
+    |--------------------------------------------------------------------------
+    |
+    | The languages a person can choose from, by code and by their own name.
+    | Each needs a lang/{code}.json file; English strings are their own keys.
+    |
+    */
+
+    'supported_locales' => [
+        'en' => 'English',
+        'bn' => 'বাংলা',
+    ],
+
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
     /*

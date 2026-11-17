@@ -1,6 +1,8 @@
 import { Link } from '@inertiajs/react';
 import AppLogo from '@/components/app-logo';
+import { LanguageMenu } from '@/components/language-menu';
 import { Card } from '@/components/ui/card';
+import { useTranslate } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { home } from '@/routes';
 import type { GuestLayoutProps } from '@/types';
@@ -12,8 +14,13 @@ export default function GuestLayout({
     description,
     wide = false,
 }: GuestLayoutProps) {
+    const __ = useTranslate();
+
     return (
-        <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background px-4 py-12 md:px-6">
+        <div className="relative flex min-h-svh flex-col items-center justify-center gap-6 bg-background px-4 py-12 md:px-6">
+            <div className="absolute top-4 right-4">
+                <LanguageMenu />
+            </div>
             <Link href={home()} className="flex items-center gap-3">
                 <AppLogo />
             </Link>
@@ -26,10 +33,10 @@ export default function GuestLayout({
             >
                 {(title || description) && (
                     <div className="flex flex-col gap-1">
-                        {title && <h1 className="text-heading">{title}</h1>}
+                        {title && <h1 className="text-heading">{__(title)}</h1>}
                         {description && (
                             <p className="text-small text-ink-muted">
-                                {description}
+                                {__(description)}
                             </p>
                         )}
                     </div>

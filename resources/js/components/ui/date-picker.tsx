@@ -4,6 +4,7 @@ import * as React from "react"
 import { Calendar } from "@/components/ui/calendar"
 import { controlClass } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { intlLocale } from "@/lib/locale"
 import { cn } from "@/lib/utils"
 
 const DAY = /^(\d{4})-(\d{2})-(\d{2})$/
@@ -23,11 +24,14 @@ function toValue(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 }
 
-const label = new Intl.DateTimeFormat("en-GB", {
-  day: "numeric",
-  month: "short",
-  year: "numeric",
-})
+const label = {
+  format: (date: Date) =>
+    new Intl.DateTimeFormat(intlLocale(), {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(date),
+}
 
 /** Today as a `Y-m-d` date in Asia/Dhaka, whatever the viewer's clock zone. */
 function dhakaToday(): string {

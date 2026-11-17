@@ -11,8 +11,10 @@ import {
 } from '@/components/ui/input-otp';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import { store } from '@/routes/two-factor/login';
+import { useTranslate } from '@/lib/i18n';
 
 export default function TwoFactorChallenge() {
+    const __ = useTranslate();
     const [showRecoveryInput, setShowRecoveryInput] = useState<boolean>(false);
     const [code, setCode] = useState<string>('');
 
@@ -51,7 +53,7 @@ export default function TwoFactorChallenge() {
 
     return (
         <>
-            <Head title="Two-factor authentication" />
+            <Head title={__('Two-factor authentication')} />
 
             <div className="space-y-6">
                 <Form
@@ -67,7 +69,7 @@ export default function TwoFactorChallenge() {
                                     <Input
                                         name="recovery_code"
                                         type="text"
-                                        placeholder="Enter recovery code"
+                                        placeholder={__('Enter recovery code')}
                                         autoFocus={showRecoveryInput}
                                         required
                                     />
@@ -109,7 +111,7 @@ export default function TwoFactorChallenge() {
                                 className="w-full"
                                 disabled={processing}
                             >
-                                Continue
+                                {__('Continue')}
                             </Button>
 
                             <div className="text-center text-small text-ink-muted">
@@ -121,7 +123,7 @@ export default function TwoFactorChallenge() {
                                         toggleRecoveryMode(clearErrors)
                                     }
                                 >
-                                    {authConfigContent.toggleText}
+                                    {__(authConfigContent.toggleText)}
                                 </button>
                             </div>
                         </>

@@ -10,18 +10,20 @@ import {
     store as confirmStore,
 } from '@/actions/Laravel/Passkeys/Http/Controllers/PasskeyConfirmationController';
 import PasskeyVerify from '@/components/passkey-verify';
+import { useTranslate } from '@/lib/i18n';
 
 export default function ConfirmPassword() {
+    const __ = useTranslate();
     return (
         <>
-            <Head title="Confirm password" />
+            <Head title={__('Confirm password')} />
 
             <PasskeyVerify
                 routes={{
                     options: confirmOptions(),
                     submit: confirmStore(),
                 }}
-                label="Confirm with passkey"
+                label={__('Confirm with passkey')}
                 loadingLabel="Confirming..."
                 separator="Or confirm with password"
             />
@@ -30,11 +32,11 @@ export default function ConfirmPassword() {
                 {({ processing, errors }) => (
                     <div className="space-y-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password">{__('Password')}</Label>
                             <PasswordInput
                                 id="password"
                                 name="password"
-                                placeholder="Password"
+                                placeholder={__('Password')}
                                 autoComplete="current-password"
                                 autoFocus
                             />
@@ -49,7 +51,7 @@ export default function ConfirmPassword() {
                                 data-test="confirm-password-button"
                             >
                                 {processing && <Spinner />}
-                                Confirm password
+                                {__('Confirm password')}
                             </Button>
                         </div>
                     </div>

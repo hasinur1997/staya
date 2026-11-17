@@ -1,6 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { BookOpen, ChartColumn, Utensils, Wallet } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
+import { LanguageMenu } from '@/components/language-menu';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useTranslate } from '@/lib/i18n';
@@ -43,6 +44,7 @@ export default function Welcome() {
                         <AppLogo />
                     </Link>
                     <nav className="flex items-center gap-2">
+                        <LanguageMenu />
                         {auth.user ? (
                             <Button asChild>
                                 <Link href={dashboard()}>
