@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Actions\Reports\MonthlyReport;
 use App\Models\BuyerPayable;
 use App\Models\Deposit;
 use App\Models\Fund;
@@ -14,10 +15,12 @@ use App\Models\MonthClosure;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use App\Policies\ReportPolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -38,6 +41,9 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         $this->configureMorphMap();
+
+        // Monthly figures are not a model; the policy is keyed by their class.
+        Gate::policy(MonthlyReport::class, ReportPolicy::class);
     }
 
     /**

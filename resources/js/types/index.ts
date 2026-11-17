@@ -6,3 +6,4 @@ export type * from './ledger';
 export type * from './member';
 export type * from './deposit';
 export type * from './grocery';
+export type * from './dashboard';

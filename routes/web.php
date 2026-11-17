@@ -5,6 +5,7 @@ use App\Http\Controllers\Approvals\ApprovalController;
 use App\Http\Controllers\Approvals\DepositQueueController;
 use App\Http\Controllers\Approvals\RegistrationController;
 use App\Http\Controllers\Auth\RegistrationStatusController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Deposits\DepositController;
 use App\Http\Controllers\Dev\LayoutPreviewController;
 use App\Http\Controllers\Grocery\GroceryPurchaseController;
@@ -28,7 +29,7 @@ Route::get('registration/status', RegistrationStatusController::class)
     ->name('registration.status');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
 
     // Users are deactivated, never deleted.
     Route::resource('users', UserController::class)->except(['show', 'destroy']);
