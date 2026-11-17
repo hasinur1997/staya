@@ -4,6 +4,7 @@ import * as React from "react"
 import { Calendar } from "@/components/ui/calendar"
 import { controlClass } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { useTranslate } from "@/lib/i18n"
 import { intlLocale } from "@/lib/locale"
 import { cn } from "@/lib/utils"
 
@@ -71,12 +72,13 @@ function DatePicker({
   onValueChange,
   min,
   max,
-  placeholder = "Pick a date",
+  placeholder,
   clearable = false,
   disabled,
   className,
   ...aria
 }: DatePickerProps) {
+  const __ = useTranslate()
   const [open, setOpen] = React.useState(false)
   const [inner, setInner] = React.useState(defaultValue)
   const current = value ?? inner
@@ -108,14 +110,14 @@ function DatePicker({
           >
             <CalendarIcon className="text-neutral size-4 shrink-0" />
             <span className={cn("truncate", !selected && "text-neutral")}>
-              {selected ? label.format(selected) : placeholder}
+              {selected ? label.format(selected) : (placeholder ?? __("Pick a date"))}
             </span>
           </button>
         </PopoverTrigger>
         {clearable && selected && !disabled && (
           <button
             type="button"
-            aria-label="Clear date"
+            aria-label={__("Clear date")}
             onClick={() => change("")}
             className="text-neutral hover:text-ink absolute top-1/2 right-2 inline-flex size-6 -translate-y-1/2 items-center justify-center rounded-sm"
           >

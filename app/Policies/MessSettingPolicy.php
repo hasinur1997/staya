@@ -23,4 +23,12 @@ class MessSettingPolicy
     {
         return $actor->can(Permission::SettingsUpdate->value);
     }
+
+    /**
+     * Determine whether the user can erase all financial and meal data.
+     */
+    public function resetData(User $actor, MessSetting $settings): bool
+    {
+        return $actor->can(Permission::SettingsResetData->value);
+    }
 }

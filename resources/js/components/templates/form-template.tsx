@@ -9,6 +9,7 @@ import {
     PageStack,
     RegionStack,
 } from '@/components/templates/page-grid';
+import { useTranslate } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -25,6 +26,8 @@ type Props = {
     aside?: ReactNode;
     /** Error summary shown above the actions. */
     errors?: ReactNode;
+    /** Use the full page width and keep the actions pinned to the bottom (long settings pages). */
+    wide?: boolean;
 };
 
 export function FormTemplate({
@@ -36,15 +39,22 @@ export function FormTemplate({
     children,
     aside,
     errors,
+    wide = false,
 }: Props) {
+    const __ = useTranslate();
     const submit = { label: submitLabel, form: formId, disabled: processing };
-    const cancel = { label: 'Cancel', href: cancelHref };
+    const cancel = { label: __('Cancel'), href: cancelHref };
 
     return (
         <PageStack>
             <PageHeader {...header} mobileAction={cancel} />
             <PageGrid>
-                <RegionStack className="col-span-4 md:col-span-8 lg:col-span-8 lg:row-start-1">
+                <RegionStack
+                    className={cn(
+                        'col-span-4 md:col-span-8 lg:row-start-1',
+                        wide ? 'lg:col-span-12' : 'lg:col-span-8',
+                    )}
+                >
                     {children}
                 </RegionStack>
                 {aside && (
@@ -54,12 +64,19 @@ export function FormTemplate({
                 )}
                 <div
                     className={cn(
-                        'col-span-4 flex flex-col gap-4 md:col-span-8 lg:col-span-8',
+                        'col-span-4 flex flex-col gap-4 md:col-span-8',
+                        wide ? 'lg:col-span-12' : 'lg:col-span-8',
                         aside && 'lg:row-start-2',
                     )}
                 >
                     {errors}
-                    <div className="hidden items-center justify-end gap-2 md:flex print:hidden">
+                    <div
+                        className={cn(
+                            'hidden items-center justify-end gap-2 md:flex print:hidden',
+                            wide &&
+                                'sticky bottom-0 z-10 -mx-4 border-t bg-background/90 px-4 py-3 backdrop-blur md:-mx-6 md:px-6',
+                        )}
+                    >
                         <ActionButton action={cancel} variant="outline" />
                         <ActionButton action={submit} />
                     </div>

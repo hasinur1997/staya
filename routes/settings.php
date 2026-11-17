@@ -27,6 +27,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // The mess-wide settings (Admin section), not the personal ones above.
     Route::get('mess-settings', [MessSettingsController::class, 'edit'])->name('mess-settings.edit');
     Route::put('mess-settings', [MessSettingsController::class, 'update'])->name('mess-settings.update');
+    Route::post('mess-settings/reset', [MessSettingsController::class, 'reset'])
+        ->middleware('throttle:3,1')
+        ->name('mess-settings.reset');
 });
 
 Route::get('.well-known/passkey-endpoints', function () {

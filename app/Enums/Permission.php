@@ -56,6 +56,7 @@ enum Permission: string
 
     case SettingsView = 'settings.view';
     case SettingsUpdate = 'settings.update';
+    case SettingsResetData = 'settings.reset_data';
 
     case AuditView = 'audit.view';
 
@@ -113,6 +114,7 @@ enum Permission: string
             self::MealRecord => __('Record daily meals for members'),
             self::SettingsView => __('View mess settings'),
             self::SettingsUpdate => __('Change mess settings'),
+            self::SettingsResetData => __('Erase all financial and meal data and start from zero'),
             self::AuditView => __('View the audit log'),
         };
     }

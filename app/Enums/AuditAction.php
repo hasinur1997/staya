@@ -48,6 +48,7 @@ enum AuditAction: string
     case RoleUpdated = 'role_updated';
     case RoleDeleted = 'role_deleted';
     case SettingsUpdated = 'settings_updated';
+    case DataReset = 'data_reset';
     case UserCreated = 'user_created';
     case UserUpdated = 'user_updated';
     case UserDeactivated = 'user_deactivated';
@@ -95,6 +96,7 @@ enum AuditAction: string
             self::RoleUpdated => __('Role updated'),
             self::RoleDeleted => __('Role deleted'),
             self::SettingsUpdated => __('Settings changed'),
+            self::DataReset => __('Financial and meal data erased'),
             self::UserCreated => __('User created'),
             self::UserUpdated => __('User updated'),
             self::UserDeactivated => __('User deactivated'),

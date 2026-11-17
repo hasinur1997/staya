@@ -1,10 +1,12 @@
 import { DatePicker } from '@/components/ui/date-picker';
 import { Head, useForm, setLayoutProps } from '@inertiajs/react';
+import { Info, Lock } from 'lucide-react';
 import type { FormEvent, ReactNode } from 'react';
 import InputError from '@/components/input-error';
+import { ResetDataCard } from '@/components/reset-data-card';
+import { SettingsSection } from '@/components/settings-section';
 import { DetailTemplate } from '@/components/templates/detail-template';
 import { FormTemplate } from '@/components/templates/form-template';
-import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Combobox } from '@/components/ui/combobox';
 import { Input } from '@/components/ui/input';
@@ -22,7 +24,11 @@ type Props = {
     /** Today in Asia/Dhaka (Y-m-d); the latest allowed fund start date. */
     today: string;
     costSplits: { value: string; label: string }[];
-    can: { update: boolean; changeOpeningBalance: boolean };
+    can: {
+        update: boolean;
+        resetData: boolean;
+        changeOpeningBalance: boolean;
+    };
 };
 
 export default function MessSettingsEdit({
@@ -73,7 +79,10 @@ export default function MessSettingsEdit({
 
     const fields = (
         <>
-            <Fieldset legend={__('Mess')}>
+            <SettingsSection
+                title={__('Mess')}
+                description={__('The name and address shown across the app.')}
+            >
                 <Field
                     id="mess_name"
                     label={__('Mess name')}
@@ -103,33 +112,33 @@ export default function MessSettingsEdit({
                         rows={3}
                     />
                 </Field>
-                <div className="grid gap-4 md:grid-cols-2">
-                    <Field
-                        id="currency"
+                <dl className="grid gap-4 border-t pt-4 md:grid-cols-2">
+                    <FixedValue
                         label={__('Currency')}
-                        help={__('Fixed in this version.')}
-                    >
-                        <Input
-                            id="currency"
-                            value={`${settings.currency} (৳)`}
-                            readOnly
-                        />
-                    </Field>
-                    <Field
-                        id="timezone"
+                        value={`${settings.currency} (৳)`}
+                    />
+                    <FixedValue
                         label={__('Timezone')}
-                        help={__('Fixed in this version.')}
-                    >
-                        <Input
-                            id="timezone"
-                            value={settings.timezone}
-                            readOnly
-                        />
-                    </Field>
-                </div>
-            </Fieldset>
+                        value={settings.timezone}
+                    />
+                </dl>
+            </SettingsSection>
 
-            <Fieldset legend={__('Fund')}>
+            <SettingsSection
+                title={__('Fund')}
+                description={__(
+                    'Where the shared fund starts. These two lock once the ledger has activity.',
+                )}
+            >
+                {!can.changeOpeningBalance && (
+                    <p className="flex items-start gap-2 rounded-md bg-warning-soft p-3 text-body text-ink">
+                        <Lock
+                            className="mt-0.5 size-4 shrink-0 text-warning"
+                            aria-hidden
+                        />
+                        {fundLockedHelp}
+                    </p>
+                )}
                 <div className="grid gap-4 md:grid-cols-2">
                     <Field
                         id="opening_balance"
@@ -141,7 +150,7 @@ export default function MessSettingsEdit({
                                           settings.opening_balance,
                                       ),
                                   })
-                                : fundLockedHelp
+                                : undefined
                         }
                         error={form.errors.opening_balance}
                     >
@@ -169,7 +178,7 @@ export default function MessSettingsEdit({
                                 ? __(
                                       'No purchase or deposit can be dated before it.',
                                   )
-                                : fundLockedHelp
+                                : undefined
                         }
                         error={form.errors.fund_start_date}
                     >
@@ -185,9 +194,12 @@ export default function MessSettingsEdit({
                         />
                     </Field>
                 </div>
-            </Fieldset>
+            </SettingsSection>
 
-            <Fieldset legend={__('Rules')}>
+            <SettingsSection
+                title={__('Rules')}
+                description={__('What members can do and see.')}
+            >
                 <div className="md:max-w-xs">
                     <Field
                         id="grocery_edit_window_minutes"
@@ -213,7 +225,7 @@ export default function MessSettingsEdit({
                         />
                     </Field>
                 </div>
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-3 border-t pt-4">
                     <Checkbox
                         id="members_can_view_balance"
                         checked={form.data.members_can_view_balance}
@@ -234,9 +246,14 @@ export default function MessSettingsEdit({
                         />
                     </div>
                 </div>
-            </Fieldset>
+            </SettingsSection>
 
-            <Fieldset legend={__('Cost sharing')}>
+            <SettingsSection
+                title={__('Cost sharing')}
+                description={__(
+                    'How the monthly cost is divided between members.',
+                )}
+            >
                 <div className="md:max-w-md">
                     <Field
                         id="cost_split"
@@ -263,15 +280,19 @@ export default function MessSettingsEdit({
                             emptyText={__('Nothing found.')}
                         />
                     </Field>
-                    <p className="mt-2 text-caption text-ink-muted">
-                        {__(
-                            'A closed month keeps the setting it was closed with. Changing this affects open months only.',
-                        )}
-                    </p>
                 </div>
-            </Fieldset>
+                <p className="flex items-start gap-2 rounded-md bg-surface-raised p-3 text-caption text-ink-muted">
+                    <Info className="mt-0.5 size-4 shrink-0" aria-hidden />
+                    {__(
+                        'A closed month keeps the setting it was closed with. Changing this affects open months only.',
+                    )}
+                </p>
+            </SettingsSection>
 
-            <Fieldset legend={__('Uploads')}>
+            <SettingsSection
+                title={__('Uploads')}
+                description={__('Limits for receipts, photos and documents.')}
+            >
                 <div className="md:max-w-xs">
                     <Field
                         id="max_upload_kb"
@@ -295,7 +316,7 @@ export default function MessSettingsEdit({
                         />
                     </Field>
                 </div>
-            </Fieldset>
+            </SettingsSection>
         </>
     );
 
@@ -309,6 +330,7 @@ export default function MessSettingsEdit({
                     submitLabel={__('Save changes')}
                     processing={form.processing}
                     cancelHref={dashboard()}
+                    wide
                 >
                     <form
                         id="mess-settings-form"
@@ -317,32 +339,34 @@ export default function MessSettingsEdit({
                     >
                         {fields}
                     </form>
+                    {can.resetData && <ResetDataCard />}
                 </FormTemplate>
             ) : (
                 <DetailTemplate header={header}>
                     <fieldset disabled className="flex flex-col gap-4 md:gap-6">
                         {fields}
                     </fieldset>
+                    {can.resetData && <ResetDataCard />}
                 </DetailTemplate>
             )}
         </>
     );
 }
 
-function Fieldset({
-    legend,
-    children,
-}: {
-    legend: string;
-    children: ReactNode;
-}) {
+/** A read-only value that cannot be changed in this version. */
+function FixedValue({ label, value }: { label: string; value: string }) {
+    const __ = useTranslate();
+
     return (
-        <Card>
-            <fieldset className="flex flex-col gap-4 px-4">
-                <legend className="mb-4 text-title">{legend}</legend>
-                {children}
-            </fieldset>
-        </Card>
+        <div className="flex flex-col gap-1">
+            <dt className="text-label text-ink-muted">{label}</dt>
+            <dd className="flex items-center gap-2 text-body text-ink">
+                {value}
+                <span className="badge-text rounded-sm bg-surface-raised px-2 py-0.5 text-ink-muted">
+                    {__('Fixed')}
+                </span>
+            </dd>
+        </div>
     );
 }
 

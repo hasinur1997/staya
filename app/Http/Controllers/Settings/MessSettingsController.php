@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Settings;
 
+use App\Actions\Settings\ResetMessData;
 use App\Actions\Settings\UpdateMessSettings;
 use App\Concerns\BusinessCalendar;
 use App\Enums\CostSplit;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Settings\ResetMessDataRequest;
 use App\Http\Requests\Settings\UpdateMessSettingsRequest;
 use App\Models\LedgerEntry;
 use App\Models\MessSetting;
@@ -45,6 +47,7 @@ class MessSettingsController extends Controller
             'today' => BusinessCalendar::today()->toDateString(),
             'can' => [
                 'update' => $request->user()->can('update', $settings),
+                'resetData' => $request->user()->can('resetData', $settings),
                 // Locked once the ledger holds more than the opening balance.
                 'changeOpeningBalance' => ! LedgerEntry::hasActivityBeyondOpeningBalance(),
             ],
@@ -59,6 +62,18 @@ class MessSettingsController extends Controller
         $updateMessSettings->handle($request->user(), $request->settings());
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Settings saved.')]);
+
+        return to_route('mess-settings.edit');
+    }
+
+    /**
+     * Erase every financial and meal record and start again from zero.
+     */
+    public function reset(ResetMessDataRequest $request, ResetMessData $resetMessData): RedirectResponse
+    {
+        $resetMessData->handle($request->user(), $request->reason());
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('All financial and meal data was erased. You are starting from zero.')]);
 
         return to_route('mess-settings.edit');
     }

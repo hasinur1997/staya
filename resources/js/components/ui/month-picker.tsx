@@ -3,6 +3,7 @@ import * as React from "react"
 
 import { controlClass } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { useTranslate } from "@/lib/i18n"
 import { intlLocale } from "@/lib/locale"
 import { cn } from "@/lib/utils"
 
@@ -38,10 +39,11 @@ function MonthPicker({
   id,
   value,
   onValueChange,
-  placeholder = "Any month",
+  placeholder,
   clearable = true,
   className,
 }: MonthPickerProps) {
+  const __ = useTranslate()
   const [open, setOpen] = React.useState(false)
   const [chosenYear, chosenMonth] = value
     ? value.split("-").map(Number)
@@ -73,14 +75,14 @@ function MonthPicker({
             <span className={cn("truncate", !value && "text-neutral")}>
               {chosenYear && chosenMonth
                 ? long.format(new Date(Date.UTC(chosenYear, chosenMonth - 1, 1)))
-                : placeholder}
+                : (placeholder ?? __("Any month"))}
             </span>
           </button>
         </PopoverTrigger>
         {clearable && value && (
           <button
             type="button"
-            aria-label="Clear month"
+            aria-label={__("Clear month")}
             onClick={() => onValueChange("")}
             className="text-neutral hover:text-ink absolute top-1/2 right-2 inline-flex size-6 -translate-y-1/2 items-center justify-center rounded-sm"
           >
@@ -90,11 +92,11 @@ function MonthPicker({
       </div>
       <PopoverContent className="w-64 p-3">
         <div className="flex items-center justify-between">
-          <button type="button" aria-label="Previous year" className={step} onClick={() => setYear(year - 1)}>
+          <button type="button" aria-label={__("Previous year")} className={step} onClick={() => setYear(year - 1)}>
             <ChevronLeftIcon className="size-4" />
           </button>
           <span className="text-label tabular-nums">{year}</span>
-          <button type="button" aria-label="Next year" className={step} onClick={() => setYear(year + 1)}>
+          <button type="button" aria-label={__("Next year")} className={step} onClick={() => setYear(year + 1)}>
             <ChevronRightIcon className="size-4" />
           </button>
         </div>
