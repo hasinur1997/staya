@@ -218,7 +218,7 @@ php artisan wayfinder:generate --with-form
 
 Every push to `main` is deployed automatically by `.github/workflows/deploy.yml`. You can also run it by hand from the Actions tab (**deploy** → **Run workflow**).
 
-The server never installs or compiles anything. GitHub Actions installs the production Composer dependencies, builds the frontend, and sends the result over SSH with `rsync`. Only files whose content changed are uploaded, so a normal deploy moves a few hundred KB and takes about a minute, most of it spent building in CI. Then `deploy/post-deploy.sh` runs on the server: maintenance mode on, `migrate --force`, rebuild the caches, restart the queue worker, maintenance mode off.
+The server never installs or compiles anything. GitHub Actions installs the production Composer dependencies, builds the frontend, and sends the result over SSH with `tar`, so the server needs nothing beyond SSH access (no `rsync`). `deploy/sync.sh` compares a checksum manifest with the one from the last deploy and uploads only the files whose content changed (and deletes the ones that were removed), so a normal deploy moves a few hundred KB and takes about a minute, most of it spent building in CI. Then `deploy/post-deploy.sh` runs on the server: maintenance mode on, `migrate --force`, rebuild the caches, restart the queue worker, maintenance mode off.
 
 The server's `.env` is written from the `ENV_FILE` variable on every deploy (see GitHub setup). `storage/` (uploads, logs, sessions) is never touched.
 

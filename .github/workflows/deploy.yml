@@ -66,31 +66,19 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
 
-      # --checksum sends only files whose content changed (a fresh build gives
-      # every file a new timestamp), so most deploys move a few hundred KB.
-      # Anything excluded is left alone on the server, including .env (written
-      # in the next step) and storage/ (uploads, logs, sessions).
+      # cPanel hosts often have no rsync, so deploy/sync.sh uses only ssh and
+      # tar. It compares a checksum manifest with the one from the last deploy
+      # and uploads just the files that changed (a fresh build gives every file
+      # a new timestamp, so timestamps cannot be used). Files that were never
+      # part of a deploy, such as .env and storage/ (uploads, logs, sessions),
+      # are never touched.
       - name: Sync files
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-        run: |
-          rsync -rlz --checksum --delete --omit-dir-times --chmod=D755,F644 --stats \
-            -e "ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
-            --exclude='.git/' \
-            --exclude='.github/' \
-            --exclude='node_modules/' \
-            --exclude='tests/' \
-            --exclude='docs/' \
-            --exclude='.env' \
-            --exclude='.env.*' \
-            --exclude='/storage/' \
-            --exclude='/public/storage' \
-            --exclude='/public/hot' \
-            --exclude='/database/*.sqlite' \
-            ./ "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/"
+        run: bash deploy/sync.sh
 
       # The server's .env comes from the ENV_FILE variable of the `production`
       # environment, so changing a setting is a variable edit plus a deploy.
@@ -109,12 +97,9 @@ jobs:
             echo "ENV_FILE is not set; keeping the .env on the server."
             exit 0
           fi
-          umask 077
-          printf '%s\n' "${ENV_FILE}" > "${RUNNER_TEMP}/env.production"
-          rsync -z --chmod=F600 \
-            -e "ssh -i ~/.ssh/deploy_key -p ${SSH_PORT} -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
-            "${RUNNER_TEMP}/env.production" "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/.env"
-          rm -f "${RUNNER_TEMP}/env.production"
+          printf '%s\n' "${ENV_FILE}" | ssh -i ~/.ssh/deploy_key -p "${SSH_PORT}" \
+            -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes "${SSH_USER}@${SSH_HOST}" \
+            "umask 077 && cat > '${DEPLOY_PATH}/.env'"
 
       - name: Migrate and refresh caches
         env:
