@@ -23,7 +23,15 @@ type Field =
           defaultValue: string;
           max: string;
       }
-    | { type: 'reason'; name: string; label: string };
+    | { type: 'reason'; name: string; label: string }
+    | {
+          /** A money amount typed as a decimal string. */
+          type: 'amount';
+          name: string;
+          label: string;
+          defaultValue?: string;
+          help?: string;
+      };
 
 type Props = {
     open: boolean;
@@ -38,7 +46,8 @@ type Props = {
 };
 
 /**
- * A confirmation dialog that posts one field (a date or a reason). Field
+ * A confirmation dialog that posts one field (a date, a reason or an
+ * amount). Field
  * errors from the server show inside the dialog; it closes on success.
  */
 export function FormDialog({
@@ -79,6 +88,26 @@ export function FormDialog({
                                             max={field.max}
                                             required
                                         />
+                                    ) : field.type === 'amount' ? (
+                                        <>
+                                            <Input
+                                                id={id}
+                                                name={field.name}
+                                                inputMode="decimal"
+                                                pattern="\d+(\.\d{1,2})?"
+                                                defaultValue={
+                                                    field.defaultValue
+                                                }
+                                                placeholder="0.00"
+                                                className="text-right tabular-nums"
+                                                required
+                                            />
+                                            {field.help && (
+                                                <p className="text-small text-ink-muted">
+                                                    {field.help}
+                                                </p>
+                                            )}
+                                        </>
                                     ) : (
                                         <Textarea
                                             id={id}

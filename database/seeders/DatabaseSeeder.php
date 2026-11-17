@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Deposit;
+use App\Models\GroceryPurchase;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -33,5 +34,9 @@ class DatabaseSeeder extends Seeder
         }
 
         Deposit::factory()->create(['member_id' => $members->first()?->id]);
+
+        foreach ($members->take(2) as $member) {
+            GroceryPurchase::factory()->settled()->create(['buyer_member_id' => $member->id]);
+        }
     }
 }

@@ -179,13 +179,33 @@ class Member extends Model
     }
 
     /**
+     * Purchases the member made as the buyer, voided ones included.
+     *
+     * @return HasMany<GroceryPurchase, $this>
+     */
+    public function purchases(): HasMany
+    {
+        return $this->hasMany(GroceryPurchase::class, 'buyer_member_id');
+    }
+
+    /**
+     * @return HasMany<BuyerPayable, $this>
+     */
+    public function payables(): HasMany
+    {
+        return $this->hasMany(BuyerPayable::class);
+    }
+
+    /**
      * Whether the member has purchases, deposits or buyer payables. Any
-     * deposit counts, whatever its status. Phase 6 adds purchases and
-     * payables; the RESTRICT foreign keys on those tables back it up.
+     * of them counts, whatever its status (a voided purchase too); the
+     * RESTRICT foreign keys on those tables back it up.
      */
     public function hasFinancialRecords(): bool
     {
-        return $this->deposits()->exists();
+        return $this->deposits()->exists()
+            || $this->purchases()->exists()
+            || $this->payables()->exists();
     }
 
     /**

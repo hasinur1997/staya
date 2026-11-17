@@ -15,8 +15,10 @@ import {
 import { dashboard, upcoming } from '@/routes';
 import { index as approvals } from '@/routes/approvals';
 import { index as deposits } from '@/routes/deposits';
+import { index as grocery } from '@/routes/grocery';
 import { index as ledger } from '@/routes/ledger';
 import { index as members } from '@/routes/members';
+import { index as payables } from '@/routes/payables';
 import { edit as messSettings } from '@/routes/mess-settings';
 import { index as roles } from '@/routes/roles';
 import { index as users } from '@/routes/users';
@@ -41,7 +43,7 @@ export const appNavigation: AppNavSection[] = [
             },
             {
                 title: 'Grocery purchases',
-                href: upcoming('grocery'),
+                href: grocery(),
                 icon: ShoppingBasket,
                 permissions: ['grocery.view'],
             },
@@ -85,7 +87,7 @@ export const appNavigation: AppNavSection[] = [
             },
             {
                 title: 'Payables',
-                href: upcoming('payables'),
+                href: payables(),
                 icon: HandCoins,
                 permissions: ['ledger.reimburse'],
                 count: 'openPayables',

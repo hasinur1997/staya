@@ -76,6 +76,7 @@ class DeleteMember
     {
         return DB::table('ledger_entries')->where('created_by', $user->id)->exists()
             || DB::table('members')->where('reviewed_by', $user->id)->exists()
+            || DB::table('grocery_purchases')->where('created_by', $user->id)->orWhere('updated_by', $user->id)->orWhere('voided_by', $user->id)->exists()
             || DB::table('month_closures')->where('closed_by', $user->id)->orWhere('reopened_by', $user->id)->exists()
             || DB::table('mess_settings')->where('updated_by', $user->id)->exists();
     }

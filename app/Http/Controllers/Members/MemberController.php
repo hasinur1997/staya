@@ -10,12 +10,14 @@ use App\Actions\Members\UpdateMember;
 use App\Concerns\BusinessCalendar;
 use App\Concerns\PresentsDeposits;
 use App\Concerns\PresentsMembers;
+use App\Concerns\PresentsPurchases;
 use App\Enums\MemberStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Members\StayDateRequest;
 use App\Http\Requests\Members\StoreMemberRequest;
 use App\Http\Requests\Members\UpdateMemberRequest;
 use App\Models\Deposit;
+use App\Models\GroceryPurchase;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -28,7 +30,7 @@ use Inertia\Response;
 
 class MemberController extends Controller
 {
-    use PresentsDeposits, PresentsMembers;
+    use PresentsDeposits, PresentsMembers, PresentsPurchases;
 
     /**
      * Show the member list.
@@ -129,6 +131,7 @@ class MemberController extends Controller
             'member' => $this->memberProfile($member, $actor),
             ...$this->nidProp($member, $actor, 'profile'),
             'deposits' => $this->depositHistory($member, $actor),
+            'purchases' => $this->purchaseHistory($member, $actor),
             'today' => BusinessCalendar::today()->toDateString(),
             'can' => [
                 'update' => $actor->can('update', $member),
@@ -163,6 +166,29 @@ class MemberController extends Controller
             ->limit(20)
             ->get()
             ->map(fn (Deposit $deposit) => $this->depositRow($deposit, $viewer))
+            ->all();
+    }
+
+    /**
+     * The latest purchases the member made, for viewers allowed to see
+     * purchases; null hides the section. Voided ones are left out.
+     *
+     * @return array<int, array<string, mixed>>|null
+     */
+    private function purchaseHistory(Member $member, User $viewer): ?array
+    {
+        if (! $viewer->can('viewAny', GroceryPurchase::class)) {
+            return null;
+        }
+
+        return $member->purchases()
+            ->active()
+            ->with(['buyer:id,first_name,last_name,user_id', 'items'])
+            ->orderByDesc('purchase_date')
+            ->orderByDesc('id')
+            ->limit(20)
+            ->get()
+            ->map(fn (GroceryPurchase $purchase) => $this->purchaseRow($purchase, $viewer))
             ->all();
     }
 

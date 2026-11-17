@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Enums\DepositStatus;
 use App\Enums\MemberStatus;
+use App\Models\BuyerPayable;
 use App\Models\Deposit;
 use App\Models\Fund;
 use App\Models\Member;
@@ -60,7 +61,9 @@ class HandleInertiaRequests extends Middleware
             'nav' => [
                 'counts' => [
                     'pendingApprovals' => fn (): ?int => $this->pendingApprovals($request),
-                    'openPayables' => null,
+                    'openPayables' => fn (): ?int => $request->user()?->can('viewAny', BuyerPayable::class)
+                        ? BuyerPayable::query()->open()->count()
+                        : null,
                 ],
             ],
             // Mess-wide rules the UI mirrors; the server still enforces them.

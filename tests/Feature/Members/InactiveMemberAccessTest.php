@@ -24,7 +24,7 @@ class InactiveMemberAccessTest extends TestCase
 
         $this->get(route('dashboard'))->assertOk();
         $this->get(route('members.show', $member))->assertOk();
-        $this->get(route('upcoming', 'grocery'))->assertOk();
+        $this->get(route('grocery.index'))->assertOk();
     }
 
     public function test_an_inactive_member_is_not_an_active_member()

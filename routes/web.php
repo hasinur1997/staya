@@ -7,6 +7,9 @@ use App\Http\Controllers\Approvals\RegistrationController;
 use App\Http\Controllers\Auth\RegistrationStatusController;
 use App\Http\Controllers\Deposits\DepositController;
 use App\Http\Controllers\Dev\LayoutPreviewController;
+use App\Http\Controllers\Grocery\GroceryPurchaseController;
+use App\Http\Controllers\Grocery\PayableController;
+use App\Http\Controllers\Grocery\PurchaseToolsController;
 use App\Http\Controllers\Ledger\AdjustmentController;
 use App\Http\Controllers\Ledger\LedgerController;
 use App\Http\Controllers\Members\MemberController;
@@ -40,6 +43,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('members/{member}/reactivate', [MemberController::class, 'reactivate'])->name('members.reactivate');
     Route::get('members/{member}/nid', [MemberFileController::class, 'nid'])->name('members.nid');
     Route::get('members/{member}/photo', [MemberFileController::class, 'photo'])->name('members.photo');
+
+    // Purchases are voided, never deleted: there is no destroy route.
+    Route::get('grocery/item-names', [PurchaseToolsController::class, 'itemNames'])->name('grocery.item-names');
+    Route::post('grocery/totals', [PurchaseToolsController::class, 'totals'])->name('grocery.totals');
+    Route::resource('grocery', GroceryPurchaseController::class)->parameters(['grocery' => 'purchase'])->except(['destroy']);
+    Route::post('grocery/{purchase}/void', [GroceryPurchaseController::class, 'void'])->name('grocery.void');
+    Route::get('grocery/{purchase}/receipt', [GroceryPurchaseController::class, 'receipt'])->name('grocery.receipt');
+
+    Route::get('payables', [PayableController::class, 'index'])->name('payables.index');
+    Route::post('payables/{payable}/reimburse', [PayableController::class, 'reimburse'])->name('payables.reimburse');
 
     // Deposits are never edited or deleted; mistakes are reversed.
     Route::resource('deposits', DepositController::class)->only(['index', 'create', 'store', 'show']);

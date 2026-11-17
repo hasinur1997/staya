@@ -9,6 +9,7 @@ import {
     MemberSummaryCard,
 } from '@/components/member-details';
 import { MemberDepositsCard } from '@/components/member-deposits-card';
+import { MemberPurchasesCard } from '@/components/member-purchases-card';
 import { MemberStatusBadge } from '@/components/member-status-badge';
 import { DetailTemplate } from '@/components/templates/detail-template';
 import { Button } from '@/components/ui/button';
@@ -30,7 +31,12 @@ import {
     reactivate,
     show,
 } from '@/routes/members';
-import type { DepositRow, MemberProfile, PageAction } from '@/types';
+import type {
+    DepositRow,
+    MemberProfile,
+    PageAction,
+    PurchaseRow,
+} from '@/types';
 
 type Props = {
     member: MemberProfile;
@@ -38,6 +44,8 @@ type Props = {
     nid?: string;
     /** Latest deposits; null when the viewer may not see them. */
     deposits: DepositRow[] | null;
+    /** Latest purchases made; null when the viewer may not see them. */
+    purchases: PurchaseRow[] | null;
     /** Today in Asia/Dhaka (Y-m-d). */
     today: string;
     can: {
@@ -56,6 +64,7 @@ export default function MembersShow({
     member,
     nid,
     deposits,
+    purchases,
     today,
     can,
 }: Props) {
@@ -147,6 +156,7 @@ export default function MembersShow({
                 <MemberDetailsCard member={member} />
                 {can.viewNid && <MemberNidCard member={member} nid={nid} />}
                 {deposits && <MemberDepositsCard deposits={deposits} />}
+                {purchases && <MemberPurchasesCard purchases={purchases} />}
                 <MemberStaysCard member={member} />
             </DetailTemplate>
 
