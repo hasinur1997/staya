@@ -201,7 +201,7 @@ function StatusBadge({ status }: { status: Purchase['status'] }) {
 
 function Placeholder({ children }: { children: ReactNode }) {
     return (
-        <p className="rounded-md border border-dashed px-4 py-6 text-center text-small text-ink-muted">
+        <p className="rounded-md border border-dashed px-4 py-6 text-center text-caption text-ink-muted">
             {children}
         </p>
     );
@@ -441,7 +441,7 @@ function ListPreview() {
                     <Button variant="outline" size="sm" disabled>
                         Previous
                     </Button>
-                    <span className="text-small text-ink-muted">
+                    <span className="text-caption text-ink-muted">
                         Page 1 of 1
                     </span>
                     <Button variant="outline" size="sm" disabled>
@@ -490,7 +490,7 @@ function DetailPreview() {
                         <CardHeader>
                             <CardTitle>Summary</CardTitle>
                         </CardHeader>
-                        <CardContent className="flex flex-col gap-2 text-small">
+                        <CardContent className="flex flex-col gap-2 text-body">
                             <div className="flex justify-between gap-3">
                                 <span className="text-ink-muted">Buyer</span>
                                 <span>Rahim Uddin</span>
@@ -615,7 +615,7 @@ function FormPreview() {
             >
                 <Card>
                     <fieldset className="flex flex-col gap-4 px-4">
-                        <legend className="mb-4 text-subhead">Purchase</legend>
+                        <legend className="mb-4 text-title">Purchase</legend>
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="preview-date">
@@ -640,7 +640,7 @@ function FormPreview() {
                 </Card>
                 <Card>
                     <fieldset className="flex flex-col gap-4 px-4">
-                        <legend className="mb-4 text-subhead">Items</legend>
+                        <legend className="mb-4 text-title">Items</legend>
                         {lineItems.map((item, index) => (
                             <div
                                 key={item.name}
@@ -816,7 +816,7 @@ function Switcher({
             role="group"
             aria-label={label}
         >
-            <span className="text-small text-ink-muted">{label}</span>
+            <span className="text-caption text-ink-muted">{label}</span>
             {options.map((option) => (
                 <Button
                     key={option}

@@ -13,9 +13,9 @@ export function StatCard({
 }) {
     return (
         <Card className="h-full gap-1 px-4">
-            <p className="text-small text-ink-muted">{label}</p>
-            <p className="text-money text-ink">{value}</p>
-            {hint && <p className="text-caption text-ink-muted">{hint}</p>}
+            <p className="stat-label">{label}</p>
+            <p className="stat-value">{value}</p>
+            {hint && <p className="stat-meta">{hint}</p>}
         </Card>
     );
 }

@@ -140,7 +140,7 @@ export function ResponsiveTable<T>({
                                 )}
                             </div>
                             {(status || meta.length > 0) && (
-                                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-small text-ink-muted">
+                                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-caption text-ink-muted">
                                     {status}
                                     {meta.map((item, index) => (
                                         <span key={index}>

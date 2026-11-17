@@ -62,7 +62,7 @@ class DepositReversalTest extends TestCase
 
         $this->actingAs($this->reverser())
             ->post(route('deposits.reverse', $deposit), ['reason' => 'Mistake'])
-            ->assertSessionHasErrors(['reason' => 'The fund does not have enough money. ৳ 1,500.00 is missing.']);
+            ->assertSessionHasErrors(['reason' => 'The fund does not have enough money. ৳ 1,500.00 is missing.']);
 
         $this->assertSame(DepositStatus::Approved, $deposit->fresh()->status);
         $this->assertFundMatchesLedger('500.00');

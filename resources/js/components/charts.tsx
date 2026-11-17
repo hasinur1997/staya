@@ -94,7 +94,7 @@ export function ChartCard({
                 <div className="flex flex-col gap-1">
                     <CardTitle>{title}</CardTitle>
                     {description && (
-                        <p className="text-small text-ink-muted">
+                        <p className="text-caption text-ink-muted">
                             {description}
                         </p>
                     )}
@@ -112,7 +112,7 @@ export function Legend({
     items: { label: string; className: string }[];
 }) {
     return (
-        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-small text-ink-muted sm:justify-end">
+        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-caption text-ink-muted sm:justify-end">
             {items.map((item) => (
                 <li key={item.label} className="flex items-center gap-2">
                     <span
@@ -128,7 +128,7 @@ export function Legend({
 
 export function EmptyChart({ children }: { children: ReactNode }) {
     return (
-        <p className="flex h-40 items-center justify-center text-small text-ink-muted">
+        <p className="flex h-40 items-center justify-center text-caption text-ink-muted">
             {children}
         </p>
     );
@@ -166,7 +166,7 @@ function Grid({
                             x={PAD.left - 8}
                             y={y + 4}
                             textAnchor="end"
-                            className="fill-ink-muted text-caption"
+                            className="fill-ink-muted text-caption tabular-nums"
                         >
                             {compact(value)}
                         </text>
@@ -244,7 +244,7 @@ export function GroupedBars({
                                 x={center}
                                 y={HEIGHT - 8}
                                 textAnchor="middle"
-                                className="fill-ink-muted text-caption"
+                                className="fill-ink-muted text-caption tabular-nums"
                             >
                                 {d.label}
                             </text>
@@ -316,7 +316,7 @@ export function AreaLine({ data, name }: { data: Point[]; name: string }) {
                             x={x(index)}
                             y={HEIGHT - 8}
                             textAnchor="middle"
-                            className="fill-ink-muted text-caption"
+                            className="fill-ink-muted text-caption tabular-nums"
                         >
                             {d.label}
                         </text>
@@ -387,7 +387,7 @@ export function Columns({
                                     x={center}
                                     y={HEIGHT - 8}
                                     textAnchor="middle"
-                                    className="fill-ink-muted text-caption"
+                                    className="fill-ink-muted text-caption tabular-nums"
                                 >
                                     {d.label}
                                 </text>
@@ -410,7 +410,7 @@ export function RankedBars({ rows }: { rows: Row[] }) {
         <ul className="flex flex-col gap-3">
             {rows.map((row) => (
                 <li key={row.label} className="flex flex-col gap-1">
-                    <div className="flex items-baseline justify-between gap-3 text-small">
+                    <div className="flex items-baseline justify-between gap-3 text-body">
                         <span className="truncate text-ink">{row.label}</span>
                         <span className="text-ink-muted tabular-nums">
                             {row.text}
@@ -455,7 +455,7 @@ export function DivergingBars({
 
                     return (
                         <li key={row.label} className="flex flex-col gap-1">
-                            <div className="flex items-baseline justify-between gap-3 text-small">
+                            <div className="flex items-baseline justify-between gap-3 text-body">
                                 <span className="truncate text-ink">
                                     {row.label}
                                 </span>

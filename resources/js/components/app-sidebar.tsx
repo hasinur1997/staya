@@ -82,10 +82,10 @@ function NavLink({
 }) {
     const __ = useTranslate();
     const className = cn(
-        'relative flex h-11 items-center rounded-md text-label text-ink-muted transition-[color,background-color] duration-150 hover:bg-surface-raised hover:text-ink',
+        'nav-item relative flex h-11 items-center rounded-md transition-[color,background-color] duration-150 hover:bg-surface-raised hover:text-ink',
         // 3px primary bar on the active item.
         'before:absolute before:inset-y-2 before:left-0 before:w-0.75 before:rounded-full',
-        active && 'bg-primary-soft text-ink before:bg-primary',
+        active && 'nav-item-active bg-primary-soft before:bg-primary',
         variant === 'full' ? 'gap-3 px-3' : 'justify-center',
     );
 
@@ -179,7 +179,7 @@ function CollapsibleSection({ section }: { section: AppNavSection }) {
 
     return (
         <Collapsible open={open} onOpenChange={toggle}>
-            <CollapsibleTrigger className="flex h-8 w-full items-center justify-between rounded-md px-3 text-overline text-neutral transition-[color,background-color] hover:bg-surface-raised">
+            <CollapsibleTrigger className="nav-section flex h-8 w-full items-center justify-between rounded-md px-3 transition-[color,background-color] hover:bg-surface-raised">
                 {section.title ? __(section.title) : null}
                 <ChevronDown
                     className={cn(
@@ -237,7 +237,7 @@ function SidebarNav({ variant }: { variant: Variant }) {
                         {section.title && (
                             <h2
                                 id={`nav-${section.id}`}
-                                className="flex h-8 items-center px-3 text-overline text-neutral"
+                                className="nav-section flex h-8 items-center px-3"
                             >
                                 {__(section.title)}
                             </h2>
@@ -295,10 +295,8 @@ export function AppDrawer() {
             <SidebarNav variant="full" />
             {balance !== null && (
                 <div className="border-t px-6 py-4">
-                    <p className="text-small text-ink-muted">Fund balance</p>
-                    <p className="text-money text-ink">
-                        {formatMoney(balance)}
-                    </p>
+                    <p className="stat-label">Fund balance</p>
+                    <p className="stat-value">{formatMoney(balance)}</p>
                 </div>
             )}
         </SheetContent>

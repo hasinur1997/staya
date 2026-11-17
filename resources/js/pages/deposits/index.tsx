@@ -78,7 +78,7 @@ export default function DepositsIndex({
                 selfApproved={deposit.is_self_approved}
             />
             {depositNote(deposit) && (
-                <span className="text-small text-ink-muted">
+                <span className="text-caption text-ink-muted">
                     {depositNote(deposit)}
                 </span>
             )}

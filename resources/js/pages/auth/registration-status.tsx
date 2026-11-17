@@ -45,11 +45,11 @@ export default function RegistrationStatus({
                     </p>
                 ) : (
                     <div className="flex flex-col gap-2">
-                        <p className="text-small text-ink-muted">
+                        <p className="text-caption text-ink-muted">
                             {__('Reason given')}
                         </p>
                         <p className="text-ink">{reason}</p>
-                        <p className="text-small text-ink-muted">
+                        <p className="text-caption text-ink-muted">
                             {__(
                                 'Contact the mess manager if you think this is a mistake.',
                             )}
@@ -61,7 +61,7 @@ export default function RegistrationStatus({
                     <Form {...send.form()} className="flex flex-col gap-2">
                         {({ processing, wasSuccessful }) => (
                             <>
-                                <p className="text-small text-ink-muted">
+                                <p className="text-caption text-ink-muted">
                                     {__(
                                         'Please also verify your email address using the link we sent you.',
                                     )}

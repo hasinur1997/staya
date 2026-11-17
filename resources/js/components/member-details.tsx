@@ -27,16 +27,20 @@ export function MemberSummaryCard({ member }: { member: MemberProfile }) {
                             alt={__('Photo of :name', { name: member.name })}
                         />
                     )}
-                    <AvatarFallback className="text-subhead">
+                    <AvatarFallback className="text-title">
                         {getInitials(member.name)}
                     </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col gap-1">
-                    <p className="text-subhead text-ink capitalize">
+                    <p className="text-title text-ink capitalize">
                         {member.name}
                     </p>
-                    <p className="text-small text-ink-muted">{member.email}</p>
-                    <p className="text-small text-ink-muted">{member.phone}</p>
+                    <p className="text-caption text-ink-muted">
+                        {member.email}
+                    </p>
+                    <p className="text-caption text-ink-muted">
+                        {member.phone}
+                    </p>
                 </div>
             </CardContent>
         </Card>
@@ -50,7 +54,7 @@ export function MemberDetailsCard({ member }: { member: MemberProfile }) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="text-subhead">{__('Details')}</CardTitle>
+                <CardTitle className="text-title">{__('Details')}</CardTitle>
             </CardHeader>
             <CardContent>
                 <dl className="flex flex-col gap-4">
@@ -123,7 +127,7 @@ export function MemberNidCard({
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="text-subhead">
+                <CardTitle className="text-title">
                     {__('National ID')}
                 </CardTitle>
             </CardHeader>
@@ -159,7 +163,7 @@ export function MemberNidCard({
                         )}
                     </DetailRow>
                 </dl>
-                <p className="mt-4 text-small text-ink-muted">
+                <p className="mt-4 text-caption text-ink-muted">
                     {__(
                         'Viewing or downloading NID data is recorded in the audit log.',
                     )}
@@ -176,11 +180,11 @@ export function MemberStaysCard({ member }: { member: MemberProfile }) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="text-subhead">{__('Stays')}</CardTitle>
+                <CardTitle className="text-title">{__('Stays')}</CardTitle>
             </CardHeader>
             <CardContent>
                 {member.stays.length === 0 ? (
-                    <p className="text-small text-ink-muted">
+                    <p className="text-caption text-ink-muted">
                         {__('No stays yet. The first one opens on approval.')}
                     </p>
                 ) : (
@@ -197,7 +201,7 @@ export function MemberStaysCard({ member }: { member: MemberProfile }) {
                                         ? formatBusinessDate(stay.left_on)
                                         : __('present')}
                                 </span>
-                                <span className="text-small text-ink-muted">
+                                <span className="text-caption text-ink-muted">
                                     {stay.left_on ? __('Ended') : __('Current')}
                                 </span>
                             </li>

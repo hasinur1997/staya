@@ -20,16 +20,16 @@ export function MemberMonthlyCard({ months }: { months: MemberMonth[] }) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="text-subhead">
+                <CardTitle className="text-title">
                     {__('Monthly due or credit')}
                 </CardTitle>
-                <p className="text-small text-ink-muted">
+                <p className="text-caption text-ink-muted">
                     {__('Each month stands alone. Nothing carries forward.')}
                 </p>
             </CardHeader>
             <CardContent>
                 {months.length === 0 ? (
-                    <p className="text-small text-ink-muted">
+                    <p className="text-caption text-ink-muted">
                         {__('No months to show yet.')}
                     </p>
                 ) : (

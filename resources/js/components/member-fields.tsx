@@ -50,7 +50,7 @@ function Field({
         <div className="flex flex-col gap-2">
             <Label htmlFor={id}>{label}</Label>
             {children}
-            {hint && <p className="text-small text-ink-muted">{hint}</p>}
+            {hint && <p className="text-caption text-ink-muted">{hint}</p>}
             <InputError message={error} />
         </div>
     );
@@ -71,7 +71,7 @@ function Group({
                 asCard ? 'flex flex-col gap-4 px-4' : 'flex flex-col gap-4'
             }
         >
-            <legend className="mb-4 text-subhead">{legend}</legend>
+            <legend className="mb-4 text-title">{legend}</legend>
             {children}
         </fieldset>
     );

@@ -40,7 +40,7 @@ type Props = {
 function Amount({ label, value }: { label: string; value: string }) {
     return (
         <div className="flex items-baseline justify-between gap-4">
-            <dt className="text-small text-ink-muted">{label}</dt>
+            <dt className="text-caption text-ink-muted">{label}</dt>
             <dd className="text-ink tabular-nums">{formatMoney(value)}</dd>
         </div>
     );
@@ -146,7 +146,7 @@ export default function GroceryShow({
                 aside={
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-subhead">
+                            <CardTitle className="text-title">
                                 {__('Payment')}
                             </CardTitle>
                         </CardHeader>
@@ -184,7 +184,7 @@ export default function GroceryShow({
                                 )}
                             </dl>
                             {purchase.status === 'voided' && (
-                                <p className="text-small text-ink-muted">
+                                <p className="text-caption text-ink-muted">
                                     {__(
                                         'This purchase was deleted, so its payment was reversed and it no longer counts.',
                                     )}
@@ -193,7 +193,7 @@ export default function GroceryShow({
                             {purchase.payable && can.viewPayables && (
                                 <Link
                                     href={payables()}
-                                    className="text-small text-primary hover:underline"
+                                    className="text-body text-primary hover:underline"
                                 >
                                     {__('Open payables')}
                                 </Link>
@@ -204,7 +204,7 @@ export default function GroceryShow({
             >
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-subhead">
+                        <CardTitle className="text-title">
                             {__('Items')}
                         </CardTitle>
                     </CardHeader>
@@ -230,7 +230,7 @@ export default function GroceryShow({
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-subhead">
+                        <CardTitle className="text-title">
                             {__('Details')}
                         </CardTitle>
                     </CardHeader>

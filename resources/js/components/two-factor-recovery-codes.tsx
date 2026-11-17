@@ -110,7 +110,7 @@ export default function TwoFactorRecoveryCodes({
                             <>
                                 <div
                                     ref={codesSectionRef}
-                                    className="grid gap-1 rounded-lg bg-muted p-4 font-mono text-small"
+                                    className="grid gap-1 rounded-lg bg-muted p-4 font-mono text-body"
                                     role="list"
                                     aria-label="Recovery codes"
                                 >

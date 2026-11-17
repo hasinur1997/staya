@@ -25,14 +25,14 @@ export function MemberDepositsCard({ deposits }: { deposits: DepositRow[] }) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="text-subhead">{__('Deposits')}</CardTitle>
-                <p className="text-small text-ink-muted">
+                <CardTitle className="text-title">{__('Deposits')}</CardTitle>
+                <p className="text-caption text-ink-muted">
                     {__('The latest 20 deposits, newest first.')}
                 </p>
             </CardHeader>
             <CardContent>
                 {deposits.length === 0 ? (
-                    <p className="text-small text-ink-muted">
+                    <p className="text-caption text-ink-muted">
                         {__('No deposits yet.')}
                     </p>
                 ) : (
@@ -69,7 +69,7 @@ export function MemberDepositsCard({ deposits }: { deposits: DepositRow[] }) {
                                                 }
                                             />
                                             {depositNote(deposit) && (
-                                                <span className="text-small text-ink-muted">
+                                                <span className="text-caption text-ink-muted">
                                                     {depositNote(deposit)}
                                                 </span>
                                             )}

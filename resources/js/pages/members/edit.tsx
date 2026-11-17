@@ -68,7 +68,7 @@ export default function MembersEdit({ member, nid, can }: Props) {
                     >
                         <Card>
                             <fieldset className="flex flex-col gap-4 px-4">
-                                <legend className="mb-4 text-subhead">
+                                <legend className="mb-4 text-title">
                                     {__('Account')}
                                 </legend>
                                 <div className="flex flex-col gap-2">
@@ -84,7 +84,7 @@ export default function MembersEdit({ member, nid, can }: Props) {
                                         required
                                     />
                                     {!can.changeEmail && (
-                                        <p className="text-small text-ink-muted">
+                                        <p className="text-caption text-ink-muted">
                                             {__(
                                                 'Only someone allowed to edit this account can change its email.',
                                             )}
@@ -114,7 +114,7 @@ export default function MembersEdit({ member, nid, can }: Props) {
                                     <Eye aria-hidden />
                                     {__('Show NID fields')}
                                 </Button>
-                                <p className="text-small text-ink-muted">
+                                <p className="text-caption text-ink-muted">
                                     {__(
                                         'Needed to change the NID number or copy. Viewing it is recorded in the audit log.',
                                     )}

@@ -323,7 +323,7 @@ export function ImageUploadDialog({
                                     ? __('Drop it here')
                                     : __('Drag and drop a file here')}
                             </p>
-                            <p className="text-small text-ink-muted">
+                            <p className="text-caption text-ink-muted">
                                 {__('or')}
                             </p>
                             <Button
@@ -333,7 +333,7 @@ export function ImageUploadDialog({
                                 <UploadCloud />
                                 {__('Upload from computer')}
                             </Button>
-                            <p className="text-small text-ink-muted">
+                            <p className="text-caption text-ink-muted">
                                 {allowPdf
                                     ? __(
                                           'JPG, PNG, WebP or PDF, up to :size MB',
@@ -345,7 +345,7 @@ export function ImageUploadDialog({
                             </p>
                         </div>
                         {problem && (
-                            <p role="alert" className="text-small text-error">
+                            <p role="alert" className="text-caption text-error">
                                 {problem}
                             </p>
                         )}

@@ -47,7 +47,7 @@ function AppBreadcrumbs({
 
     return (
         <Breadcrumb className="min-w-0">
-            <BreadcrumbList className="flex-nowrap text-small text-ink-muted">
+            <BreadcrumbList className="flex-nowrap text-caption text-ink-muted">
                 {hidden > 0 && (
                     <>
                         <BreadcrumbItem>
@@ -216,7 +216,7 @@ export function AppTopBar({
 
             <div className="min-w-0 flex-1">
                 {mobileTitle && (
-                    <span className="block truncate text-label text-ink md:hidden">
+                    <span className="block truncate text-title text-ink md:hidden">
                         {__(mobileTitle)}
                     </span>
                 )}
@@ -230,10 +230,8 @@ export function AppTopBar({
 
             {balance !== null && (
                 <p className="hidden items-baseline gap-2 whitespace-nowrap md:flex">
-                    <span className="text-small text-ink-muted">
-                        {__('Fund')}
-                    </span>
-                    <span className="text-label text-ink tabular-nums">
+                    <span className="stat-label">{__('Fund')}</span>
+                    <span className="money text-body-strong">
                         {formatMoney(balance)}
                     </span>
                 </p>

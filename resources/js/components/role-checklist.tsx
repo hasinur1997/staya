@@ -25,9 +25,11 @@ export function RoleChecklist({ roles, value, onChange, lockedReason }: Props) {
     return (
         <Card>
             <fieldset className="flex flex-col gap-4 px-4">
-                <legend className="mb-4 text-subhead">{__('Roles')}</legend>
+                <legend className="mb-4 text-title">{__('Roles')}</legend>
                 {lockedReason && (
-                    <p className="text-small text-ink-muted">{lockedReason}</p>
+                    <p className="text-caption text-ink-muted">
+                        {lockedReason}
+                    </p>
                 )}
                 {roles.map((role) => {
                     const id = `role-${role.id}`;

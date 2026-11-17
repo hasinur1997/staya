@@ -16,13 +16,13 @@ export default function Heading({
         <header className={variant === 'small' ? '' : 'mb-8 space-y-1'}>
             <Title
                 className={
-                    variant === 'small' ? 'text-subhead' : 'text-heading'
+                    variant === 'small' ? 'card-title' : 'section-heading'
                 }
             >
                 {__(title)}
             </Title>
             {description && (
-                <p className="text-small text-ink-muted">{__(description)}</p>
+                <p className="text-body text-ink-muted">{__(description)}</p>
             )}
         </header>
     );

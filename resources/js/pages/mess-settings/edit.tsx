@@ -263,7 +263,7 @@ export default function MessSettingsEdit({
                             emptyText={__('Nothing found.')}
                         />
                     </Field>
-                    <p className="mt-2 text-small text-ink-muted">
+                    <p className="mt-2 text-caption text-ink-muted">
                         {__(
                             'A closed month keeps the setting it was closed with. Changing this affects open months only.',
                         )}
@@ -339,7 +339,7 @@ function Fieldset({
     return (
         <Card>
             <fieldset className="flex flex-col gap-4 px-4">
-                <legend className="mb-4 text-subhead">{legend}</legend>
+                <legend className="mb-4 text-title">{legend}</legend>
                 {children}
             </fieldset>
         </Card>
@@ -367,7 +367,7 @@ function Field({
                 {label}
             </Label>
             {children}
-            {help && <p className="text-small text-ink-muted">{help}</p>}
+            {help && <p className="text-caption text-ink-muted">{help}</p>}
             <InputError message={error} />
         </div>
     );

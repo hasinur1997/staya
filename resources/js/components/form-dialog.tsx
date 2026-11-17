@@ -104,7 +104,7 @@ export function FormDialog({
                                                 required
                                             />
                                             {field.help && (
-                                                <p className="text-small text-ink-muted">
+                                                <p className="text-caption text-ink-muted">
                                                     {field.help}
                                                 </p>
                                             )}

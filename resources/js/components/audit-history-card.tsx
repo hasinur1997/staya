@@ -16,13 +16,13 @@ export function AuditHistoryCard({ history }: { history: AuditRow[] }) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="text-subhead">
+                <CardTitle className="text-title">
                     {__('Audit history')}
                 </CardTitle>
             </CardHeader>
             <CardContent>
                 {history.length === 0 ? (
-                    <p className="text-small text-ink-muted">
+                    <p className="text-caption text-ink-muted">
                         {__('Nothing has been logged for this record.')}
                     </p>
                 ) : (
@@ -45,7 +45,7 @@ export function AuditHistoryCard({ history }: { history: AuditRow[] }) {
                                         </Badge>
                                     )}
                                 </span>
-                                <span className="text-small text-ink-muted">
+                                <span className="text-caption text-ink-muted">
                                     {entry.created_at
                                         ? formatDateTime(entry.created_at)
                                         : ''}

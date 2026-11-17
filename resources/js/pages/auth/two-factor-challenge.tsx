@@ -114,7 +114,7 @@ export default function TwoFactorChallenge() {
                                 {__('Continue')}
                             </Button>
 
-                            <div className="text-center text-small text-ink-muted">
+                            <div className="text-center text-caption text-ink-muted">
                                 <span>or you can </span>
                                 <button
                                     type="button"

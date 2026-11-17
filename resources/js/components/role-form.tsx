@@ -62,7 +62,7 @@ export function RoleForm({
             >
                 <Card>
                     <fieldset className="flex flex-col gap-4 px-4">
-                        <legend className="mb-4 text-subhead">
+                        <legend className="mb-4 text-title">
                             {__('Role')}
                         </legend>
                         <div className="flex flex-col gap-2 md:max-w-sm">
@@ -82,7 +82,7 @@ export function RoleForm({
                             {!canRename && (
                                 <p
                                     id="name-help"
-                                    className="text-small text-ink-muted"
+                                    className="text-caption text-ink-muted"
                                 >
                                     {__('System roles cannot be renamed.')}
                                 </p>

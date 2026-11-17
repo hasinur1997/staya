@@ -56,7 +56,7 @@ export default function AdjustmentsCreate({ today, fundStartDate }: Props) {
                         <CardHeader>
                             <CardTitle>{__('Before you post')}</CardTitle>
                         </CardHeader>
-                        <CardContent className="flex flex-col gap-3 text-small text-ink-muted">
+                        <CardContent className="flex flex-col gap-3 text-caption text-ink-muted">
                             {fund.balance !== null && (
                                 <p>
                                     {__('The fund holds :amount now.', {
@@ -66,7 +66,7 @@ export default function AdjustmentsCreate({ today, fundStartDate }: Props) {
                             )}
                             <p>
                                 {__(
-                                    'Taking money out cannot bring the fund below ৳ 0.00.',
+                                    'Taking money out cannot bring the fund below ৳ 0.00.',
                                 )}
                             </p>
                             <p>
@@ -85,7 +85,7 @@ export default function AdjustmentsCreate({ today, fundStartDate }: Props) {
                 >
                     <Card>
                         <fieldset className="flex flex-col gap-4 px-4">
-                            <legend className="mb-4 text-subhead">
+                            <legend className="mb-4 text-title">
                                 {__('Adjustment')}
                             </legend>
                             <div className="flex flex-col gap-2">
@@ -223,7 +223,7 @@ function Field({
                 {label}
             </Label>
             {children}
-            {help && <p className="text-small text-ink-muted">{help}</p>}
+            {help && <p className="text-caption text-ink-muted">{help}</p>}
             <InputError message={error} />
         </div>
     );

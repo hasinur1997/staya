@@ -13,7 +13,7 @@ export function DetailRow({
 }) {
     return (
         <div className="flex flex-col gap-1 md:grid md:grid-cols-3 md:items-baseline md:gap-4">
-            <dt className="text-small text-ink-muted">{label}</dt>
+            <dt className="text-caption text-ink-muted">{label}</dt>
             <dd className="text-body text-ink md:col-span-2">{children}</dd>
         </div>
     );

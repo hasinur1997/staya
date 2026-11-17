@@ -18,7 +18,7 @@ const EmptyState = () => {
                 <KeyRound className="h-7 w-7 text-ink-muted" />
             </div>
             <p className="font-medium">No passkeys yet</p>
-            <p className="mt-1 text-small text-ink-muted">
+            <p className="mt-1 text-caption text-ink-muted">
                 Add a passkey to sign in without a password
             </p>
         </div>

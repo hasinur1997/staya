@@ -35,7 +35,7 @@ class CalculatePurchaseTotals
 
             if (bccomp($lineTotal, '0', Money::SCALE) <= 0) {
                 throw ValidationException::withMessages([
-                    "items.{$position}.unit_price" => __('This line comes to ৳ 0.00. Check the quantity and unit price.'),
+                    "items.{$position}.unit_price" => __('This line comes to ৳ 0.00. Check the quantity and unit price.'),
                 ]);
             }
 

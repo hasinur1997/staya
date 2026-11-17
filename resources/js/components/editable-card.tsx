@@ -44,9 +44,9 @@ export function EditableCard({
         <Card className="h-full">
             <CardHeader className="flex-row items-start justify-between gap-3">
                 <div className="flex flex-col gap-1">
-                    <CardTitle className="text-subhead">{title}</CardTitle>
+                    <CardTitle className="text-title">{title}</CardTitle>
                     {description && (
-                        <p className="text-small text-ink-muted">
+                        <p className="text-caption text-ink-muted">
                             {description}
                         </p>
                     )}

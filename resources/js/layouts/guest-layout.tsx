@@ -33,9 +33,11 @@ export default function GuestLayout({
             >
                 {(title || description) && (
                     <div className="flex flex-col gap-1">
-                        {title && <h1 className="text-heading">{__(title)}</h1>}
+                        {title && (
+                            <h1 className="section-heading">{__(title)}</h1>
+                        )}
                         {description && (
-                            <p className="text-small text-ink-muted">
+                            <p className="text-body text-ink-muted">
                                 {__(description)}
                             </p>
                         )}

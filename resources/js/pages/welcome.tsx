@@ -68,8 +68,8 @@ export default function Welcome() {
 
                 <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-12 px-4 pt-8 pb-16 md:gap-16 md:px-6 md:pt-16">
                     <section className="flex max-w-2xl flex-col gap-4">
-                        <p className="text-overline text-neutral">{name}</p>
-                        <h1 className="text-heading md:text-headline">
+                        <p className="text-caption text-ink-muted">{name}</p>
+                        <h1 className="page-title">
                             {__('Run your mess with clear numbers.')}
                         </h1>
                         <p className="text-body text-ink-muted">
@@ -101,10 +101,10 @@ export default function Welcome() {
                                     className="size-6 text-primary"
                                     aria-hidden
                                 />
-                                <h2 className="text-subhead">
+                                <h2 className="text-title">
                                     {__(feature.title)}
                                 </h2>
-                                <p className="text-small text-ink-muted">
+                                <p className="text-caption text-ink-muted">
                                     {__(feature.text)}
                                 </p>
                             </Card>

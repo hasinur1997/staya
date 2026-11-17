@@ -126,7 +126,7 @@ class ManualAdjustmentTest extends TestCase
 
         $this->actingAs($adjuster)
             ->post(route('ledger.adjustments.store'), $this->payload(['direction' => 'debit', 'amount' => '1250.00']))
-            ->assertSessionHasErrors(['amount' => 'The fund does not have enough money. ৳ 1,150.00 is missing.']);
+            ->assertSessionHasErrors(['amount' => 'The fund does not have enough money. ৳ 1,150.00 is missing.']);
 
         $this->assertSame(1, LedgerEntry::query()->count());
         $this->assertSame(1, Activity::query()->where('description', 'adjustment_posted')->count());

@@ -27,7 +27,7 @@ function CommandInput({
       <CommandPrimitive.Input
         data-slot="command-input"
         className={cn(
-          "placeholder:text-neutral h-full w-full bg-transparent text-small outline-hidden focus-visible:outline-none disabled:opacity-50",
+          "placeholder:text-neutral h-full w-full bg-transparent text-caption outline-hidden focus-visible:outline-none disabled:opacity-50",
           className
         )}
         {...props}
@@ -56,7 +56,7 @@ function CommandEmpty({
   return (
     <CommandPrimitive.Empty
       data-slot="command-empty"
-      className={cn("text-ink-muted px-3 py-4 text-center text-small", className)}
+      className={cn("text-ink-muted px-3 py-4 text-center text-caption", className)}
       {...props}
     />
   )
@@ -70,7 +70,7 @@ function CommandItem({
     <CommandPrimitive.Item
       data-slot="command-item"
       className={cn(
-        "data-[selected=true]:bg-primary-soft relative flex min-h-9 cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-small outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+        "data-[selected=true]:bg-primary-soft relative flex min-h-9 cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-body outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
         className
       )}
       {...props}

@@ -91,7 +91,7 @@ export default function LedgerIndex({
                         <>
                             <span>{entry.reason}</span>
                             {details(entry) && (
-                                <span className="text-small text-ink-muted">
+                                <span className="text-caption text-ink-muted">
                                     {details(entry)}
                                 </span>
                             )}
@@ -200,7 +200,7 @@ export default function LedgerIndex({
                                 href={entries.prev_page_url}
                                 label={__('Previous')}
                             />
-                            <span className="text-small text-ink-muted">
+                            <span className="text-caption text-ink-muted">
                                 {__('Page :page of :pages', {
                                     page: entries.current_page,
                                     pages: entries.last_page,
@@ -263,7 +263,7 @@ export default function LedgerIndex({
                         ],
                     })}
                     empty={
-                        <p className="text-small text-ink-muted">
+                        <p className="text-caption text-ink-muted">
                             {__('No ledger entries in this period.')}
                         </p>
                     }

@@ -133,7 +133,7 @@ export function ImageDropzone({
                               ? __('Drop it to upload')
                               : __('No :subject chosen', { subject: label })}
                     </p>
-                    <p className="text-small text-ink-muted">
+                    <p className="text-caption text-ink-muted">
                         {__('Drag a file here or use the button.')}
                     </p>
                     <div className="flex flex-wrap justify-center gap-2 pt-1 sm:justify-start">

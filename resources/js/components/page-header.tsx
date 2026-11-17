@@ -100,14 +100,16 @@ export function PageHeader({
             <div className="flex items-start gap-4">
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
                     {overline && (
-                        <p className="text-overline text-neutral">{overline}</p>
+                        <p className="text-caption text-ink-muted">
+                            {overline}
+                        </p>
                     )}
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                        <h1 className="text-heading text-ink">{title}</h1>
+                        <h1 className="page-title">{title}</h1>
                         {status}
                     </div>
                     {description && (
-                        <div className="text-small text-ink-muted">
+                        <div className="text-body text-ink-muted">
                             {description}
                         </div>
                     )}
@@ -138,7 +140,7 @@ export function PageHeader({
                     {primaryAction && (
                         <ActionButton
                             action={primaryAction}
-                            className="hidden md:inline-flex"
+                            className="hidden text-body-strong md:inline-flex"
                         />
                     )}
                 </div>
@@ -151,7 +153,7 @@ export function PageHeader({
                     <ActionButton
                         action={primaryAction}
                         size="lg"
-                        className="w-full"
+                        className="w-full text-body-strong"
                     />
                 </StickyActionBar>
             )}

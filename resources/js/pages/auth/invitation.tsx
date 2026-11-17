@@ -30,7 +30,7 @@ function Unavailable({ title, message }: { title: string; message: string }) {
             className="flex flex-col items-center gap-4 py-6 text-center"
         >
             <CircleAlert className="size-8 text-ink-muted" aria-hidden />
-            <h2 className="text-subhead">{title}</h2>
+            <h2 className="text-title">{title}</h2>
             <p className="text-ink-muted">{message}</p>
             <Button asChild variant="outline">
                 <a href={login.url()}>{__('Go to log in')}</a>
@@ -113,7 +113,7 @@ export default function Invitation({
                 {({ processing, errors }) => (
                     <>
                         <fieldset className="flex flex-col gap-4">
-                            <legend className="mb-4 text-subhead">
+                            <legend className="mb-4 text-title">
                                 {__('Account')}
                             </legend>
                             <div className="flex flex-col gap-2">
@@ -129,7 +129,7 @@ export default function Invitation({
                                 />
                                 <p
                                     id="email-help"
-                                    className="text-small text-ink-muted"
+                                    className="text-caption text-ink-muted"
                                 >
                                     {expiresAt
                                         ? __(
@@ -152,7 +152,7 @@ export default function Invitation({
                         />
 
                         <fieldset className="flex flex-col gap-4">
-                            <legend className="mb-4 text-subhead">
+                            <legend className="mb-4 text-title">
                                 {__('Password')}
                             </legend>
                             <div className="grid gap-4 md:grid-cols-2">

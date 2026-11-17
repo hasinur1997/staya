@@ -166,7 +166,7 @@ function MealsDay({
     const grid = (
         <Card>
             <CardHeader className="flex-row items-center justify-between gap-3">
-                <CardTitle className="text-subhead">
+                <CardTitle className="text-title">
                     {formatBusinessDate(date)}
                 </CardTitle>
                 {editable && !editing && (
@@ -199,7 +199,7 @@ function MealsDay({
                 ) : (
                     <div className="flex flex-col">
                         <div
-                            className="hidden items-end gap-3 border-b pb-3 text-small text-ink-muted md:grid"
+                            className="hidden items-end gap-3 border-b pb-3 text-caption text-ink-muted md:grid"
                             style={{ gridTemplateColumns: columns }}
                         >
                             <span>{__('Member')}</span>
@@ -350,7 +350,7 @@ function MealsDay({
                                     );
                                 })}
                                 <span className="flex justify-between text-label text-ink tabular-nums md:block md:text-right">
-                                    <span className="text-small text-ink-muted md:hidden">
+                                    <span className="text-caption text-ink-muted md:hidden">
                                         {__('Total')}
                                     </span>
                                     {memberTotal(member.id)}
@@ -369,7 +369,7 @@ function MealsDay({
                                     key={type.id}
                                     className="text-label text-ink tabular-nums md:text-center"
                                 >
-                                    <span className="text-small text-ink-muted md:hidden">
+                                    <span className="text-caption text-ink-muted md:hidden">
                                         {type.name}:{' '}
                                     </span>
                                     {editable
@@ -448,11 +448,11 @@ function MealsDay({
     const summary = (
         <Card>
             <CardHeader>
-                <CardTitle className="text-subhead">
+                <CardTitle className="text-title">
                     {formatMonth(date.slice(0, 7))}
                 </CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-col gap-2 text-small">
+            <CardContent className="flex flex-col gap-2 text-body">
                 <p className="flex justify-between gap-3">
                     <span className="text-ink-muted">{__('Meals so far')}</span>
                     <span className="tabular-nums">{month.meals}</span>
@@ -522,7 +522,7 @@ function MealsDay({
                         {grid}
                         {active && (
                             <div className="shadow-md sticky bottom-4 flex items-center justify-between gap-3 rounded-lg border bg-background p-3 print:hidden">
-                                <span className="text-small text-ink-muted">
+                                <span className="text-caption text-ink-muted">
                                     {form.isDirty
                                         ? __('You have unsaved changes.')
                                         : __('Editing meals')}

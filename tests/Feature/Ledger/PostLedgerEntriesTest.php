@@ -69,7 +69,7 @@ class PostLedgerEntriesTest extends TestCase
         } catch (InsufficientFunds $exception) {
             $this->assertSame('50.50', $exception->missing);
             $this->assertSame(
-                'The fund does not have enough money. ৳ 50.50 is missing.',
+                'The fund does not have enough money. ৳ 50.50 is missing.',
                 $exception->errors()['amount'][0],
             );
         }
@@ -142,7 +142,7 @@ class PostLedgerEntriesTest extends TestCase
 
         try {
             $this->postEntry(LedgerDirection::Debit, '50.00');
-            $this->fail('The second debit should have been checked against ৳ 20.00.');
+            $this->fail('The second debit should have been checked against ৳ 20.00.');
         } catch (InsufficientFunds $exception) {
             $this->assertSame('30.00', $exception->missing);
         }

@@ -72,7 +72,7 @@ export default function DepositsCreate({
                     >
                         <Card>
                             <fieldset className="flex flex-col gap-4 px-4">
-                                <legend className="mb-4 text-subhead">
+                                <legend className="mb-4 text-title">
                                     {__('Deposit')}
                                 </legend>
 
@@ -162,7 +162,7 @@ export default function DepositsCreate({
                                             <Label htmlFor="approve">
                                                 {__('Approve on save')}
                                             </Label>
-                                            <p className="text-small text-ink-muted">
+                                            <p className="text-caption text-ink-muted">
                                                 {forOwn
                                                     ? __(
                                                           'This is your own deposit, so the approval is flagged as a self-approval.',

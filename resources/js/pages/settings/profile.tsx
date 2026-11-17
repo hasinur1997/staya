@@ -107,7 +107,7 @@ export default function Profile({
                             {mustVerifyEmail &&
                                 auth.user.email_verified_at === null && (
                                     <div>
-                                        <p className="-mt-4 text-small text-ink-muted">
+                                        <p className="-mt-4 text-caption text-ink-muted">
                                             Your email address is unverified.{' '}
                                             <Link
                                                 href={send()}

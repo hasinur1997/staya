@@ -29,9 +29,11 @@
  * var(--surface)), so a nested [data-theme] element re-themes its subtree.
  */
 @theme inline {
-    /* Noto Sans Bengali covers Bangla text and the ৳ sign. */
-    --font-sans: 'Open Sans', 'Noto Sans Bengali', system-ui, sans-serif;
-    --font-display: 'Open Sans', 'Noto Sans Bengali', system-ui, sans-serif;
+    /* Plus Jakarta Sans for English; Noto Sans Bengali (Bangla and the ৳ sign) is unchanged. */
+    --font-sans:
+        'Plus Jakarta Sans', 'Noto Sans Bengali', ui-sans-serif, system-ui,
+        sans-serif;
+    --font-brand: 'Nunito', 'Plus Jakarta Sans', sans-serif;
     --font-mono: 'Roboto Mono', ui-monospace, monospace;
 
     /*
@@ -240,80 +242,70 @@
 }
 
 /*
- * Type styles. Everything is Open Sans at regular (400) or medium (500) only.
+ * Type scale — docs/TYPOGRAPHY.md. Every piece of text maps to one of these
+ * roles; no other font sizes or weights are used. Size and line-height are
+ * the doc's tokens; weight and tracking ride along so a role is one class.
  */
-@utility text-display {
-    font-family: var(--font-display);
-    font-size: 64px;
-    line-height: 72px;
-    font-weight: 500;
-    letter-spacing: -0.01em;
+@theme {
+    --text-display: 30px;
+    --text-display--line-height: 38px;
+    --text-display--font-weight: 700;
+    --text-display--letter-spacing: -0.02em;
+    --text-heading: 20px;
+    --text-heading--line-height: 28px;
+    --text-heading--font-weight: 700;
+    --text-heading--letter-spacing: -0.01em;
+    --text-title: 16px;
+    --text-title--line-height: 24px;
+    --text-title--font-weight: 700;
+    --text-body: 15px;
+    --text-body--line-height: 22px;
+    --text-body--font-weight: 400;
+    --text-label: 13px;
+    --text-label--line-height: 18px;
+    --text-label--font-weight: 600;
+    --text-caption: 12px;
+    --text-caption--line-height: 16px;
+    --text-caption--font-weight: 500;
+    --text-money: 26px;
+    --text-money--line-height: 32px;
+    --text-money--font-weight: 700;
+    --text-money--letter-spacing: -0.01em;
+    --text-money-lg: 34px;
+    --text-money-lg--line-height: 40px;
+    --text-money-lg--font-weight: 800;
+    --text-money-lg--letter-spacing: -0.02em;
+    --text-overline: 11px;
+    --text-overline--line-height: 16px;
+    --text-overline--font-weight: 700;
+    --text-overline--letter-spacing: 0.08em;
 }
 
-@utility text-headline {
-    font-family: var(--font-display);
-    font-size: 48px;
-    line-height: 56px;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-}
-
-@utility text-heading {
-    font-family: var(--font-display);
-    font-size: 28px;
-    line-height: 36px;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-}
-
-@utility text-subhead {
-    font-size: 20px;
-    line-height: 28px;
-    font-weight: 500;
-}
-
-@utility text-body {
-    font-size: 16px;
-    line-height: 24px;
-    font-weight: 400;
-}
-
-@utility text-small {
-    font-size: 14px;
-    line-height: 20px;
-    font-weight: 400;
-}
-
-@utility text-label {
-    font-size: 14px;
-    line-height: 20px;
-    font-weight: 500;
-}
-
-@utility text-caption {
-    font-size: 12px;
-    line-height: 16px;
-    font-weight: 400;
-}
-
-@utility text-overline {
-    font-size: 11px;
-    line-height: 16px;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-}
-
-@utility text-money {
-    font-size: 20px;
-    line-height: 28px;
-    font-weight: 500;
-    font-variant-numeric: tabular-nums;
+/* body-strong: the body size at weight 600. */
+@utility text-body-strong {
+    font-size: 15px;
+    line-height: 22px;
+    font-weight: 600;
 }
 
 @layer base {
     * {
         @apply border-border;
+    }
+
+    html {
+        font-family: var(--font-sans);
+        font-size: 15px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        font: inherit;
     }
 
     body {
@@ -328,6 +320,7 @@
     h2,
     h3,
     h4 {
+        letter-spacing: -0.02em;
         text-wrap: balance;
     }
 
@@ -340,6 +333,83 @@
     pre,
     samp {
         @apply font-mono;
+    }
+}
+
+@layer components {
+    .brand-wordmark {
+        @apply font-brand text-[22px] leading-7 font-black tracking-[-0.03em] text-ink;
+    }
+
+    .page-title {
+        @apply text-display text-ink;
+    }
+    .section-heading {
+        @apply text-heading text-ink;
+    }
+    .card-title {
+        @apply text-title text-ink;
+    }
+    .card-sub {
+        @apply text-label font-medium text-ink-muted;
+    }
+
+    .stat-label {
+        @apply text-label text-ink-muted;
+    }
+    .stat-value {
+        @apply text-money whitespace-nowrap text-ink tabular-nums;
+    }
+    .stat-value-lg {
+        @apply text-money-lg whitespace-nowrap text-ink tabular-nums;
+    }
+    .stat-meta {
+        @apply text-caption text-ink-muted tabular-nums;
+    }
+
+    .field-label {
+        @apply text-label text-ink;
+    }
+    .field-help {
+        @apply text-caption text-ink-muted;
+    }
+    .field-error {
+        @apply text-caption font-semibold text-error;
+    }
+
+    .btn-text {
+        @apply text-label;
+    }
+
+    .nav-item {
+        @apply text-body font-medium text-ink-muted;
+    }
+    .nav-item-active {
+        @apply text-body font-semibold text-ink;
+    }
+    .nav-section {
+        @apply text-overline text-ink-muted uppercase;
+    }
+
+    .table-head {
+        @apply text-label text-ink-muted;
+    }
+    .table-cell {
+        @apply text-body text-ink;
+    }
+
+    .badge-text {
+        @apply text-caption font-semibold;
+    }
+
+    .money {
+        @apply whitespace-nowrap tabular-nums;
+    }
+    .money-credit {
+        @apply font-semibold whitespace-nowrap text-success tabular-nums;
+    }
+    .money-due {
+        @apply font-semibold whitespace-nowrap text-error tabular-nums;
     }
 }
 

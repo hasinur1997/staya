@@ -36,7 +36,7 @@ export function PermissionChecklist({
             {groups.map((group) => (
                 <Card key={group.group}>
                     <fieldset className="flex flex-col gap-4 px-4">
-                        <legend className="mb-4 text-subhead">
+                        <legend className="mb-4 text-title">
                             {group.label}
                         </legend>
                         {group.permissions.map((permission) => {

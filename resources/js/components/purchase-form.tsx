@@ -86,7 +86,7 @@ function Field({
                 {label}
             </Label>
             {children}
-            {help && <p className="text-small text-ink-muted">{help}</p>}
+            {help && <p className="text-caption text-ink-muted">{help}</p>}
             <InputError message={error} />
         </div>
     );
@@ -171,7 +171,7 @@ export function PurchaseFields({
         <>
             <Card>
                 <fieldset className="flex flex-col gap-4 px-4">
-                    <legend className="mb-4 text-subhead">
+                    <legend className="mb-4 text-title">
                         {__('Purchase')}
                     </legend>
                     <div className="grid gap-4 md:grid-cols-2">
@@ -241,7 +241,7 @@ export function PurchaseFields({
                                     {__('Member')}
                                 </ToggleGroupItem>
                             </ToggleGroup>
-                            <p className="text-small text-ink-muted">
+                            <p className="text-caption text-ink-muted">
                                 {paidBy === 'fund'
                                     ? __(
                                           'The fund pays as soon as you save. If it does not hold enough, the rest is owed to the buyer.',
@@ -329,7 +329,7 @@ export function PurchaseFields({
                                 href={receiptRoute.url(purchase.id)}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="text-small text-primary hover:underline"
+                                className="text-body text-primary hover:underline"
                             >
                                 {__('View it')}
                             </a>
@@ -340,7 +340,7 @@ export function PurchaseFields({
 
             <Card>
                 <fieldset className="flex flex-col gap-4 px-4">
-                    <legend className="mb-4 text-subhead">{__('Items')}</legend>
+                    <legend className="mb-4 text-title">{__('Items')}</legend>
                     <datalist id="item-name-suggestions">
                         {names.map((name) => (
                             <option key={name} value={name} />
@@ -532,16 +532,13 @@ export function PurchaseTotalsCard({
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="text-subhead">{__('Total')}</CardTitle>
+                <CardTitle className="text-title">{__('Total')}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
-                <p
-                    className="text-heading text-ink tabular-nums"
-                    aria-live="polite"
-                >
+                <p className="stat-value" aria-live="polite">
                     {totals ? formatMoney(totals.grand_total) : '—'}
                 </p>
-                <p className="text-small text-ink-muted">
+                <p className="text-caption text-ink-muted">
                     {pending
                         ? __('Working out the total…')
                         : __(
@@ -549,7 +546,7 @@ export function PurchaseTotalsCard({
                           )}
                 </p>
                 {fund.balance !== null && (
-                    <p className="text-small text-ink-muted">
+                    <p className="text-caption text-ink-muted">
                         {__('The fund holds :amount now.', {
                             amount: formatMoney(fund.balance),
                         })}

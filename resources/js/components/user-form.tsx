@@ -70,7 +70,7 @@ export function UserForm({
             >
                 <Card>
                     <fieldset className="flex flex-col gap-4 px-4">
-                        <legend className="mb-4 text-subhead">
+                        <legend className="mb-4 text-title">
                             {__('Account')}
                         </legend>
                         <div className="grid gap-4 md:grid-cols-2">

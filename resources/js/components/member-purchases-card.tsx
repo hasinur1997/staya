@@ -17,13 +17,13 @@ export function MemberPurchasesCard({
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="text-subhead">
+                <CardTitle className="text-title">
                     {__('Purchases made')}
                 </CardTitle>
             </CardHeader>
             <CardContent>
                 {purchases.length === 0 ? (
-                    <p className="text-small text-ink-muted">
+                    <p className="text-caption text-ink-muted">
                         {__('No purchases yet.')}
                     </p>
                 ) : (
@@ -42,7 +42,7 @@ export function MemberPurchasesCard({
                                             purchase.purchase_date,
                                         )}
                                     </Link>
-                                    <span className="truncate text-small text-ink-muted">
+                                    <span className="truncate text-caption text-ink-muted">
                                         {purchase.item_names.join(', ')}
                                     </span>
                                 </span>

@@ -32,7 +32,7 @@ export function Pager<T>({ page }: { page: Paginated<T> }) {
     return (
         <div className="flex items-center gap-3">
             <PageLink href={page.prev_page_url} label={__('Previous')} />
-            <span className="text-small text-ink-muted">
+            <span className="text-caption text-ink-muted">
                 {__('Page :page of :pages', {
                     page: page.current_page,
                     pages: page.last_page,

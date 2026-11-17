@@ -118,10 +118,10 @@ export default function DepositsShow({ deposit, history, can }: Props) {
                         <Card className="border-success/40 bg-success-soft">
                             <CardContent className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                                 <div className="flex flex-col gap-1">
-                                    <p className="text-subhead text-ink">
+                                    <p className="text-title text-ink">
                                         {__('Waiting for your decision')}
                                     </p>
-                                    <p className="text-small text-ink-muted">
+                                    <p className="text-caption text-ink-muted">
                                         {deposit.is_own
                                             ? __(
                                                   'This is your own deposit. Approving it is recorded as a self-approval.',
@@ -160,7 +160,7 @@ export default function DepositsShow({ deposit, history, can }: Props) {
                     )}
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-subhead">
+                        <CardTitle className="text-title">
                             {__('Details')}
                         </CardTitle>
                     </CardHeader>

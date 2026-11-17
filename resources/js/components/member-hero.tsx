@@ -158,13 +158,13 @@ export function MemberHero({ member, canEdit, actions, menuActions }: Props) {
                             label={member.status_label}
                         />
                     </div>
-                    <p className="text-small text-ink-muted">
+                    <p className="text-caption text-ink-muted">
                         {[member.email, member.phone]
                             .filter(Boolean)
                             .join(' · ')}
                     </p>
                     {currentStay && (
-                        <p className="text-small text-ink-muted">
+                        <p className="text-caption text-ink-muted">
                             {__('Living in the mess since :date', {
                                 date: formatBusinessDate(currentStay.joined_on),
                             })}

@@ -58,7 +58,7 @@ export default function PasskeyRegistration({ onSuccess }: Props) {
 
     if (!isSupported) {
         return (
-            <div className="text-small text-ink-muted">
+            <div className="text-caption text-ink-muted">
                 Passkeys are not supported in this browser.
             </div>
         );

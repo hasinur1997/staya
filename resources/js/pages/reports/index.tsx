@@ -334,7 +334,7 @@ export default function ReportsIndex({
             >
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-subhead">
+                        <CardTitle className="text-title">
                             {can.viewAll
                                 ? __('Each member')
                                 : __('Your figures')}
@@ -342,7 +342,7 @@ export default function ReportsIndex({
                     </CardHeader>
                     <CardContent>
                         {report.members.length === 0 ? (
-                            <p className="text-small text-ink-muted">
+                            <p className="text-caption text-ink-muted">
                                 {__('No members to show for this period.')}
                             </p>
                         ) : (
@@ -376,10 +376,10 @@ export default function ReportsIndex({
                 {report.unapproved && (
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-subhead">
+                            <CardTitle className="text-title">
                                 {__('Deposits not counted')}
                             </CardTitle>
-                            <p className="text-small text-ink-muted">
+                            <p className="text-caption text-ink-muted">
                                 {__(
                                     'Pending and rejected deposits dated in this period never affect the balance or anyone’s due or credit.',
                                 )}
@@ -421,10 +421,10 @@ export default function ReportsIndex({
                 {report.self_approved && (
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-subhead">
+                            <CardTitle className="text-title">
                                 {__('Self-approved deposits')}
                             </CardTitle>
-                            <p className="text-small text-ink-muted">
+                            <p className="text-caption text-ink-muted">
                                 {__(
                                     'Approved by the person who submitted them. Worth a second look.',
                                 )}
@@ -432,7 +432,7 @@ export default function ReportsIndex({
                         </CardHeader>
                         <CardContent>
                             {report.self_approved.length === 0 ? (
-                                <p className="text-small text-ink-muted">
+                                <p className="text-caption text-ink-muted">
                                     {__('None in this period.')}
                                 </p>
                             ) : (
@@ -448,7 +448,7 @@ export default function ReportsIndex({
                                                     name={deposit.member_name}
                                                     linked={can.viewAll}
                                                 />
-                                                <span className="text-small text-ink-muted">
+                                                <span className="text-caption text-ink-muted">
                                                     {formatBusinessDate(
                                                         deposit.deposit_date,
                                                     )}
@@ -471,7 +471,7 @@ export default function ReportsIndex({
                 {report.open_payables && (
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-subhead">
+                            <CardTitle className="text-title">
                                 {__('Open payables')}
                             </CardTitle>
                         </CardHeader>
@@ -485,7 +485,7 @@ export default function ReportsIndex({
                                 {money(report.open_payables.amount)}
                                 <Link
                                     href={payables()}
-                                    className="text-small text-primary hover:underline print:hidden"
+                                    className="text-body text-primary hover:underline print:hidden"
                                 >
                                     {__('View payables')}
                                 </Link>
@@ -497,11 +497,11 @@ export default function ReportsIndex({
                 {report.closure && (
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-subhead">
+                            <CardTitle className="text-title">
                                 {__('Month status')}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="flex flex-col gap-1 text-small">
+                        <CardContent className="flex flex-col gap-1 text-body">
                             {closed && report.closure.closed_at ? (
                                 <p>
                                     {__(

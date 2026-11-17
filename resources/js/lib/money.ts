@@ -1,5 +1,6 @@
 /**
- * Formats a server decimal string ("12450.5", "-980.50") as "৳ 12,450.50".
+ * Formats a server decimal string ("12450.5", "-980.50") as "৳ 12,450.50" (thin space
+ * after the taka sign), with "+ " or "− " in front when signed or negative.
  * String work only: money is never turned into a float on the client.
  */
 export function formatMoney(value: string, { signed = false } = {}): string {
@@ -13,7 +14,7 @@ export function formatMoney(value: string, { signed = false } = {}): string {
         ',',
     );
     const isZero = /^0*$/.test(whole) && /^0*$/.test(fraction);
-    const sign = negative && !isZero ? '−' : signed && !isZero ? '+' : '';
+    const sign = negative && !isZero ? '− ' : signed && !isZero ? '+ ' : '';
 
-    return `${sign}৳ ${grouped}.${fraction.padEnd(2, '0').slice(0, 2)}`;
+    return `${sign}৳\u2009${grouped}.${fraction.padEnd(2, '0').slice(0, 2)}`;
 }

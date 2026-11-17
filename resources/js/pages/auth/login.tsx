@@ -59,7 +59,7 @@ export default function Login({ status, canResetPassword }: Props) {
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
-                                            className="ml-auto text-small"
+                                            className="ml-auto text-body"
                                             tabIndex={5}
                                         >
                                             {__('Forgot your password?')}
@@ -100,7 +100,7 @@ export default function Login({ status, canResetPassword }: Props) {
                             </Button>
                         </div>
 
-                        <div className="text-center text-small text-ink-muted">
+                        <div className="text-center text-caption text-ink-muted">
                             {__("Don't have an account?")}{' '}
                             <TextLink href={register()} tabIndex={5}>
                                 {__('Sign up')}

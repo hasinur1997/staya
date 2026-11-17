@@ -501,15 +501,15 @@ export default function Dashboard({
                         {owed !== null && (
                             <Card>
                                 <CardHeader>
-                                    <CardTitle className="text-subhead">
+                                    <CardTitle className="text-title">
                                         {__('Owed to you')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-1">
-                                    <p className="text-money tabular-nums">
+                                    <p className="stat-value">
                                         {formatMoney(owed)}
                                     </p>
-                                    <p className="text-small text-ink-muted">
+                                    <p className="text-caption text-ink-muted">
                                         {__(
                                             'What the fund still owes you for purchases it could not cover or that you paid for yourself.',
                                         )}
@@ -520,7 +520,7 @@ export default function Dashboard({
                         {showQueues && (
                             <Card>
                                 <CardHeader>
-                                    <CardTitle className="text-subhead">
+                                    <CardTitle className="text-title">
                                         {__('Waiting for you')}
                                     </CardTitle>
                                 </CardHeader>
@@ -562,12 +562,12 @@ export default function Dashboard({
                 {report && (
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-subhead">
+                            <CardTitle className="text-title">
                                 {__('Everyone in :month', {
                                     month: formatMonth(month),
                                 })}
                             </CardTitle>
-                            <p className="text-small text-ink-muted">
+                            <p className="text-caption text-ink-muted">
                                 {__(
                                     'Expenses :expenses · :members · :share each',
                                     {
@@ -586,7 +586,7 @@ export default function Dashboard({
                         </CardHeader>
                         <CardContent>
                             {report.members.length === 0 ? (
-                                <p className="text-small text-ink-muted">
+                                <p className="text-caption text-ink-muted">
                                     {__(
                                         'No members lived in the mess this month.',
                                     )}
@@ -628,19 +628,19 @@ export default function Dashboard({
                 {memberStatus !== null && can.viewDeposits && (
                     <Card>
                         <CardHeader className="flex-row items-center justify-between">
-                            <CardTitle className="text-subhead">
+                            <CardTitle className="text-title">
                                 {__('Your latest deposits')}
                             </CardTitle>
                             <Link
                                 href={deposits()}
-                                className="text-small text-primary hover:underline"
+                                className="text-body text-primary hover:underline"
                             >
                                 {__('All deposits')}
                             </Link>
                         </CardHeader>
                         <CardContent>
                             {recentDeposits.length === 0 ? (
-                                <p className="text-small text-ink-muted">
+                                <p className="text-caption text-ink-muted">
                                     {__('No deposits yet.')}
                                 </p>
                             ) : (
@@ -664,7 +664,7 @@ export default function Dashboard({
                                                     }
                                                 />
                                                 {deposit.rejection_reason && (
-                                                    <span className="text-small text-ink-muted">
+                                                    <span className="text-caption text-ink-muted">
                                                         {__('Reason: :reason', {
                                                             reason: deposit.rejection_reason,
                                                         })}
@@ -685,19 +685,19 @@ export default function Dashboard({
                 {memberStatus !== null && can.viewPurchases && (
                     <Card>
                         <CardHeader className="flex-row items-center justify-between">
-                            <CardTitle className="text-subhead">
+                            <CardTitle className="text-title">
                                 {__('Your latest purchases')}
                             </CardTitle>
                             <Link
                                 href={purchases()}
-                                className="text-small text-primary hover:underline"
+                                className="text-body text-primary hover:underline"
                             >
                                 {__('All purchases')}
                             </Link>
                         </CardHeader>
                         <CardContent>
                             {recentPurchases.length === 0 ? (
-                                <p className="text-small text-ink-muted">
+                                <p className="text-caption text-ink-muted">
                                     {__('No purchases yet.')}
                                 </p>
                             ) : (
@@ -718,7 +718,7 @@ export default function Dashboard({
                                                         purchase.purchase_date,
                                                     )}
                                                 </Link>
-                                                <span className="truncate text-small text-ink-muted">
+                                                <span className="truncate text-caption text-ink-muted">
                                                     {purchase.item_names.join(
                                                         ', ',
                                                     )}

@@ -112,7 +112,7 @@ function MonthPicker({
                   setOpen(false)
                 }}
                 className={cn(
-                  "hover:bg-surface-raised h-9 rounded-sm text-small transition-colors",
+                  "hover:bg-surface-raised h-9 rounded-sm text-body transition-colors",
                   active && "bg-primary text-on-primary hover:bg-primary-hover font-medium"
                 )}
               >

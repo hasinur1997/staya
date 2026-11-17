@@ -86,7 +86,7 @@ export function MemberMealsTab({
 
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-subhead">
+                    <CardTitle className="text-title">
                         {__('Meals in :month', {
                             month: formatMonth(meals.month),
                         })}
@@ -94,7 +94,7 @@ export function MemberMealsTab({
                 </CardHeader>
                 <CardContent>
                     {meals.types.length === 0 ? (
-                        <p className="text-small text-ink-muted">
+                        <p className="text-caption text-ink-muted">
                             {__('No meal types yet.')}
                         </p>
                     ) : (

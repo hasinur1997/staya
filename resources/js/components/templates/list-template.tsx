@@ -74,7 +74,7 @@ export function ListTemplate({
                                         className="rounded-t-lg pb-6"
                                     >
                                         <SheetHeader>
-                                            <SheetTitle className="text-subhead">
+                                            <SheetTitle className="text-title">
                                                 Filters
                                             </SheetTitle>
                                             <SheetDescription>
@@ -90,7 +90,7 @@ export function ListTemplate({
                                 moreFilters
                             ))}
                         {resultCount && (
-                            <span className="ml-auto text-small text-ink-muted">
+                            <span className="ml-auto text-caption text-ink-muted">
                                 {resultCount}
                             </span>
                         )}
@@ -100,7 +100,7 @@ export function ListTemplate({
 
             <div className="flex flex-col gap-4">
                 {summary && (
-                    <p className="text-small text-ink-muted tabular-nums">
+                    <p className="text-caption text-ink-muted tabular-nums">
                         {summary}
                     </p>
                 )}

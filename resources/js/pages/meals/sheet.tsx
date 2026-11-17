@@ -165,7 +165,7 @@ export default function MealSheet({
             >
                 <Card className="overflow-hidden p-0">
                     <div className="overflow-x-auto">
-                        <table className="w-full border-collapse text-small tabular-nums">
+                        <table className="w-full border-collapse text-body tabular-nums">
                             <caption className="sr-only">
                                 {__('Meals by member and day')}
                             </caption>

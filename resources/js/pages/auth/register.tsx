@@ -36,7 +36,7 @@ export default function Register({ passwordRules }: Props) {
                         />
 
                         <fieldset className="flex flex-col gap-4">
-                            <legend className="mb-4 text-subhead">
+                            <legend className="mb-4 text-title">
                                 {__('Account')}
                             </legend>
                             <div className="flex flex-col gap-2">
@@ -94,7 +94,7 @@ export default function Register({ passwordRules }: Props) {
                             {__('Submit registration')}
                         </Button>
 
-                        <div className="text-center text-small text-ink-muted">
+                        <div className="text-center text-caption text-ink-muted">
                             {__('Already have an account?')}{' '}
                             <TextLink href={login()}>{__('Log in')}</TextLink>
                         </div>

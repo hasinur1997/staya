@@ -57,7 +57,7 @@ export default function MembersCreate({
                     >
                         <Card>
                             <fieldset className="flex flex-col gap-4 px-4">
-                                <legend className="mb-4 text-subhead">
+                                <legend className="mb-4 text-title">
                                     {__('Account')}
                                 </legend>
                                 <ToggleGroup
@@ -147,7 +147,7 @@ export default function MembersCreate({
                                                 errors.user_id,
                                             )}
                                         />
-                                        <p className="text-small text-ink-muted">
+                                        <p className="text-caption text-ink-muted">
                                             {__(
                                                 'Accounts without a member profile. Their name is replaced by the member name.',
                                             )}
@@ -167,7 +167,7 @@ export default function MembersCreate({
 
                         <Card>
                             <fieldset className="flex flex-col gap-4 px-4">
-                                <legend className="mb-4 text-subhead">
+                                <legend className="mb-4 text-title">
                                     {__('Stay')}
                                 </legend>
                                 <div className="flex flex-col gap-2 md:w-1/2">

@@ -25,23 +25,31 @@ const colours = [
 
 const typeStyles = [
     { name: 'display', className: 'text-display', sample: 'Shared fund' },
-    { name: 'headline', className: 'text-headline', sample: 'Mess fund' },
+    { name: 'money-lg', className: 'text-money-lg', sample: '৳ 12,450.00' },
     { name: 'heading', className: 'text-heading', sample: 'October deposits' },
-    { name: 'subhead', className: 'text-subhead', sample: 'Grocery purchase' },
+    { name: 'title', className: 'text-title', sample: 'Grocery purchase' },
+    { name: 'money', className: 'text-money', sample: '৳ 12,450.00' },
     {
         name: 'body',
         className: 'text-body',
         sample: 'Rice, lentils and onions for the week. বাজারের হিসাব',
     },
-    { name: 'small', className: 'text-small', sample: 'Added by Rahim' },
+    {
+        name: 'body-strong',
+        className: 'text-body-strong',
+        sample: 'Rahim Uddin',
+    },
     { name: 'label', className: 'text-label', sample: 'Approve deposit' },
     {
         name: 'caption',
         className: 'text-caption',
         sample: '17 Oct 2026, 9:40 PM',
     },
-    { name: 'overline', className: 'text-overline', sample: 'This month' },
-    { name: 'money', className: 'text-money', sample: '৳ 12,450.00' },
+    {
+        name: 'overline',
+        className: 'text-overline uppercase',
+        sample: 'Manage',
+    },
 ] as const;
 
 const spacing = [
@@ -71,7 +79,7 @@ const tokenNames = [
     ...radii.map((radius) => radius.name),
 ];
 
-const amounts = ['৳ 12,450.00', '৳ 1,111.11', '৳ 980.50', '৳ 100,000.00'];
+const amounts = ['৳ 12,450.00', '৳ 1,111.11', '৳ 980.50', '৳ 100,000.00'];
 
 function useTokenValues(names: readonly string[]) {
     const ref = useRef<HTMLDivElement>(null);
@@ -168,13 +176,13 @@ function ThemePanel({ theme }: { theme: 'light' | 'dark' }) {
                         </span>
                     ))}
                     <span className="text-right text-money text-success">
-                        + ৳ 500.00
+                        + ৳ 500.00
                     </span>
                     <span className="text-right text-money text-error">
-                        − ৳ 1,000.00
+                        − ৳ 1,000.00
                     </span>
                     <span className="text-right text-money text-ink-muted">
-                        ৳ 0.00
+                        ৳ 0.00
                     </span>
                 </div>
             </Section>
@@ -211,7 +219,7 @@ function ThemePanel({ theme }: { theme: 'light' | 'dark' }) {
                     ))}
                 </div>
                 <div className="rounded-lg border border-border bg-surface p-4 shadow-card">
-                    <p className="text-subhead">shadow-card</p>
+                    <p className="text-title">shadow-card</p>
                     <p className="text-body text-ink-muted">
                         A card in its hover state.
                     </p>

@@ -2,7 +2,7 @@
 
 ## Overview
 
-A bright, friendly and professional design system for a mess management tool. A clear blue anchors the brand, surfaces are generous and white, corners are softly rounded and type is a single clean family, Open Sans. It adapts the Skylearn system's look (colours, rounded corners, soft shadows, input style, accessibility stance) to a finance tool: compact sizes, dense tables, no illustration or gamification. Light and dark modes both feel intentional.
+A bright, friendly and professional design system for a mess management tool. A clear blue anchors the brand, surfaces are generous and white, corners are softly rounded and type is a single clean family, Plus Jakarta Sans. It adapts the Skylearn system's look (colours, rounded corners, soft shadows, input style, accessibility stance) to a finance tool: compact sizes, dense tables, no illustration or gamification. Light and dark modes both feel intentional.
 
 ## Colors
 
@@ -24,13 +24,14 @@ Dark mode keeps the same slate family: background #0F172A, surface #1E293B, rais
 
 ## Typography
 
-- **Display and Body Font**: Open Sans, regular (400) and medium (500) only, loaded from Google Fonts
+The full rules, roles and where each one is used live in `docs/TYPOGRAPHY.md`; that file wins over this section.
+
+- **UI font (English)**: Plus Jakarta Sans, weights 400–800, loaded from Google Fonts in the layout head
+- **Brand font**: Nunito 900, only for the "Staya" wordmark
 - **Code Font**: Roboto Mono
-- **Bangla and the ৳ sign**: Noto Sans Bengali as fallback
+- **Bangla and the ৳ sign**: Noto Sans Bengali as fallback (unchanged)
 
-Headings use Open Sans medium with slightly tight letter spacing (-0.01em). Body and UI text use regular; labels, subheads and buttons use medium. Money uses tabular figures.
-
-Type scale: Display 64px, Headline 48px, Section heading 28px, Subhead 20px, Body 16px, Small 14px, Caption 12px, Overline 11px uppercase tracking-wide.
+Type scale (size / line-height, weight): Display 30/38 700, Money large 34/40 800, Heading 20/28 700, Title 16/24 700, Money 26/32 700, Body 15/22 400 (strong 600), Label 13/18 600, Caption 12/16 500, Overline 11/16 700 uppercase. Money uses tabular figures and the `৳ 12,450.00` format.
 
 ## Elevation
 
@@ -73,10 +74,10 @@ Contrast targets WCAG AA (4.5:1) on all text. Colour is never the only signal: e
 
 - Do use the primary blue only for interactive elements and active states
 - Do keep one primary button per view
-- Do use Open Sans only, at regular and medium weights
+- Do use Plus Jakarta Sans and only the roles in `docs/TYPOGRAPHY.md`
 - Do build every dropdown from `Combobox` and every date from `DatePicker` / `MonthPicker`
 - Do use the highlight yellow sparingly, for attention only
-- Don't use more than two font weights on a screen
+- Don't use font sizes or weights outside the type scale, and no weight 900 outside the wordmark
 - Don't use raw hex colours, arbitrary pixel values or Tailwind's default palette in components; use the tokens
 - Don't add decorative elements, illustrations, confetti or emoji
 - Don't mix radius values: buttons and inputs 12px, cards 20px

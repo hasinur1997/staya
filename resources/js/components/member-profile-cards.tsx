@@ -127,7 +127,7 @@ export function PersonalDetailsCard({
                             required
                         />
                         {!canChangeEmail && (
-                            <p className="text-small text-ink-muted">
+                            <p className="text-caption text-ink-muted">
                                 {__(
                                     'Only someone allowed to edit this account can change its email.',
                                 )}
@@ -293,14 +293,14 @@ export function NidDetailsCard({
                             subject={__('NID copy')}
                             error={errors.nid_file}
                         />
-                        <p className="text-small text-ink-muted">
+                        <p className="text-caption text-ink-muted">
                             {__('Leave empty to keep the current copy.')}
                         </p>
                     </Field>
                 </>
             )}
             footer={
-                <p className="text-small text-ink-muted">
+                <p className="text-caption text-ink-muted">
                     {__(
                         'Viewing or downloading NID data is recorded in the audit log.',
                     )}
@@ -347,7 +347,7 @@ export function RegistrationCard({ member }: { member: MemberProfile }) {
     return (
         <Card className="h-full">
             <CardHeader>
-                <CardTitle className="text-subhead">
+                <CardTitle className="text-title">
                     {__('Registration')}
                 </CardTitle>
             </CardHeader>

@@ -12,7 +12,8 @@ class Money
     public const int SCALE = 2;
 
     /**
-     * Formats "12450.5" as "৳ 12,450.50" (and "-980" as "−৳ 980.00").
+     * Formats "12450.5" as "৳ 12,450.50" and "-980" as "− ৳ 980.00" (a thin space after
+     * the taka sign, a real minus sign): docs/TYPOGRAPHY.md.
      */
     public static function format(string $amount): string
     {
@@ -21,7 +22,7 @@ class Money
         [$whole, $fraction] = explode('.', ltrim($normalized, '-'));
         $grouped = (string) preg_replace('/\B(?=(\d{3})+(?!\d))/', ',', $whole);
 
-        return ($negative ? '−' : '').'৳ '.$grouped.'.'.$fraction;
+        return ($negative ? '− ' : '')."৳\u{2009}".$grouped.'.'.$fraction;
     }
 
     /**

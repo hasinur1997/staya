@@ -12,7 +12,7 @@ function Value({ value }: { value: string | null }) {
     return value === null ? (
         <span className="text-ink-muted">—</span>
     ) : (
-        <span className="font-mono text-small break-words">{value}</span>
+        <span className="font-mono text-body break-words">{value}</span>
     );
 }
 
@@ -45,7 +45,7 @@ export default function AuditShow({ activity }: { activity: AuditDetail }) {
             >
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-subhead">
+                        <CardTitle className="text-title">
                             {__('Details')}
                         </CardTitle>
                     </CardHeader>
@@ -101,13 +101,13 @@ export default function AuditShow({ activity }: { activity: AuditDetail }) {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-subhead">
+                        <CardTitle className="text-title">
                             {__('Before and after')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         {activity.diff.length === 0 ? (
-                            <p className="text-small text-ink-muted">
+                            <p className="text-caption text-ink-muted">
                                 {__('No values were recorded for this action.')}
                             </p>
                         ) : (
@@ -119,7 +119,7 @@ export default function AuditShow({ activity }: { activity: AuditDetail }) {
                                         )}
                                     </caption>
                                     <thead>
-                                        <tr className="border-b text-small text-ink-muted">
+                                        <tr className="border-b text-caption text-ink-muted">
                                             <th className="py-2 pr-4 font-normal">
                                                 {__('Field')}
                                             </th>
@@ -139,7 +139,7 @@ export default function AuditShow({ activity }: { activity: AuditDetail }) {
                                             >
                                                 <th
                                                     scope="row"
-                                                    className="py-2 pr-4 text-small font-normal"
+                                                    className="py-2 pr-4 text-body font-normal"
                                                 >
                                                     {row.field}
                                                 </th>

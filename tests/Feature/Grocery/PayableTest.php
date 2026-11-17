@@ -94,7 +94,7 @@ class PayableTest extends TestCase
 
         $this->actingAs($this->treasurer())
             ->post(route('payables.reimburse', $purchase->payable), ['amount' => '250.01'])
-            ->assertSessionHasErrors(['amount' => 'Only ৳ 250.00 is still owed for this purchase.']);
+            ->assertSessionHasErrors(['amount' => 'Only ৳ 250.00 is still owed for this purchase.']);
 
         $this->assertSame('0.00', $purchase->payable->fresh()->amount_reimbursed);
         $this->assertFundMatchesLedger('5000.00');
@@ -108,7 +108,7 @@ class PayableTest extends TestCase
 
         $this->actingAs($this->treasurer())
             ->post(route('payables.reimburse', $purchase->payable), ['amount' => '100.00'])
-            ->assertSessionHasErrors(['amount' => 'The fund does not have enough money. ৳ 60.00 is missing.']);
+            ->assertSessionHasErrors(['amount' => 'The fund does not have enough money. ৳ 60.00 is missing.']);
 
         $this->assertSame('0.00', $purchase->payable->fresh()->amount_reimbursed);
         $this->assertFundMatchesLedger('40.00');

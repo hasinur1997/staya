@@ -20,8 +20,11 @@ export function SignedMoney({
     return (
         <span
             className={cn(
-                'tabular-nums',
-                !zero && (negative ? 'text-error' : 'text-success'),
+                zero
+                    ? 'money text-ink-muted'
+                    : negative
+                      ? 'money-due'
+                      : 'money-credit',
             )}
         >
             {formatMoney(value, { signed: true })}

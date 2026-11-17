@@ -36,7 +36,7 @@ export default function DepositQueue({ deposits }: Props) {
                 linked
             />
             {deposit.is_own && (
-                <span className="text-small text-ink-muted">
+                <span className="text-caption text-ink-muted">
                     {' '}
                     {__('(you)')}
                 </span>
