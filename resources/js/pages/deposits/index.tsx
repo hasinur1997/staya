@@ -1,4 +1,5 @@
 import { Combobox } from '@/components/ui/combobox';
+import { MemberName } from '@/components/member-name';
 import { MonthPicker } from '@/components/ui/month-picker';
 import { Head, Link, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
@@ -103,7 +104,12 @@ export default function DepositsIndex({
                   {
                       key: 'member',
                       header: __('Member'),
-                      cell: (deposit: DepositRow) => deposit.member_name,
+                      cell: (deposit: DepositRow) => (
+                          <MemberName
+                              id={deposit.member_id}
+                              name={deposit.member_name}
+                          />
+                      ),
                   },
               ]
             : []),
@@ -234,7 +240,14 @@ export default function DepositsIndex({
                             title: date(deposit),
                             value: amount(deposit),
                             status: status(deposit),
-                            meta: can.viewAll ? [deposit.member_name] : [],
+                            meta: can.viewAll
+                                ? [
+                                      <MemberName
+                                          id={deposit.member_id}
+                                          name={deposit.member_name}
+                                      />,
+                                  ]
+                                : [],
                         })}
                     />
                 )}

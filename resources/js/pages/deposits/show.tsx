@@ -1,4 +1,5 @@
-import { Head, Link, setLayoutProps, usePage } from '@inertiajs/react';
+import { Head, setLayoutProps, usePage } from '@inertiajs/react';
+import { MemberName } from '@/components/member-name';
 import { DetailRow } from '@/components/detail-row';
 import { Check, RotateCcw, X } from 'lucide-react';
 import { useState } from 'react';
@@ -23,7 +24,6 @@ import {
     reverse,
     show,
 } from '@/routes/deposits';
-import { show as showMember } from '@/routes/members';
 import type { AuditRow, DepositDetail, PageAction } from '@/types';
 
 type Props = {
@@ -164,16 +164,11 @@ export default function DepositsShow({ deposit, history, can }: Props) {
                     <CardContent>
                         <dl className="flex flex-col gap-4">
                             <DetailRow label={__('Member')}>
-                                {can.viewMember ? (
-                                    <Link
-                                        href={showMember(deposit.member_id)}
-                                        className="text-primary hover:underline"
-                                    >
-                                        {deposit.member_name}
-                                    </Link>
-                                ) : (
-                                    deposit.member_name
-                                )}
+                                <MemberName
+                                    id={deposit.member_id}
+                                    name={deposit.member_name}
+                                    linked={can.viewMember}
+                                />
                             </DetailRow>
                             <DetailRow label={__('Amount')}>
                                 <span className="tabular-nums">

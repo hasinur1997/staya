@@ -124,7 +124,11 @@ export function PersonalDetailsCard({
             )}
         >
             <dl className="flex flex-col gap-4">
-                <Row label={__('Name')}>{member.name}</Row>
+                <Row label={__('Name')}>
+                    <span className="font-medium capitalize">
+                        {member.name}
+                    </span>
+                </Row>
                 <Row label={__('Mobile number')}>{member.phone}</Row>
                 <Row label={__('Email')}>{member.email}</Row>
             </dl>

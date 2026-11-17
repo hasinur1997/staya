@@ -59,6 +59,7 @@ export type PurchaseDetail = PurchaseRow & {
     payable: {
         id: number;
         /** The member the money is owed to. */
+        member_id: number;
         member_name: string;
         amount: string;
         amount_reimbursed: string;

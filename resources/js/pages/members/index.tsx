@@ -1,5 +1,6 @@
 import { Combobox } from '@/components/ui/combobox';
-import { Head, Link, router } from '@inertiajs/react';
+import { MemberName } from '@/components/member-name';
+import { Head, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
@@ -12,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { formatBusinessDate } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
 import { index as invitations } from '@/routes/invitations';
-import { create, index, show } from '@/routes/members';
+import { create, index } from '@/routes/members';
 import type {
     MemberFilters,
     MemberRow,
@@ -69,9 +70,7 @@ export default function MembersIndex({
     };
 
     const name = (member: MemberRow) => (
-        <Link href={show(member.id)} className="text-ink hover:text-primary">
-            {member.name}
-        </Link>
+        <MemberName id={member.id} name={member.name} linked />
     );
 
     const status = (member: MemberRow) => (

@@ -150,7 +150,9 @@ export function MemberHero({ member, canEdit, actions, menuActions }: Props) {
 
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                        <h1 className="text-heading text-ink">{member.name}</h1>
+                        <h1 className="text-heading text-ink capitalize">
+                            {member.name}
+                        </h1>
                         <MemberStatusBadge
                             status={member.status}
                             label={member.status_label}

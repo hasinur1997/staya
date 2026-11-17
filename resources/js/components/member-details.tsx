@@ -31,7 +31,9 @@ export function MemberSummaryCard({ member }: { member: MemberProfile }) {
                     </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col gap-1">
-                    <p className="text-subhead text-ink">{member.name}</p>
+                    <p className="text-subhead text-ink capitalize">
+                        {member.name}
+                    </p>
                     <p className="text-small text-ink-muted">{member.email}</p>
                     <p className="text-small text-ink-muted">{member.phone}</p>
                 </div>

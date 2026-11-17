@@ -1,4 +1,5 @@
 import { Head, router, setLayoutProps, useForm } from '@inertiajs/react';
+import { MemberName } from '@/components/member-name';
 import { useState } from 'react';
 import {
     ChevronLeft,
@@ -244,9 +245,7 @@ function MealsDay({
                                 className="flex flex-col gap-2 border-b py-3 md:grid md:items-center md:gap-3"
                                 style={{ gridTemplateColumns: columns }}
                             >
-                                <span className="text-label text-ink">
-                                    {member.name}
-                                </span>
+                                <MemberName id={member.id} name={member.name} />
                                 {types.map((type) => {
                                     const id = `meal-${member.id}-${type.id}`;
                                     const locked = !active || !type.is_active;

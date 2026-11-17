@@ -1,4 +1,5 @@
 import { Head, Link, router, setLayoutProps } from '@inertiajs/react';
+import { MemberName } from '@/components/member-name';
 import { Printer } from 'lucide-react';
 import { StatCard } from '@/components/stat-card';
 import { ReportTemplate } from '@/components/templates/report-template';
@@ -215,10 +216,13 @@ export default function MealSheet({
                                             scope="row"
                                             className={cn(
                                                 stickyName,
-                                                'text-label font-normal text-ink',
+                                                'text-label font-normal',
                                             )}
                                         >
-                                            {row.name}
+                                            <MemberName
+                                                id={row.member_id}
+                                                name={row.name}
+                                            />
                                         </th>
                                         {days.map((day) => {
                                             const count = row.counts[day.day];

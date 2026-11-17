@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import { MemberName } from '@/components/member-name';
 import { Check } from 'lucide-react';
 import { useState } from 'react';
 import { ApprovalTabs } from '@/components/approval-tabs';
@@ -28,15 +29,19 @@ export default function DepositQueue({ deposits }: Props) {
     const [reviewing, setReviewing] = useState<QueueRow | null>(null);
 
     const member = (deposit: QueueRow) => (
-        <Link href={show(deposit.id)} className="text-ink hover:text-primary">
-            {deposit.member_name}
+        <>
+            <MemberName
+                id={deposit.member_id}
+                name={deposit.member_name}
+                linked
+            />
             {deposit.is_own && (
                 <span className="text-small text-ink-muted">
                     {' '}
                     {__('(you)')}
                 </span>
             )}
-        </Link>
+        </>
     );
     const amount = (deposit: QueueRow) => (
         <span className="tabular-nums">{formatMoney(deposit.amount)}</span>

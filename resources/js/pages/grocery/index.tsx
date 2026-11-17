@@ -1,4 +1,5 @@
 import { Combobox } from '@/components/ui/combobox';
+import { MemberName } from '@/components/member-name';
 import { DatePicker } from '@/components/ui/date-picker';
 import { MonthPicker } from '@/components/ui/month-picker';
 import { Head, Link, router } from '@inertiajs/react';
@@ -89,12 +90,22 @@ export default function GroceryIndex({
         {
             key: 'buyer',
             header: __('Buyer'),
-            cell: (purchase) => purchase.buyer_name,
+            cell: (purchase) => (
+                <MemberName
+                    id={purchase.buyer_member_id}
+                    name={purchase.buyer_name}
+                />
+            ),
         },
         {
             key: 'paid_by',
             header: __('Paid by'),
-            cell: (purchase) => purchase.paid_by_name,
+            cell: (purchase) => (
+                <MemberName
+                    id={purchase.paid_by_member_id}
+                    name={purchase.paid_by_name}
+                />
+            ),
             priority: 'low',
         },
         {
@@ -239,10 +250,17 @@ export default function GroceryIndex({
                             value: amount(purchase),
                             status: status(purchase),
                             meta: [
-                                purchase.buyer_name,
-                                __('Paid by :name', {
-                                    name: purchase.paid_by_name,
-                                }),
+                                <MemberName
+                                    id={purchase.buyer_member_id}
+                                    name={purchase.buyer_name}
+                                />,
+                                <span>
+                                    {__('Paid by')}{' '}
+                                    <MemberName
+                                        id={purchase.paid_by_member_id}
+                                        name={purchase.paid_by_name}
+                                    />
+                                </span>,
                                 itemSummary(purchase),
                             ],
                         })}

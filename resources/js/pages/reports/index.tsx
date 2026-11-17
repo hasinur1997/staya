@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import { MemberName } from '@/components/member-name';
 import { Lock, LockOpen, Printer } from 'lucide-react';
 import { useState } from 'react';
 import { FormDialog } from '@/components/form-dialog';
@@ -16,8 +17,6 @@ import { MonthPicker } from '@/components/ui/month-picker';
 import { formatBusinessDate, formatDateTime, formatMonth } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
-import { show as showDeposit } from '@/routes/deposits';
-import { show as showMember } from '@/routes/members';
 import { index as payables } from '@/routes/payables';
 import { close, index, reopen } from '@/routes/reports';
 import type {
@@ -162,17 +161,13 @@ export default function ReportsIndex({
         {
             key: 'name',
             header: __('Member'),
-            cell: (row) =>
-                can.viewAll ? (
-                    <Link
-                        href={showMember(row.member_id)}
-                        className="text-ink hover:text-primary"
-                    >
-                        {row.name}
-                    </Link>
-                ) : (
-                    row.name
-                ),
+            cell: (row) => (
+                <MemberName
+                    id={row.member_id}
+                    name={row.name}
+                    linked={can.viewAll}
+                />
+            ),
         },
         {
             key: 'deposits',
@@ -359,7 +354,13 @@ export default function ReportsIndex({
                                 rows={report.members}
                                 rowKey={(row) => row.member_id}
                                 card={(row) => ({
-                                    title: row.name,
+                                    title: (
+                                        <MemberName
+                                            id={row.member_id}
+                                            name={row.name}
+                                            linked={can.viewAll}
+                                        />
+                                    ),
                                     value: signed(row.due_credit),
                                     meta: [
                                         __('Deposited :amount', {
@@ -442,14 +443,11 @@ export default function ReportsIndex({
                                             className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0"
                                         >
                                             <span className="flex flex-col gap-1">
-                                                <Link
-                                                    href={showDeposit(
-                                                        deposit.id,
-                                                    )}
-                                                    className="text-ink hover:text-primary"
-                                                >
-                                                    {deposit.member_name}
-                                                </Link>
+                                                <MemberName
+                                                    id={deposit.member_id}
+                                                    name={deposit.member_name}
+                                                    linked={can.viewAll}
+                                                />
                                                 <span className="text-small text-ink-muted">
                                                     {formatBusinessDate(
                                                         deposit.deposit_date,

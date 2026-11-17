@@ -1,4 +1,5 @@
 import { Head, Link, setLayoutProps } from '@inertiajs/react';
+import { MemberName } from '@/components/member-name';
 import { DetailRow } from '@/components/detail-row';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -19,7 +20,6 @@ import {
     show,
     voidMethod as voidPurchase,
 } from '@/routes/grocery';
-import { show as showMember } from '@/routes/members';
 import { index as payables } from '@/routes/payables';
 import type {
     AuditRow,
@@ -237,21 +237,17 @@ export default function GroceryShow({
                     <CardContent>
                         <dl className="flex flex-col gap-4">
                             <DetailRow label={__('Buyer')}>
-                                {can.viewBuyer ? (
-                                    <Link
-                                        href={showMember(
-                                            purchase.buyer_member_id,
-                                        )}
-                                        className="text-primary hover:underline"
-                                    >
-                                        {purchase.buyer_name}
-                                    </Link>
-                                ) : (
-                                    purchase.buyer_name
-                                )}
+                                <MemberName
+                                    id={purchase.buyer_member_id}
+                                    name={purchase.buyer_name}
+                                    linked={can.viewBuyer}
+                                />
                             </DetailRow>
                             <DetailRow label={__('Paid by')}>
-                                {purchase.paid_by_name}
+                                <MemberName
+                                    id={purchase.paid_by_member_id}
+                                    name={purchase.paid_by_name}
+                                />
                             </DetailRow>
                             <DetailRow label={__('Date bought')}>
                                 {formatBusinessDate(purchase.purchase_date)}

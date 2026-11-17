@@ -297,6 +297,7 @@ class GroceryPurchaseController extends Controller
             'voided_at' => $purchase->voided_at?->toIso8601String(),
             'payable' => $payable === null ? null : [
                 'id' => $payable->id,
+                'member_id' => $payable->member_id,
                 'member_name' => $payable->member->full_name,
                 'amount' => $payable->amount,
                 'amount_reimbursed' => $payable->amount_reimbursed,

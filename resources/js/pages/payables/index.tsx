@@ -1,4 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
+import { MemberName } from '@/components/member-name';
 import { useState } from 'react';
 import { FormDialog } from '@/components/form-dialog';
 import { ResponsiveTable } from '@/components/responsive-table';
@@ -51,7 +52,9 @@ export default function PayablesIndex({ payables, outstanding }: Props) {
         {
             key: 'member',
             header: __('Owed to'),
-            cell: (payable) => payable.member_name,
+            cell: (payable) => (
+                <MemberName id={payable.member_id} name={payable.member_name} />
+            ),
         },
         {
             key: 'why',
@@ -132,7 +135,10 @@ export default function PayablesIndex({ payables, outstanding }: Props) {
                             value: money(payable.outstanding),
                             status: reimburseButton(payable),
                             meta: [
-                                payable.member_name,
+                                <MemberName
+                                    id={payable.member_id}
+                                    name={payable.member_name}
+                                />,
                                 payable.paid_by === 'member'
                                     ? __('Paid by member')
                                     : __('Fund fell short'),

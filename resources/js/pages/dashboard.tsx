@@ -1,4 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import { MemberName } from '@/components/member-name';
 import { Plus, Wallet } from 'lucide-react';
 import {
     AreaLine,
@@ -148,7 +149,11 @@ export default function Dashboard({
         : [];
 
     const columns: ResponsiveColumn<MonthlyMemberRow>[] = [
-        { key: 'name', header: __('Member'), cell: (row) => row.name },
+        {
+            key: 'name',
+            header: __('Member'),
+            cell: (row) => <MemberName id={row.member_id} name={row.name} />,
+        },
         {
             key: 'deposits',
             header: __('Deposits'),
@@ -595,7 +600,12 @@ export default function Dashboard({
                                     rows={report.members}
                                     rowKey={(row) => row.member_id}
                                     card={(row) => ({
-                                        title: row.name,
+                                        title: (
+                                            <MemberName
+                                                id={row.member_id}
+                                                name={row.name}
+                                            />
+                                        ),
                                         value: (
                                             <SignedMoney
                                                 value={row.due_credit}
