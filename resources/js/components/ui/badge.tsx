@@ -18,10 +18,14 @@ const badgeVariants = cva(
         outline:
           "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         // Statuses: tinted background, the word carries the meaning.
-        neutral: "border-border bg-surface-raised text-ink",
-        success: "border-success bg-success-soft text-ink",
-        warning: "border-warning bg-warning-soft text-ink",
-        error: "border-error bg-error-soft text-ink",
+        neutral:
+          "rounded-pill border-transparent bg-surface-raised px-2.5 font-medium text-ink before:size-1.5 before:rounded-full before:bg-neutral before:content-['']",
+        success:
+          "rounded-pill border-transparent bg-success-soft px-2.5 font-medium text-ink before:size-1.5 before:rounded-full before:bg-success before:content-['']",
+        warning:
+          "rounded-pill border-transparent bg-warning-soft px-2.5 font-medium text-ink before:size-1.5 before:rounded-full before:bg-warning before:content-['']",
+        error:
+          "rounded-pill border-transparent bg-error-soft px-2.5 font-medium text-ink before:size-1.5 before:rounded-full before:bg-error before:content-['']",
         // Counts on nav items and menus (amber accent).
         count:
           "rounded-pill border-transparent bg-highlight px-2 text-ink tabular-nums",

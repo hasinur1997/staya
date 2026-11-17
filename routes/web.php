@@ -72,6 +72,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('members/{member}/reactivate', [MemberController::class, 'reactivate'])->name('members.reactivate');
     Route::get('members/{member}/nid', [MemberFileController::class, 'nid'])->name('members.nid');
     Route::get('members/{member}/photo', [MemberFileController::class, 'photo'])->name('members.photo');
+    Route::get('members/{member}/banner', [MemberFileController::class, 'banner'])->name('members.banner');
+    Route::patch('members/{member}/sections/{section}', [MemberController::class, 'updateSection'])
+        ->whereIn('section', ['images', 'personal', 'family', 'nid'])
+        ->name('members.sections.update');
 
     // Purchases are voided, never deleted: there is no destroy route.
     Route::get('grocery/item-names', [PurchaseToolsController::class, 'itemNames'])->name('grocery.item-names');

@@ -1,19 +1,21 @@
-import { Head, router, setLayoutProps } from '@inertiajs/react';
-import { Pencil, RotateCcw, Trash2, UserMinus } from 'lucide-react';
+import { Head, Link, router, setLayoutProps } from '@inertiajs/react';
+import { RotateCcw, Trash2, UserMinus } from 'lucide-react';
 import { useState } from 'react';
 import { FormDialog } from '@/components/form-dialog';
-import {
-    MemberDetailsCard,
-    MemberNidCard,
-    MemberStaysCard,
-    MemberSummaryCard,
-} from '@/components/member-details';
-import { MemberDepositsCard } from '@/components/member-deposits-card';
 import { AuditHistoryCard } from '@/components/audit-history-card';
-import { MemberMonthlyCard } from '@/components/member-monthly-card';
+import { MemberBalanceTab } from '@/components/member-balance-tab';
+import { MemberDepositsCard } from '@/components/member-deposits-card';
+import { MemberStaysCard } from '@/components/member-details';
+import { MemberHero } from '@/components/member-hero';
+import { MemberMealsTab } from '@/components/member-meals-tab';
+import {
+    FamilyDetailsCard,
+    NidDetailsCard,
+    PersonalDetailsCard,
+    RegistrationCard,
+} from '@/components/member-profile-cards';
 import { MemberPurchasesCard } from '@/components/member-purchases-card';
-import { MemberStatusBadge } from '@/components/member-status-badge';
-import { DetailTemplate } from '@/components/templates/detail-template';
+import { PageStack } from '@/components/templates/page-grid';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -23,22 +25,17 @@ import {
     DialogFooter,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { formatBusinessDate } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
-import {
-    deactivate,
-    destroy,
-    edit,
-    index,
-    reactivate,
-    show,
-} from '@/routes/members';
+import { cn } from '@/lib/utils';
+import { deactivate, destroy, index, reactivate, show } from '@/routes/members';
 import type {
     AuditRow,
     DepositRow,
+    MemberBalance,
+    MemberMeals,
     MemberProfile,
+    MemberTab,
     PageAction,
-    MemberMonth,
     PurchaseRow,
 } from '@/types';
 
@@ -50,14 +47,21 @@ type Props = {
     deposits: DepositRow[] | null;
     /** Latest purchases made; null when the viewer may not see them. */
     purchases: PurchaseRow[] | null;
-    /** Monthly due or credit; null when the viewer may not see it. */
-    monthly: MemberMonth[] | null;
+    /** The open tab. */
+    tab: MemberTab;
+    /** One month of meals; only loaded on the meals tab. */
+    meals: MemberMeals | null;
+    mealsVisible: boolean;
+    /** Dues and what the fund owes; only loaded on the balance tab. */
+    balance: MemberBalance | null;
+    balanceVisible: boolean;
     /** Audit history; null without `audit.view`. */
     history: AuditRow[] | null;
     /** Today in Asia/Dhaka (Y-m-d). */
     today: string;
     can: {
         update: boolean;
+        changeEmail: boolean;
         deactivate: boolean;
         reactivate: boolean;
         delete: boolean;
@@ -71,9 +75,13 @@ type OpenDialog = 'deactivate' | 'reactivate' | 'delete' | null;
 export default function MembersShow({
     member,
     nid,
+    tab,
     deposits,
     purchases,
-    monthly,
+    meals,
+    mealsVisible,
+    balance,
+    balanceVisible,
     history,
     today,
     can,
@@ -81,7 +89,6 @@ export default function MembersShow({
     const __ = useTranslate();
     const [dialog, setDialog] = useState<OpenDialog>(null);
     const [deleting, setDeleting] = useState(false);
-    const currentStay = member.stays.find((stay) => stay.left_on === null);
 
     setLayoutProps({
         breadcrumbs: [
@@ -89,6 +96,22 @@ export default function MembersShow({
             { title: member.name, href: show(member.id) },
         ],
     });
+
+    const tabs: { key: MemberTab; label: string }[] = [
+        { key: 'profile', label: __('Profile') },
+        ...(mealsVisible
+            ? [{ key: 'meals' as const, label: __('Meal sheet') }]
+            : []),
+        ...(purchases !== null
+            ? [{ key: 'purchases' as const, label: __('Purchases') }]
+            : []),
+        ...(deposits !== null
+            ? [{ key: 'deposits' as const, label: __('Deposits') }]
+            : []),
+        ...(balanceVisible
+            ? [{ key: 'balance' as const, label: __('Balance') }]
+            : []),
+    ];
 
     const secondaryActions: PageAction[] = [
         ...(can.reactivate
@@ -136,41 +159,87 @@ export default function MembersShow({
     return (
         <>
             <Head title={member.name} />
-            <DetailTemplate
-                header={{
-                    overline: __('Member'),
-                    title: member.name,
-                    status: (
-                        <MemberStatusBadge
-                            status={member.status}
-                            label={member.status_label}
-                        />
-                    ),
-                    description: currentStay
-                        ? __('Living in the mess since :date', {
-                              date: formatBusinessDate(currentStay.joined_on),
-                          })
-                        : undefined,
-                    primaryAction: can.update
-                        ? {
-                              label: __('Edit'),
-                              href: edit(member.id),
-                              icon: Pencil,
-                          }
-                        : undefined,
-                    secondaryActions,
-                    menuActions,
-                }}
-                aside={<MemberSummaryCard member={member} />}
-            >
-                <MemberDetailsCard member={member} />
-                {can.viewNid && <MemberNidCard member={member} nid={nid} />}
-                {deposits && <MemberDepositsCard deposits={deposits} />}
-                {monthly && <MemberMonthlyCard months={monthly} />}
-                {purchases && <MemberPurchasesCard purchases={purchases} />}
-                {history && <AuditHistoryCard history={history} />}
-                <MemberStaysCard member={member} />
-            </DetailTemplate>
+            <PageStack>
+                <MemberHero
+                    member={member}
+                    canEdit={can.update}
+                    actions={secondaryActions}
+                    menuActions={menuActions}
+                />
+
+                <nav
+                    aria-label={__('Member sections')}
+                    className="-mt-2 flex gap-1 overflow-x-auto border-b border-border md:-mt-4 lg:-mt-8 print:hidden"
+                >
+                    {tabs.map((item) => (
+                        <Link
+                            key={item.key}
+                            href={show.url(member.id, {
+                                query: {
+                                    tab:
+                                        item.key === 'profile'
+                                            ? undefined
+                                            : item.key,
+                                },
+                            })}
+                            preserveScroll
+                            aria-current={item.key === tab ? 'page' : undefined}
+                            className={cn(
+                                '-mb-px border-b-2 px-3 py-2 whitespace-nowrap text-ink-muted hover:bg-surface-raised',
+                                item.key === tab
+                                    ? 'border-primary text-primary'
+                                    : 'border-transparent',
+                            )}
+                        >
+                            {item.label}
+                        </Link>
+                    ))}
+                </nav>
+
+                {tab === 'profile' && (
+                    <div className="flex flex-col gap-4 md:gap-6">
+                        <div className="grid gap-4 md:grid-cols-2 md:gap-6">
+                            <PersonalDetailsCard
+                                member={member}
+                                canEdit={can.update}
+                                canChangeEmail={can.changeEmail}
+                            />
+                            <FamilyDetailsCard
+                                member={member}
+                                canEdit={can.update}
+                            />
+                            {can.viewNid && (
+                                <NidDetailsCard
+                                    member={member}
+                                    nid={nid}
+                                    canEdit={can.update}
+                                />
+                            )}
+                            <RegistrationCard member={member} />
+                        </div>
+                        <MemberStaysCard member={member} />
+                        {history && <AuditHistoryCard history={history} />}
+                    </div>
+                )}
+
+                {tab === 'meals' && meals && (
+                    <MemberMealsTab memberId={member.id} meals={meals} />
+                )}
+
+                {tab === 'purchases' && purchases && (
+                    <MemberPurchasesCard purchases={purchases} />
+                )}
+
+                {tab === 'deposits' && deposits && (
+                    <MemberDepositsCard deposits={deposits} />
+                )}
+
+                {tab === 'balance' && balance && (
+                    <div className="flex flex-col gap-4 md:gap-6">
+                        <MemberBalanceTab balance={balance} />
+                    </div>
+                )}
+            </PageStack>
 
             <FormDialog
                 open={dialog === 'deactivate'}

@@ -39,6 +39,9 @@ export type MemberProfile = {
     reviewed_at: string | null;
     registered_at: string | null;
     has_photo: boolean;
+    has_banner: boolean;
+    /** Changes when the member is updated, to refresh cached pictures. */
+    media_version: number | null;
     /** null when the viewer may not see NID data. */
     has_nid_file: boolean | null;
     stays: MemberStayRow[];
@@ -62,4 +65,51 @@ export type RegistrationRow = {
     email_verified: boolean;
     phone: string;
     registered_at: string | null;
+};
+
+export type MemberTab =
+    | 'profile'
+    | 'meals'
+    | 'purchases'
+    | 'deposits'
+    | 'balance';
+
+export type MemberMealDay = {
+    date: string;
+    weekday: number;
+    counts: Record<string, number>;
+    total: number;
+};
+
+/** One member's meals for a month. */
+export type MemberMeals = {
+    month: string;
+    currentMonth: string;
+    types: { id: number; name: string }[];
+    days: MemberMealDay[];
+    typeTotals: Record<string, number>;
+    total: number;
+    figures: {
+        expenses: string;
+        total_meals: number;
+        rate: string | null;
+        cost: string | null;
+    };
+    can: { record: boolean };
+};
+
+export type MemberBalance = {
+    /** Sum of the months the member owes. */
+    to_pay: string;
+    /** Sum of the months they deposited more than their share. */
+    credit: string;
+    /** Open payables: what the fund still owes them. */
+    fund_owes: string;
+    months: {
+        month: string;
+        deposits: string;
+        share: string;
+        meals: number;
+        due_credit: string;
+    }[];
 };

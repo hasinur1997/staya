@@ -1,9 +1,18 @@
 import { Head, router, setLayoutProps, useForm } from '@inertiajs/react';
-import { Settings2, Table2, User } from 'lucide-react';
+import { useState } from 'react';
+import {
+    ChevronLeft,
+    ChevronRight,
+    Minus,
+    Pencil,
+    Plus,
+    Settings2,
+    Table2,
+    User,
+} from 'lucide-react';
 import type { FormEvent } from 'react';
 import InputError from '@/components/input-error';
 import { DetailTemplate } from '@/components/templates/detail-template';
-import { FormTemplate } from '@/components/templates/form-template';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +22,6 @@ import { Label } from '@/components/ui/label';
 import { formatBusinessDate, formatMonth } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
-import { dashboard } from '@/routes';
 import { index, mine, sheet, store } from '@/routes/meals';
 import { index as mealTypes } from '@/routes/meal-types';
 import type { MealDayMember, MealMonthFigures, MealTypeOption } from '@/types';
@@ -43,6 +51,17 @@ export default function MealsIndex(props: Props) {
     return <MealsDay key={props.date} {...props} />;
 }
 
+function shiftDate(date: string, days: number): string {
+    const next = new Date(`${date}T00:00:00Z`);
+    next.setUTCDate(next.getUTCDate() + days);
+
+    return next.toISOString().slice(0, 10);
+}
+
+function clampCount(value: number, max: number): string {
+    return String(Math.min(Math.max(value, 0), max));
+}
+
 function MealsDay({
     date,
     today,
@@ -56,6 +75,8 @@ function MealsDay({
 }: Props) {
     const __ = useTranslate();
     const editable = can.record && !monthClosed;
+    const [editing, setEditing] = useState(false);
+    const active = editable && editing;
 
     const form = useForm<{
         date: string;
@@ -97,9 +118,31 @@ function MealsDay({
             ),
         );
 
+    const memberTotal = (memberId: number) =>
+        Object.values(form.data.entries[memberId] ?? {}).reduce(
+            (sum, value) => sum + (Number.parseInt(value, 10) || 0),
+            0,
+        );
+
+    const step = (memberId: number, typeId: number, by: number) =>
+        setCount(
+            memberId,
+            typeId,
+            clampCount(
+                (Number.parseInt(
+                    form.data.entries[memberId]?.[typeId] ?? '0',
+                    10,
+                ) || 0) + by,
+                maxPerType,
+            ),
+        );
+
     const submit = (event: FormEvent) => {
         event.preventDefault();
-        form.post(store.url(), { preserveScroll: true });
+        form.post(store.url(), {
+            preserveScroll: true,
+            onSuccess: () => setEditing(false),
+        });
     };
 
     const goTo = (next: string) =>
@@ -117,14 +160,26 @@ function MealsDay({
             0,
         );
 
-    const columns = `minmax(0, 1fr) repeat(${types.length}, minmax(0, 7rem))`;
+    const columns = `minmax(0, 1fr) repeat(${types.length}, minmax(0, 10rem)) 4rem`;
 
     const grid = (
         <Card>
-            <CardHeader>
+            <CardHeader className="flex-row items-center justify-between gap-3">
                 <CardTitle className="text-subhead">
                     {formatBusinessDate(date)}
                 </CardTitle>
+                {editable && !editing && (
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        aria-label={__('Edit meals')}
+                        title={__('Edit meals')}
+                        onClick={() => setEditing(true)}
+                    >
+                        <Pencil />
+                    </Button>
+                )}
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
                 {monthClosed && (
@@ -143,37 +198,50 @@ function MealsDay({
                 ) : (
                     <div className="flex flex-col">
                         <div
-                            className="hidden items-end gap-3 border-b pb-2 text-small text-ink-muted md:grid"
+                            className="hidden items-end gap-3 border-b pb-3 text-small text-ink-muted md:grid"
                             style={{ gridTemplateColumns: columns }}
                         >
                             <span>{__('Member')}</span>
                             {types.map((type) => (
                                 <span
                                     key={type.id}
-                                    className="flex flex-col gap-1"
+                                    className="flex flex-col items-center gap-1"
                                 >
                                     <span className="text-label text-ink">
                                         {type.name}
                                     </span>
-                                    {editable && type.is_active && (
-                                        <Button
-                                            type="button"
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={() =>
-                                                fillColumn(type.id, '1')
-                                            }
-                                        >
-                                            {__('Everyone 1')}
-                                        </Button>
+                                    {active && type.is_active && (
+                                        <span className="flex gap-1">
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                variant="ghost"
+                                                onClick={() =>
+                                                    fillColumn(type.id, '1')
+                                                }
+                                            >
+                                                {__('All 1')}
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                variant="ghost"
+                                                onClick={() =>
+                                                    fillColumn(type.id, '0')
+                                                }
+                                            >
+                                                {__('Clear')}
+                                            </Button>
+                                        </span>
                                     )}
                                 </span>
                             ))}
+                            <span className="text-right">{__('Total')}</span>
                         </div>
                         {members.map((member) => (
                             <div
                                 key={member.id}
-                                className="flex flex-col gap-2 border-b py-3 last:border-0 md:grid md:items-center md:gap-3"
+                                className="flex flex-col gap-2 border-b py-3 md:grid md:items-center md:gap-3"
                                 style={{ gridTemplateColumns: columns }}
                             >
                                 <span className="text-label text-ink">
@@ -181,12 +249,17 @@ function MealsDay({
                                 </span>
                                 {types.map((type) => {
                                     const id = `meal-${member.id}-${type.id}`;
-                                    const locked = !editable || !type.is_active;
+                                    const locked = !active || !type.is_active;
+
+                                    const value =
+                                        form.data.entries[member.id]?.[
+                                            type.id
+                                        ] ?? '0';
 
                                     return (
                                         <div
                                             key={type.id}
-                                            className="flex items-center justify-between gap-3 md:block"
+                                            className="flex items-center justify-between gap-3 md:justify-center"
                                         >
                                             <Label
                                                 htmlFor={id}
@@ -194,34 +267,99 @@ function MealsDay({
                                             >
                                                 {type.name}
                                             </Label>
-                                            <Input
-                                                id={id}
-                                                type="number"
-                                                inputMode="numeric"
-                                                min={0}
-                                                max={maxPerType}
-                                                value={
-                                                    form.data.entries[
-                                                        member.id
-                                                    ]?.[type.id] ?? '0'
-                                                }
-                                                disabled={locked}
-                                                onChange={(event) =>
-                                                    setCount(
-                                                        member.id,
-                                                        type.id,
-                                                        event.target.value,
-                                                    )
-                                                }
-                                                className="w-24 text-right tabular-nums md:w-full"
-                                            />
+                                            {!active ? (
+                                                <span
+                                                    className={`w-24 text-center tabular-nums md:w-auto ${
+                                                        Number(value) > 0
+                                                            ? 'text-label text-ink'
+                                                            : 'text-ink-muted'
+                                                    }`}
+                                                >
+                                                    {value}
+                                                </span>
+                                            ) : (
+                                                <div className="flex items-center gap-1">
+                                                    <Button
+                                                        type="button"
+                                                        size="sm"
+                                                        variant="outline"
+                                                        className="w-8 px-0"
+                                                        aria-label={`${__('Decrease')} ${type.name}`}
+                                                        disabled={
+                                                            locked ||
+                                                            Number(value) <= 0
+                                                        }
+                                                        onClick={() =>
+                                                            step(
+                                                                member.id,
+                                                                type.id,
+                                                                -1,
+                                                            )
+                                                        }
+                                                    >
+                                                        <Minus />
+                                                    </Button>
+                                                    <Input
+                                                        id={id}
+                                                        type="number"
+                                                        inputMode="numeric"
+                                                        min={0}
+                                                        max={maxPerType}
+                                                        value={value}
+                                                        disabled={locked}
+                                                        onFocus={(event) =>
+                                                            event.target.select()
+                                                        }
+                                                        onChange={(event) =>
+                                                            setCount(
+                                                                member.id,
+                                                                type.id,
+                                                                event.target
+                                                                    .value,
+                                                            )
+                                                        }
+                                                        className={`h-8 w-14 [appearance:textfield] px-1 text-center tabular-nums [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
+                                                            Number(value) > 0
+                                                                ? 'text-label text-ink'
+                                                                : 'text-ink-muted'
+                                                        }`}
+                                                    />
+                                                    <Button
+                                                        type="button"
+                                                        size="sm"
+                                                        variant="outline"
+                                                        className="w-8 px-0"
+                                                        aria-label={`${__('Increase')} ${type.name}`}
+                                                        disabled={
+                                                            locked ||
+                                                            Number(value) >=
+                                                                maxPerType
+                                                        }
+                                                        onClick={() =>
+                                                            step(
+                                                                member.id,
+                                                                type.id,
+                                                                1,
+                                                            )
+                                                        }
+                                                    >
+                                                        <Plus />
+                                                    </Button>
+                                                </div>
+                                            )}
                                         </div>
                                     );
                                 })}
+                                <span className="flex justify-between text-label text-ink tabular-nums md:block md:text-right">
+                                    <span className="text-small text-ink-muted md:hidden">
+                                        {__('Total')}
+                                    </span>
+                                    {memberTotal(member.id)}
+                                </span>
                             </div>
                         ))}
                         <div
-                            className="flex flex-col gap-1 pt-3 md:grid md:items-center md:gap-3"
+                            className="flex flex-col gap-1 border-t pt-3 md:grid md:items-center md:gap-3"
                             style={{ gridTemplateColumns: columns }}
                         >
                             <span className="text-label text-ink">
@@ -230,7 +368,7 @@ function MealsDay({
                             {types.map((type) => (
                                 <span
                                     key={type.id}
-                                    className="text-label text-ink tabular-nums md:text-right"
+                                    className="text-label text-ink tabular-nums md:text-center"
                                 >
                                     <span className="text-small text-ink-muted md:hidden">
                                         {type.name}:{' '}
@@ -240,6 +378,16 @@ function MealsDay({
                                         : (dayTotals[type.id] ?? 0)}
                                 </span>
                             ))}
+                            <span className="text-label text-ink tabular-nums md:text-right">
+                                {types.reduce(
+                                    (sum, type) =>
+                                        sum +
+                                        (editable
+                                            ? total(type.id)
+                                            : (dayTotals[type.id] ?? 0)),
+                                    0,
+                                )}
+                            </span>
                         </div>
                     </div>
                 )}
@@ -257,14 +405,44 @@ function MealsDay({
     const picker = (
         <div className="flex flex-col gap-1">
             <Label htmlFor="meal-date">{__('Day')}</Label>
-            <DatePicker
-                id="meal-date"
-                value={date}
-                max={today}
-                onValueChange={goTo}
-                clearable={false}
-                className="w-48"
-            />
+            <div className="flex flex-wrap items-center gap-2">
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    aria-label={__('Previous day')}
+                    onClick={() => goTo(shiftDate(date, -1))}
+                >
+                    <ChevronLeft />
+                </Button>
+                <DatePicker
+                    id="meal-date"
+                    value={date}
+                    max={today}
+                    onValueChange={goTo}
+                    clearable={false}
+                    className="w-48"
+                />
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    aria-label={__('Next day')}
+                    disabled={date >= today}
+                    onClick={() => goTo(shiftDate(date, 1))}
+                >
+                    <ChevronRight />
+                </Button>
+                {date !== today && (
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => goTo(today)}
+                    >
+                        {__('Today')}
+                    </Button>
+                )}
+            </div>
         </div>
     );
 
@@ -335,24 +513,49 @@ function MealsDay({
     return (
         <>
             <Head title={__('Meals')} />
-            {editable ? (
-                <FormTemplate
-                    header={header}
-                    formId="meals-form"
-                    submitLabel={__('Save meals')}
-                    processing={form.processing}
-                    cancelHref={dashboard()}
-                    aside={summary}
-                >
-                    <form id="meals-form" onSubmit={submit}>
+            <DetailTemplate header={header} aside={summary}>
+                {editable ? (
+                    <form
+                        id="meals-form"
+                        onSubmit={submit}
+                        className="flex flex-col gap-4"
+                    >
                         {grid}
+                        {active && (
+                            <div className="shadow-md sticky bottom-4 flex items-center justify-between gap-3 rounded-lg border bg-background p-3 print:hidden">
+                                <span className="text-small text-ink-muted">
+                                    {form.isDirty
+                                        ? __('You have unsaved changes.')
+                                        : __('Editing meals')}
+                                </span>
+                                <div className="flex gap-2">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        disabled={form.processing}
+                                        onClick={() => {
+                                            form.reset();
+                                            setEditing(false);
+                                        }}
+                                    >
+                                        {form.isDirty
+                                            ? __('Discard')
+                                            : __('Cancel')}
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        disabled={form.processing}
+                                    >
+                                        {__('Save meals')}
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </form>
-                </FormTemplate>
-            ) : (
-                <DetailTemplate header={header} aside={summary}>
-                    {grid}
-                </DetailTemplate>
-            )}
+                ) : (
+                    grid
+                )}
+            </DetailTemplate>
         </>
     );
 }

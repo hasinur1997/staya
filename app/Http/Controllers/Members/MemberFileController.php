@@ -51,4 +51,18 @@ class MemberFileController extends Controller
 
         return $disk->response($member->photo_path, headers: ['Cache-Control' => 'private, max-age=3600']);
     }
+
+    /**
+     * Show the member's profile banner.
+     */
+    public function banner(Member $member): StreamedResponse
+    {
+        Gate::authorize('view', $member);
+
+        $disk = Storage::disk(MemberUploads::DISK);
+
+        abort_unless($member->banner_path !== null && $disk->exists($member->banner_path), 404);
+
+        return $disk->response($member->banner_path, headers: ['Cache-Control' => 'private, max-age=3600']);
+    }
 }

@@ -4,6 +4,14 @@ import {
     depositNote,
 } from '@/components/deposit-status-badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import { formatBusinessDate } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
@@ -18,6 +26,9 @@ export function MemberDepositsCard({ deposits }: { deposits: DepositRow[] }) {
         <Card>
             <CardHeader>
                 <CardTitle className="text-subhead">{__('Deposits')}</CardTitle>
+                <p className="text-small text-ink-muted">
+                    {__('The latest 20 deposits, newest first.')}
+                </p>
             </CardHeader>
             <CardContent>
                 {deposits.length === 0 ? (
@@ -25,38 +36,52 @@ export function MemberDepositsCard({ deposits }: { deposits: DepositRow[] }) {
                         {__('No deposits yet.')}
                     </p>
                 ) : (
-                    <ul className="flex flex-col divide-y divide-border">
-                        {deposits.map((deposit) => (
-                            <li
-                                key={deposit.id}
-                                className="flex items-start justify-between gap-4 py-3 first:pt-0 last:pb-0"
-                            >
-                                <span className="flex flex-col gap-1">
-                                    <Link
-                                        href={show(deposit.id)}
-                                        className="text-ink hover:text-primary"
-                                    >
-                                        {formatBusinessDate(
-                                            deposit.deposit_date,
-                                        )}
-                                    </Link>
-                                    <DepositStatusBadge
-                                        status={deposit.status}
-                                        label={deposit.status_label}
-                                        selfApproved={deposit.is_self_approved}
-                                    />
-                                    {depositNote(deposit) && (
-                                        <span className="text-small text-ink-muted">
-                                            {depositNote(deposit)}
-                                        </span>
-                                    )}
-                                </span>
-                                <span className="tabular-nums">
-                                    {formatMoney(deposit.amount)}
-                                </span>
-                            </li>
-                        ))}
-                    </ul>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>{__('Date')}</TableHead>
+                                <TableHead>{__('Status')}</TableHead>
+                                <TableHead className="text-right">
+                                    {__('Amount')}
+                                </TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {deposits.map((deposit) => (
+                                <TableRow key={deposit.id}>
+                                    <TableCell className="whitespace-nowrap">
+                                        <Link
+                                            href={show(deposit.id)}
+                                            className="text-primary hover:underline"
+                                        >
+                                            {formatBusinessDate(
+                                                deposit.deposit_date,
+                                            )}
+                                        </Link>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex flex-col items-start gap-1">
+                                            <DepositStatusBadge
+                                                status={deposit.status}
+                                                label={deposit.status_label}
+                                                selfApproved={
+                                                    deposit.is_self_approved
+                                                }
+                                            />
+                                            {depositNote(deposit) && (
+                                                <span className="text-small text-ink-muted">
+                                                    {depositNote(deposit)}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-right tabular-nums">
+                                        {formatMoney(deposit.amount)}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
                 )}
             </CardContent>
         </Card>

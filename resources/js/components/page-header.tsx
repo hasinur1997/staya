@@ -30,7 +30,7 @@ export type PageHeaderProps = {
     children?: ReactNode;
 };
 
-function MoreMenu({
+export function MoreMenu({
     actions,
     className,
 }: {

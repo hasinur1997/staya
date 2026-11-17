@@ -6,10 +6,12 @@ use App\Actions\Members\CreateMember;
 use App\Actions\Members\DeactivateMember;
 use App\Actions\Members\DeleteMember;
 use App\Actions\Members\ReactivateMember;
+use App\Actions\Members\SummarizeMemberBalance;
 use App\Actions\Members\UpdateMember;
 use App\Actions\Reports\CalculateMonthlyReport;
 use App\Actions\Reports\MonthlyReport;
 use App\Concerns\BusinessCalendar;
+use App\Concerns\Money;
 use App\Concerns\PresentsAudit;
 use App\Concerns\PresentsDeposits;
 use App\Concerns\PresentsMembers;
@@ -19,10 +21,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Members\StayDateRequest;
 use App\Http\Requests\Members\StoreMemberRequest;
 use App\Http\Requests\Members\UpdateMemberRequest;
+use App\Http\Requests\Members\UpdateMemberSectionRequest;
 use App\Models\Deposit;
 use App\Models\GroceryPurchase;
+use App\Models\Meal;
+use App\Models\MealType;
 use App\Models\Member;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -124,22 +130,31 @@ class MemberController extends Controller
     /**
      * Show a member's profile.
      */
-    public function show(Request $request, Member $member): Response
+    public function show(Request $request, Member $member, SummarizeMemberBalance $summarizeBalance): Response
     {
         Gate::authorize('view', $member);
 
         $actor = $request->user();
+        $tab = $request->query('tab');
+        $tab = in_array($tab, ['profile', 'meals', 'purchases', 'deposits', 'balance'], true) ? $tab : 'profile';
+        $monthly = $this->monthlyHistory($member, $actor);
 
         return Inertia::render('members/show', [
             'member' => $this->memberProfile($member, $actor),
             ...$this->nidProp($member, $actor, 'profile'),
+            'tab' => $tab,
             'deposits' => $this->depositHistory($member, $actor),
             'purchases' => $this->purchaseHistory($member, $actor),
-            'monthly' => $this->monthlyHistory($member, $actor),
+            'monthly' => $monthly,
+            'meals' => $tab === 'meals' ? $this->mealSheet($request, $member) : null,
+            'balance' => $tab === 'balance' && $monthly !== null ? $summarizeBalance->handle($member) : null,
+            'balanceVisible' => $monthly !== null,
+            'mealsVisible' => $this->canViewMeals($member, $actor),
             'history' => $this->auditHistory($member, $actor),
             'today' => BusinessCalendar::today()->toDateString(),
             'can' => [
                 'update' => $actor->can('update', $member),
+                'changeEmail' => $actor->can('changeEmail', $member),
                 'deactivate' => $actor->can('deactivate', $member),
                 'reactivate' => $actor->can('reactivate', $member),
                 'delete' => $actor->can('delete', $member),
@@ -147,6 +162,94 @@ class MemberController extends Controller
                 'viewAny' => $actor->can('viewAny', Member::class),
             ],
         ]);
+    }
+
+    /**
+     * Edit one card of the profile.
+     */
+    public function updateSection(UpdateMemberSectionRequest $request, Member $member, string $section, UpdateMember $updateMember): RedirectResponse
+    {
+        $updateMember->handle(
+            $member,
+            $request->details(),
+            $request->email(),
+            $request->nidFile(),
+            $request->photo(),
+            $request->banner(),
+            $request->removesBanner(),
+        );
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Member updated.')]);
+
+        return back();
+    }
+
+    private function canViewMeals(Member $member, User $viewer): bool
+    {
+        return $viewer->can('viewAll', Meal::class)
+            || ($member->user_id === $viewer->id && $viewer->can('viewOwn', Meal::class));
+    }
+
+    /**
+     * One member's meals for a month: a row per day with the count of each
+     * meal type, totals, and the cost of their meals. Null hides the tab.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function mealSheet(Request $request, Member $member): ?array
+    {
+        if (! $this->canViewMeals($member, $request->user())) {
+            return null;
+        }
+
+        $request->validate(['month' => ['nullable', 'date_format:Y-m']]);
+
+        $current = BusinessCalendar::today()->format('Y-m');
+        $month = min($request->string('month')->toString() ?: $current, $current);
+        $year = (int) substr($month, 0, 4);
+        $number = (int) substr($month, 5, 2);
+        [$first, $last] = BusinessCalendar::monthDates($year, $number);
+
+        $counts = [];
+        $perType = [];
+
+        foreach ($member->meals()->whereBetween('meal_date', [$first, $last])->get(['meal_type_id', 'meal_date', 'count']) as $meal) {
+            $day = (int) $meal->meal_date->format('j');
+            $counts[$day][$meal->meal_type_id] = $meal->count;
+            $perType[$meal->meal_type_id] = ($perType[$meal->meal_type_id] ?? 0) + $meal->count;
+        }
+
+        $types = MealType::query()->ordered()->get()
+            ->filter(fn (MealType $type): bool => $type->is_active || isset($perType[$type->id]))
+            ->map(fn (MealType $type): array => ['id' => $type->id, 'name' => $type->name])
+            ->values();
+
+        $report = app(CalculateMonthlyReport::class)->handle($year, $number);
+        $row = $report->rowFor($member->id);
+        $meals = $row['meals'] ?? array_sum($perType);
+
+        return [
+            'month' => $month,
+            'currentMonth' => $current,
+            'types' => $types->all(),
+            'days' => array_map(fn (int $day): array => [
+                'date' => sprintf('%s-%02d', $month, $day),
+                'weekday' => CarbonImmutable::create($year, $number, $day)->dayOfWeek,
+                'counts' => (object) ($counts[$day] ?? []),
+                'total' => array_sum($counts[$day] ?? []),
+            ], range(1, (int) substr($last, 8, 2))),
+            'typeTotals' => (object) $perType,
+            'total' => array_sum($perType),
+            'figures' => [
+                'expenses' => $report->expenses,
+                'total_meals' => $report->totalMeals,
+                'rate' => $report->totalMeals > 0 ? bcdiv(Money::numeric($report->expenses), (string) $report->totalMeals, 2) : null,
+                'cost' => $report->totalMeals > 0
+                    ? bcdiv(bcmul(Money::numeric($report->expenses), (string) $meals, 2), (string) $report->totalMeals, 2)
+                    : null,
+            ],
+            'can' => ['record' => $request->user()->can('record', Meal::class)],
+        ];
     }
 
     /**

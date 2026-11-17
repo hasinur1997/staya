@@ -17,15 +17,16 @@ class UpdateMember
      *
      * @param  array<string, string>  $details  Validated member fields, phone normalized
      */
-    public function handle(Member $member, array $details, string $email, ?UploadedFile $nidFile = null, ?UploadedFile $photo = null): Member
+    public function handle(Member $member, array $details, string $email, ?UploadedFile $nidFile = null, ?UploadedFile $photo = null, ?UploadedFile $banner = null, bool $removeBanner = false): Member
     {
         $uploads = new MemberUploads;
 
         try {
             $nidPath = $uploads->store($nidFile, 'nid');
             $photoPath = $uploads->store($photo, 'photos');
+            $bannerPath = $uploads->store($banner, 'banners');
 
-            $replaced = DB::transaction(function () use ($member, $details, $email, $nidPath, $photoPath): array {
+            $replaced = DB::transaction(function () use ($member, $details, $email, $nidPath, $photoPath, $bannerPath, $removeBanner): array {
                 $member = Member::query()->lockForUpdate()->findOrFail($member->id);
                 $before = $member->auditSnapshot();
                 $replaced = [];
@@ -43,6 +44,11 @@ class UpdateMember
                     $member->photo_path = $photoPath;
                 }
 
+                if ($bannerPath !== null || $removeBanner) {
+                    $replaced[] = $member->banner_path;
+                    $member->banner_path = $bannerPath;
+                }
+
                 $member->save();
 
                 $user = $member->user;
@@ -56,7 +62,7 @@ class UpdateMember
 
                 $after = $member->auditSnapshot();
 
-                if ($before !== $after || $nidChanged || $nidPath !== null || $photoPath !== null) {
+                if ($before !== $after || $nidChanged || $nidPath !== null || $photoPath !== null || $bannerPath !== null || $removeBanner) {
                     activity()
                         ->useLog(AuditLog::Member)
                         ->performedOn($member)
@@ -66,6 +72,7 @@ class UpdateMember
                             'nid_number_changed' => $nidChanged,
                             'nid_file_replaced' => $nidPath !== null,
                             'photo_replaced' => $photoPath !== null,
+                            'banner_replaced' => $bannerPath !== null || $removeBanner,
                         ])
                         ->log('member_updated');
                 }

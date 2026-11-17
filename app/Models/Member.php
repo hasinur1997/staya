@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string $permanent_address
  * @property string $nid_file_path
  * @property string|null $photo_path
+ * @property string|null $banner_path
  * @property MemberStatus $status
  * @property string|null $rejection_reason
  * @property int|null $reviewed_by
@@ -54,8 +55,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
     'permanent_address',
     'nid_file_path',
     'photo_path',
+    'banner_path',
 ])]
-#[Hidden(['nid_number', 'nid_number_hash', 'nid_file_path', 'photo_path'])]
+#[Hidden(['nid_number', 'nid_number_hash', 'nid_file_path', 'photo_path', 'banner_path'])]
 class Member extends Model
 {
     /** @use HasFactory<MemberFactory> */
@@ -236,6 +238,7 @@ class Member extends Model
             'nid_number' => '[hidden]',
             'nid_file' => $this->nid_file_path !== '' ? 'on file' : null,
             'photo' => $this->photo_path !== null ? 'on file' : null,
+            'banner' => $this->banner_path !== null ? 'on file' : null,
             'status' => $this->status->value,
             'rejection_reason' => $this->rejection_reason,
             'stays' => $this->stays()->orderBy('joined_on')->get()->map(fn (MemberStay $stay) => [

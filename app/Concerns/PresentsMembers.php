@@ -43,6 +43,8 @@ trait PresentsMembers
             'reviewed_at' => $member->reviewed_at?->toIso8601String(),
             'registered_at' => $member->created_at?->toIso8601String(),
             'has_photo' => $member->photo_path !== null,
+            'has_banner' => $member->banner_path !== null,
+            'media_version' => $member->updated_at?->timestamp,
             'has_nid_file' => $canViewNid ? $member->nid_file_path !== '' : null,
             'stays' => $member->stays()->orderByDesc('joined_on')->get()->map(fn (MemberStay $stay) => [
                 'id' => $stay->id,
