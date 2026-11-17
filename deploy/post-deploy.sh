@@ -27,6 +27,10 @@ chmod -R u+rwX,g+rwX storage bootstrap/cache
 
 artisan down --retry=60 --refresh=15 || true
 
+# The config cache from the previous deploy lacks new config files and any
+# changed .env values, so clear it before anything reads configuration.
+artisan optimize:clear
+
 artisan migrate --force
 
 # Roles, permissions and the settings row (idempotent), then the first Admin
@@ -36,7 +40,6 @@ artisan db:seed --class=MessSettingsSeeder --force
 artisan staya:create-owner
 
 # Rebuild the config, route, event and view caches from the new code.
-artisan optimize:clear
 artisan optimize
 
 # Queue workers keep the old code in memory until they are told to restart.
