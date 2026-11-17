@@ -43,6 +43,7 @@ export default function MembersEdit({ member, nid, can }: Props) {
         <>
             <Head title={__('Edit :name', { name: member.name })} />
             <Form
+                noValidate
                 {...update.form(member.id)}
                 id="member-form"
                 disableWhileProcessing

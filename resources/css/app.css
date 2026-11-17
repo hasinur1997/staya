@@ -414,6 +414,30 @@
 }
 
 /*
+ * A field whose error message is showing gets the error border on its
+ * control; the browser's own required bubbles are off (forms are noValidate).
+ */
+:has(> [data-slot='input-error'])
+    > :is(
+        input,
+        textarea,
+        [data-slot='input'],
+        [data-slot='combobox'],
+        [data-slot='date-picker'],
+        [data-slot='month-picker']
+    ),
+:has(> [data-slot='input-error'])
+    > .relative
+    > :is(
+        input,
+        [data-slot='combobox'],
+        [data-slot='date-picker'],
+        [data-slot='month-picker']
+    ) {
+    border-color: var(--error);
+}
+
+/*
  * Global focus ring. Deliberately unlayered so it wins over Tailwind's
  * outline-none / outline-hidden utilities on every focusable control.
  */

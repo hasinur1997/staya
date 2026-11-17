@@ -79,6 +79,7 @@ export default function AdjustmentsCreate({ today, fundStartDate }: Props) {
                 }
             >
                 <form
+                    noValidate
                     id="adjustment-form"
                     onSubmit={submit}
                     className="flex flex-col gap-4 md:gap-6"

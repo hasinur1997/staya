@@ -81,7 +81,11 @@ export function ResetDataCard() {
 
             <Dialog open={open} onOpenChange={close}>
                 <DialogContent>
-                    <form onSubmit={submit} className="flex flex-col gap-4">
+                    <form
+                        noValidate
+                        onSubmit={submit}
+                        className="flex flex-col gap-4"
+                    >
                         <DialogTitle>
                             {__('Erase all financial and meal data?')}
                         </DialogTitle>

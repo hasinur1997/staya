@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { ImageDropzone } from '@/components/image-dropzone';
 import InputError from '@/components/input-error';
 import { Card } from '@/components/ui/card';
@@ -31,6 +32,12 @@ type Props = {
     maxUploadKb: number;
     /** Wrap each group in a Card (staff forms) or not (sign-up card). */
     asCards?: boolean;
+    /**
+     * One column of cards under a profile photo card, each with its fields in two columns.
+     * `leading` and `trailing` are extra cards placed at the top of the left
+     * column and the bottom of the right column.
+     */
+    columns?: { leading?: ReactNode; trailing?: ReactNode };
 };
 
 function Field({
@@ -81,7 +88,7 @@ function Group({
 
 /**
  * The member form's personal, family and document fields, as plain named
- * inputs for an Inertia <Form>. Shared by sign-up and the staff forms; the
+ * inputs for an Inertia <Form noValidate>. Shared by sign-up and the staff forms; the
  * server validates everything again.
  */
 export function MemberFields({
@@ -89,211 +96,251 @@ export function MemberFields({
     member,
     nid = { show: true, fileRequired: true },
     asCards = false,
+    columns,
 }: Props) {
     const __ = useTranslate();
 
-    return (
-        <>
-            <Group legend={__('Personal details')} asCard={asCards}>
+    const nameBn = (
+        <Field id="name_bn" label={__('Name (Bangla)')} error={errors.name_bn}>
+            <Input
+                id="name_bn"
+                name="name_bn"
+                defaultValue={member?.name_bn}
+                lang="bn"
+                required
+            />
+        </Field>
+    );
+    const firstName = (
+        <Field
+            id="first_name"
+            label={__('First name')}
+            error={errors.first_name}
+        >
+            <Input
+                id="first_name"
+                name="first_name"
+                defaultValue={member?.first_name}
+                autoComplete="given-name"
+                required
+            />
+        </Field>
+    );
+    const lastName = (
+        <Field id="last_name" label={__('Last name')} error={errors.last_name}>
+            <Input
+                id="last_name"
+                name="last_name"
+                defaultValue={member?.last_name}
+                autoComplete="family-name"
+                required
+            />
+        </Field>
+    );
+    const phone = (
+        <Field
+            id="phone"
+            label={__('Mobile number')}
+            error={errors.phone}
+            hint={__('A Bangladeshi number, such as 01712345678')}
+        >
+            <Input
+                id="phone"
+                name="phone"
+                type="tel"
+                inputMode="tel"
+                defaultValue={member?.phone}
+                autoComplete="tel"
+                required
+            />
+        </Field>
+    );
+    const nidNumber = nid.show ? (
+        <Field
+            id="nid_number"
+            label={__('NID number')}
+            error={errors.nid_number}
+            hint={__('10, 13 or 17 digits')}
+        >
+            <Input
+                id="nid_number"
+                name="nid_number"
+                inputMode="numeric"
+                defaultValue={nid.value}
+                autoComplete="off"
+                required
+            />
+        </Field>
+    ) : null;
+
+    const personal = columns ? (
+        <Group legend={__('Personal details')} asCard={asCards}>
+            <div className="grid gap-4 md:grid-cols-2">
+                {firstName}
+                {lastName}
+                {nameBn}
+                {phone}
+            </div>
+        </Group>
+    ) : (
+        <Group legend={__('Personal details')} asCard={asCards}>
+            {nameBn}
+            <div className="grid gap-4 md:grid-cols-2">
+                {firstName}
+                {lastName}
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+                {phone}
+                {nidNumber}
+            </div>
+        </Group>
+    );
+
+    const family = (
+        <Group legend={__('Family and address')} asCard={asCards}>
+            <div className="grid gap-4 md:grid-cols-2">
                 <Field
-                    id="name_bn"
-                    label={__('Name (Bangla)')}
-                    error={errors.name_bn}
+                    id="father_name"
+                    label={__("Father's name (English)")}
+                    error={errors.father_name}
                 >
                     <Input
-                        id="name_bn"
-                        name="name_bn"
-                        defaultValue={member?.name_bn}
+                        id="father_name"
+                        name="father_name"
+                        defaultValue={member?.father_name}
+                        required
+                    />
+                </Field>
+                <Field
+                    id="father_name_bn"
+                    label={__("Father's name (Bangla)")}
+                    error={errors.father_name_bn}
+                >
+                    <Input
+                        id="father_name_bn"
+                        name="father_name_bn"
+                        defaultValue={member?.father_name_bn}
                         lang="bn"
                         required
                     />
                 </Field>
-                <div className="grid gap-4 md:grid-cols-2">
-                    <Field
-                        id="first_name"
-                        label={__('First name')}
-                        error={errors.first_name}
-                    >
-                        <Input
-                            id="first_name"
-                            name="first_name"
-                            defaultValue={member?.first_name}
-                            autoComplete="given-name"
-                            required
-                        />
-                    </Field>
-                    <Field
-                        id="last_name"
-                        label={__('Last name')}
-                        error={errors.last_name}
-                    >
-                        <Input
-                            id="last_name"
-                            name="last_name"
-                            defaultValue={member?.last_name}
-                            autoComplete="family-name"
-                            required
-                        />
-                    </Field>
-                </div>
-                <div className="grid gap-4 md:grid-cols-2">
-                    <Field
-                        id="phone"
-                        label={__('Mobile number')}
-                        error={errors.phone}
-                        hint={__('A Bangladeshi number, such as 01712345678')}
-                    >
-                        <Input
-                            id="phone"
-                            name="phone"
-                            type="tel"
-                            inputMode="tel"
-                            defaultValue={member?.phone}
-                            autoComplete="tel"
-                            required
-                        />
-                    </Field>
-                    {nid.show && (
-                        <Field
-                            id="nid_number"
-                            label={__('NID number')}
-                            error={errors.nid_number}
-                            hint={__('10, 13 or 17 digits')}
-                        >
-                            <Input
-                                id="nid_number"
-                                name="nid_number"
-                                inputMode="numeric"
-                                defaultValue={nid.value}
-                                autoComplete="off"
-                                required
-                            />
-                        </Field>
-                    )}
-                </div>
-            </Group>
-
-            <Group legend={__('Family and address')} asCard={asCards}>
-                <div className="grid gap-4 md:grid-cols-2">
-                    <Field
-                        id="father_name"
-                        label={__("Father's name (English)")}
-                        error={errors.father_name}
-                    >
-                        <Input
-                            id="father_name"
-                            name="father_name"
-                            defaultValue={member?.father_name}
-                            required
-                        />
-                    </Field>
-                    <Field
-                        id="father_name_bn"
-                        label={__("Father's name (Bangla)")}
-                        error={errors.father_name_bn}
-                    >
-                        <Input
-                            id="father_name_bn"
-                            name="father_name_bn"
-                            defaultValue={member?.father_name_bn}
-                            lang="bn"
-                            required
-                        />
-                    </Field>
-                    <Field
-                        id="mother_name"
-                        label={__("Mother's name (English)")}
-                        error={errors.mother_name}
-                    >
-                        <Input
-                            id="mother_name"
-                            name="mother_name"
-                            defaultValue={member?.mother_name}
-                            required
-                        />
-                    </Field>
-                    <Field
-                        id="mother_name_bn"
-                        label={__("Mother's name (Bangla)")}
-                        error={errors.mother_name_bn}
-                    >
-                        <Input
-                            id="mother_name_bn"
-                            name="mother_name_bn"
-                            defaultValue={member?.mother_name_bn}
-                            lang="bn"
-                            required
-                        />
-                    </Field>
-                </div>
                 <Field
-                    id="permanent_address"
-                    label={__('Permanent address')}
-                    error={errors.permanent_address}
+                    id="mother_name"
+                    label={__("Mother's name (English)")}
+                    error={errors.mother_name}
                 >
-                    <Textarea
-                        id="permanent_address"
-                        name="permanent_address"
-                        defaultValue={member?.permanent_address}
-                        rows={3}
+                    <Input
+                        id="mother_name"
+                        name="mother_name"
+                        defaultValue={member?.mother_name}
                         required
                     />
                 </Field>
-            </Group>
+                <Field
+                    id="mother_name_bn"
+                    label={__("Mother's name (Bangla)")}
+                    error={errors.mother_name_bn}
+                >
+                    <Input
+                        id="mother_name_bn"
+                        name="mother_name_bn"
+                        defaultValue={member?.mother_name_bn}
+                        lang="bn"
+                        required
+                    />
+                </Field>
+            </div>
+            <Field
+                id="permanent_address"
+                label={__('Permanent address')}
+                error={errors.permanent_address}
+            >
+                <Textarea
+                    id="permanent_address"
+                    name="permanent_address"
+                    defaultValue={member?.permanent_address}
+                    rows={3}
+                    required
+                />
+            </Field>
+        </Group>
+    );
 
-            <Group legend={__('Documents')} asCard={asCards}>
-                <div className="grid gap-4 md:grid-cols-2">
-                    {nid.show && (
-                        <Field
-                            id="nid_file"
-                            label={
-                                nid.fileRequired
-                                    ? __('NID copy')
-                                    : __('Replace NID copy')
-                            }
-                        >
-                            <ImageDropzone
-                                name="nid_file"
-                                id="nid_file"
-                                allowPdf
-                                maxWidth={2000}
-                                required={nid.fileRequired}
-                                subject={__('NID copy')}
-                                error={errors.nid_file}
-                            />
-                        </Field>
-                    )}
+    const photoField = (
+        <Field
+            id="photo"
+            label={member ? __('Replace photo') : __('Photo (optional)')}
+        >
+            <ImageDropzone
+                name="photo"
+                id="photo"
+                subject={__('photo')}
+                aspect={1}
+                round
+                maxWidth={800}
+                error={errors.photo}
+                currentSrc={
+                    member?.id && member.has_photo
+                        ? photoRoute.url(member.id, {
+                              query: {
+                                  v: member.media_version ?? undefined,
+                              },
+                          })
+                        : null
+                }
+            />
+        </Field>
+    );
+
+    const documents = (
+        <Group legend={__('Documents')} asCard={asCards}>
+            <div className="grid gap-4 md:grid-cols-2">
+                {columns && nidNumber}
+                {nid.show && (
                     <Field
-                        id="photo"
+                        id="nid_file"
                         label={
-                            member
-                                ? __('Replace photo')
-                                : __('Photo (optional)')
+                            nid.fileRequired
+                                ? __('NID copy')
+                                : __('Replace NID copy')
                         }
                     >
                         <ImageDropzone
-                            name="photo"
-                            id="photo"
-                            subject={__('photo')}
-                            aspect={1}
-                            round
-                            maxWidth={800}
-                            error={errors.photo}
-                            currentSrc={
-                                member?.id && member.has_photo
-                                    ? photoRoute.url(member.id, {
-                                          query: {
-                                              v:
-                                                  member.media_version ??
-                                                  undefined,
-                                          },
-                                      })
-                                    : null
-                            }
+                            name="nid_file"
+                            id="nid_file"
+                            allowPdf
+                            maxWidth={2000}
+                            required={nid.fileRequired}
+                            subject={__('NID copy')}
+                            error={errors.nid_file}
                         />
                     </Field>
-                </div>
+                )}
+                {!columns && photoField}
+            </div>
+        </Group>
+    );
+
+    if (!columns) {
+        return (
+            <>
+                {personal}
+                {family}
+                {documents}
+            </>
+        );
+    }
+
+    return (
+        <>
+            <Group legend={__('Profile photo')} asCard={asCards}>
+                <div className="md:max-w-sm">{photoField}</div>
             </Group>
+            {columns.leading}
+            {personal}
+            {family}
+            {documents}
+            {columns.trailing}
         </>
     );
 }

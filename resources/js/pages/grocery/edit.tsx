@@ -37,6 +37,7 @@ export default function GroceryEdit({ purchase, serverNow, ...form }: Props) {
         <>
             <Head title={__('Edit purchase')} />
             <Form
+                noValidate
                 {...update.form(purchase.id)}
                 id="purchase-form"
                 disableWhileProcessing

@@ -70,6 +70,7 @@ export function FormDialog({
                 <DialogTitle>{title}</DialogTitle>
                 <DialogDescription>{description}</DialogDescription>
                 <Form
+                    noValidate
                     action={action}
                     options={{ preserveScroll: true }}
                     onSuccess={() => onOpenChange(false)}

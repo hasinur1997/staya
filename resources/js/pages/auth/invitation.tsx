@@ -105,6 +105,7 @@ export default function Invitation({
         <>
             <Head title={__('Join the mess')} />
             <Form
+                noValidate
                 {...accept.form(token)}
                 resetOnSuccess={['password', 'password_confirmation']}
                 disableWhileProcessing

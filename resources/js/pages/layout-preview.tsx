@@ -609,6 +609,7 @@ function FormPreview() {
             }
         >
             <form
+                noValidate
                 id="preview-form"
                 className="flex flex-col gap-4 md:gap-6"
                 onSubmit={(event) => event.preventDefault()}

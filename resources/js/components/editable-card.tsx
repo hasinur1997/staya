@@ -67,6 +67,7 @@ export function EditableCard({
             <CardContent className="flex flex-col gap-4">
                 {editing ? (
                     <Form
+                        noValidate
                         {...form}
                         options={{ preserveScroll: true }}
                         onSuccess={() => setEditing(false)}

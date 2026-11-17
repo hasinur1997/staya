@@ -515,6 +515,7 @@ function MealsDay({
             <DetailTemplate header={header} aside={summary}>
                 {editable ? (
                     <form
+                        noValidate
                         id="meals-form"
                         onSubmit={submit}
                         className="flex flex-col gap-4"

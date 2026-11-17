@@ -114,6 +114,7 @@ export default function MembersIndex({
                 }}
                 filters={
                     <form
+                        noValidate
                         onSubmit={submitSearch}
                         className="flex flex-col gap-1"
                         role="search"

@@ -159,6 +159,7 @@ export default function InvitationsIndex({
                         )}
                     </DialogDescription>
                     <Form
+                        noValidate
                         action={store()}
                         options={{ preserveScroll: true }}
                         onSuccess={() => setInviting(false)}

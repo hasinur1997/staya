@@ -58,7 +58,11 @@ export default function RegistrationStatus({
                 )}
 
                 {!emailVerified && status === 'pending' && (
-                    <Form {...send.form()} className="flex flex-col gap-2">
+                    <Form
+                        noValidate
+                        {...send.form()}
+                        className="flex flex-col gap-2"
+                    >
                         {({ processing, wasSuccessful }) => (
                             <>
                                 <p className="text-caption text-ink-muted">
@@ -76,7 +80,7 @@ export default function RegistrationStatus({
                     </Form>
                 )}
 
-                <Form {...logout.form()}>
+                <Form noValidate {...logout.form()}>
                     <Button variant="ghost" className="w-full">
                         {__('Log out')}
                     </Button>

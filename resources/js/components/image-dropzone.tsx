@@ -87,7 +87,7 @@ export function ImageDropzone({
 
     return (
         <div className="flex flex-col gap-2">
-            {/* The cropped file travels in this input, so any <Form> posts it. */}
+            {/* The cropped file travels in this input, so any <Form noValidate> posts it. */}
             <input
                 ref={input}
                 id={id}

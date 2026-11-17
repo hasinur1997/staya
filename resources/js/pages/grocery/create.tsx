@@ -21,7 +21,12 @@ export default function GroceryCreate({ ownMemberId, ...form }: Props) {
     return (
         <>
             <Head title={__('New grocery purchase')} />
-            <Form {...store.form()} id="purchase-form" disableWhileProcessing>
+            <Form
+                noValidate
+                {...store.form()}
+                id="purchase-form"
+                disableWhileProcessing
+            >
                 {({ errors, processing }) => (
                     <FormTemplate
                         header={{

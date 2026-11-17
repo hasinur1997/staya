@@ -333,6 +333,7 @@ export default function MessSettingsEdit({
                     wide
                 >
                     <form
+                        noValidate
                         id="mess-settings-form"
                         onSubmit={submit}
                         className="flex flex-col gap-4 md:gap-6"

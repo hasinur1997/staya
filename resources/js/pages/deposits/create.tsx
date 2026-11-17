@@ -42,6 +42,7 @@ export default function DepositsCreate({
         <>
             <Head title={__('New deposit')} />
             <Form
+                noValidate
                 {...store.form()}
                 id="deposit-form"
                 transform={(data) => ({

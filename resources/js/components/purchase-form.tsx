@@ -115,7 +115,7 @@ export function usePurchaseItems(purchase?: PurchaseDetail) {
 }
 
 /**
- * The fields of the purchase form, as named inputs for an Inertia <Form>.
+ * The fields of the purchase form, as named inputs for an Inertia <Form noValidate>.
  * Line totals come from the server; the browser never adds anything up.
  */
 export function PurchaseFields({

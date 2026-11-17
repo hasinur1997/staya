@@ -132,6 +132,7 @@ export default function MealTypes({ types, can, maxPerType }: Props) {
                             )}
                         </DialogDescription>
                         <Form
+                            noValidate
                             action={current ? update(current.id) : store()}
                             options={{ preserveScroll: true }}
                             onSuccess={() => setEditing(null)}

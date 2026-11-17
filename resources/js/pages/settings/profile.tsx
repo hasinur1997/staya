@@ -37,6 +37,7 @@ export default function Profile({
                 />
 
                 <Form
+                    noValidate
                     {...ProfileController.update.form()}
                     options={{
                         preserveScroll: true,

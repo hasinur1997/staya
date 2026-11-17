@@ -56,6 +56,7 @@ export function RoleForm({
             cancelHref={cancelHref}
         >
             <form
+                noValidate
                 id="role-form"
                 onSubmit={submit}
                 className="flex flex-col gap-4 md:gap-6"
