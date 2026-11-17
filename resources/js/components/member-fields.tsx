@@ -1,9 +1,11 @@
+import { ImageDropzone } from '@/components/image-dropzone';
 import InputError from '@/components/input-error';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useTranslate } from '@/lib/i18n';
+import { photo as photoRoute } from '@/routes/members';
 import type { MemberProfile } from '@/types';
 
 type Errors = Partial<Record<string, string>>;
@@ -19,7 +21,8 @@ type Props = {
         | 'father_name'
         | 'mother_name'
         | 'permanent_address'
-    >;
+    > &
+        Partial<Pick<MemberProfile, 'id' | 'has_photo' | 'media_version'>>;
     /** The NID number field; hidden when the viewer may not see NIDs. */
     nid?: { show: boolean; value?: string; fileRequired: boolean };
     maxUploadKb: number;
@@ -82,13 +85,9 @@ export function MemberFields({
     errors,
     member,
     nid = { show: true, fileRequired: true },
-    maxUploadKb,
     asCards = false,
 }: Props) {
     const __ = useTranslate();
-    const maxMb = Math.round((maxUploadKb / 1024) * 10) / 10;
-    const uploadHint = (types: string) =>
-        __(':types, up to :size MB', { types, size: maxMb });
 
     return (
         <>
@@ -210,15 +209,15 @@ export function MemberFields({
                                     ? __('NID copy')
                                     : __('Replace NID copy')
                             }
-                            error={errors.nid_file}
-                            hint={uploadHint('PDF, JPG or PNG')}
                         >
-                            <Input
-                                id="nid_file"
+                            <ImageDropzone
                                 name="nid_file"
-                                type="file"
-                                accept=".pdf,.jpg,.jpeg,.png"
+                                id="nid_file"
+                                allowPdf
+                                maxWidth={2000}
                                 required={nid.fileRequired}
+                                subject={__('NID copy')}
+                                error={errors.nid_file}
                             />
                         </Field>
                     )}
@@ -229,14 +228,26 @@ export function MemberFields({
                                 ? __('Replace photo')
                                 : __('Photo (optional)')
                         }
-                        error={errors.photo}
-                        hint={uploadHint('JPG, PNG or WebP')}
                     >
-                        <Input
-                            id="photo"
+                        <ImageDropzone
                             name="photo"
-                            type="file"
-                            accept=".jpg,.jpeg,.png,.webp"
+                            id="photo"
+                            subject={__('photo')}
+                            aspect={1}
+                            round
+                            maxWidth={800}
+                            error={errors.photo}
+                            currentSrc={
+                                member?.id && member.has_photo
+                                    ? photoRoute.url(member.id, {
+                                          query: {
+                                              v:
+                                                  member.media_version ??
+                                                  undefined,
+                                          },
+                                      })
+                                    : null
+                            }
                         />
                     </Field>
                 </div>

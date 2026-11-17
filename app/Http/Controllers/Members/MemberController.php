@@ -177,6 +177,7 @@ class MemberController extends Controller
             $request->photo(),
             $request->banner(),
             $request->removesBanner(),
+            $request->removesPhoto(),
         );
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Member updated.')]);

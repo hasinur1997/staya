@@ -1,15 +1,18 @@
 import { router } from '@inertiajs/react';
-import { Camera, ImagePlus, Trash2 } from 'lucide-react';
-import { useRef } from 'react';
+import { Camera, ImagePlus } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { ActionButton } from '@/components/action-button';
+import { ImageUploadDialog } from '@/components/image-upload-dialog';
 import { MemberStatusBadge } from '@/components/member-status-badge';
 import { MoreMenu } from '@/components/page-header';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { useImageDrop } from '@/hooks/use-image-drop';
 import { useInitials } from '@/hooks/use-initials';
 import { formatBusinessDate } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
 import { banner, photo } from '@/routes/members';
 import { update as updateSection } from '@/routes/members/sections';
 import type { MemberProfile, PageAction } from '@/types';
@@ -29,8 +32,6 @@ type Props = {
 export function MemberHero({ member, canEdit, actions, menuActions }: Props) {
     const __ = useTranslate();
     const getInitials = useInitials();
-    const bannerInput = useRef<HTMLInputElement>(null);
-    const photoInput = useRef<HTMLInputElement>(null);
     const currentStay = member.stays.find((stay) => stay.left_on === null);
     const version = member.media_version ?? undefined;
 
@@ -49,15 +50,39 @@ export function MemberHero({ member, canEdit, actions, menuActions }: Props) {
             },
         );
 
-    const upload = (field: 'photo' | 'banner', file: File | undefined) => {
-        if (file) {
-            send({ [field]: file });
-        }
+    const [dialog, setDialog] = useState<{
+        field: 'photo' | 'banner';
+        file: File | null;
+    } | null>(null);
+
+    const bannerDrop = useImageDrop(
+        (file) => setDialog({ field: 'banner', file }),
+        !canEdit,
+    );
+    const photoDrop = useImageDrop(
+        (file) => setDialog({ field: 'photo', file }),
+        !canEdit,
+    );
+
+    const finish = (data: Record<string, unknown>) => {
+        send(data);
+        setDialog(null);
     };
 
     return (
         <section className="rounded-xl flex flex-col overflow-hidden border bg-card">
-            <div className="relative h-36 bg-gradient-to-r from-primary/15 to-highlight/20 md:h-48">
+            <div
+                {...bannerDrop.handlers}
+                className={cn(
+                    'relative h-36 bg-gradient-to-r from-primary/15 to-highlight/20 md:h-48',
+                    bannerDrop.dragging && 'ring-2 ring-primary ring-inset',
+                )}
+            >
+                {canEdit && bannerDrop.dragging && (
+                    <p className="absolute inset-0 z-10 flex items-center justify-center bg-card/80 text-label text-ink">
+                        {__('Drop the banner here')}
+                    </p>
+                )}
                 {member.has_banner && (
                     <img
                         src={banner.url(member.id, { query: { v: version } })}
@@ -66,46 +91,31 @@ export function MemberHero({ member, canEdit, actions, menuActions }: Props) {
                     />
                 )}
                 {canEdit && (
-                    <div className="absolute top-3 right-3 flex gap-2 print:hidden">
+                    <div className="absolute top-3 right-3 print:hidden">
                         <Button
                             type="button"
                             size="icon"
                             variant="outline"
                             aria-label={__('Change banner')}
                             title={__('Change banner')}
-                            onClick={() => bannerInput.current?.click()}
+                            onClick={() =>
+                                setDialog({ field: 'banner', file: null })
+                            }
                         >
                             <ImagePlus />
                         </Button>
-                        {member.has_banner && (
-                            <Button
-                                type="button"
-                                size="icon"
-                                variant="outline"
-                                aria-label={__('Remove banner')}
-                                title={__('Remove banner')}
-                                onClick={() => send({ remove_banner: 1 })}
-                            >
-                                <Trash2 />
-                            </Button>
-                        )}
-                        <input
-                            ref={bannerInput}
-                            type="file"
-                            accept="image/jpeg,image/png,image/webp"
-                            className="sr-only"
-                            tabIndex={-1}
-                            onChange={(event) => {
-                                upload('banner', event.target.files?.[0]);
-                                event.target.value = '';
-                            }}
-                        />
                     </div>
                 )}
             </div>
 
             <div className="flex flex-col gap-4 px-4 pb-4 md:flex-row md:items-end md:gap-6 md:px-6 md:pb-6">
-                <div className="relative -mt-12 w-fit md:-mt-16">
+                <div
+                    {...photoDrop.handlers}
+                    className={cn(
+                        'relative -mt-12 w-fit rounded-full md:-mt-16',
+                        photoDrop.dragging && 'ring-2 ring-primary',
+                    )}
+                >
                     <Avatar className="size-24 border-4 border-card md:size-32">
                         {member.has_photo && (
                             <AvatarImage
@@ -122,30 +132,19 @@ export function MemberHero({ member, canEdit, actions, menuActions }: Props) {
                         </AvatarFallback>
                     </Avatar>
                     {canEdit && (
-                        <>
-                            <Button
-                                type="button"
-                                size="icon"
-                                variant="outline"
-                                className="absolute right-0 bottom-0 size-8 rounded-full print:hidden"
-                                aria-label={__('Change profile picture')}
-                                title={__('Change profile picture')}
-                                onClick={() => photoInput.current?.click()}
-                            >
-                                <Camera />
-                            </Button>
-                            <input
-                                ref={photoInput}
-                                type="file"
-                                accept="image/jpeg,image/png,image/webp"
-                                className="sr-only"
-                                tabIndex={-1}
-                                onChange={(event) => {
-                                    upload('photo', event.target.files?.[0]);
-                                    event.target.value = '';
-                                }}
-                            />
-                        </>
+                        <Button
+                            type="button"
+                            size="icon"
+                            variant="outline"
+                            className="absolute right-0 bottom-0 size-8 rounded-full print:hidden"
+                            aria-label={__('Change profile picture')}
+                            title={__('Change profile picture')}
+                            onClick={() =>
+                                setDialog({ field: 'photo', file: null })
+                            }
+                        >
+                            <Camera />
+                        </Button>
                     )}
                 </div>
 
@@ -182,6 +181,40 @@ export function MemberHero({ member, canEdit, actions, menuActions }: Props) {
                     <MoreMenu actions={menuActions} />
                 </div>
             </div>
+
+            <ImageUploadDialog
+                open={dialog !== null}
+                initialFile={dialog?.file ?? null}
+                title={
+                    dialog?.field === 'banner'
+                        ? __('Banner')
+                        : __('Profile picture')
+                }
+                aspect={dialog?.field === 'banner' ? 4 : 1}
+                round={dialog?.field === 'photo'}
+                maxWidth={dialog?.field === 'banner' ? 1600 : 800}
+                confirmLabel={__('Crop and upload')}
+                currentSrc={
+                    dialog?.field === 'banner'
+                        ? member.has_banner
+                            ? banner.url(member.id, { query: { v: version } })
+                            : null
+                        : member.has_photo
+                          ? photo.url(member.id, { query: { v: version } })
+                          : null
+                }
+                onRemove={() =>
+                    finish(
+                        dialog?.field === 'banner'
+                            ? { remove_banner: 1 }
+                            : { remove_photo: 1 },
+                    )
+                }
+                onClose={() => setDialog(null)}
+                onConfirm={(file) =>
+                    finish(dialog ? { [dialog.field]: file } : {})
+                }
+            />
         </section>
     );
 }

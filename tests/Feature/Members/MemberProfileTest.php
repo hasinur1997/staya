@@ -157,6 +157,22 @@ class MemberProfileTest extends TestCase
         ));
     }
 
+    public function test_the_profile_picture_can_be_removed()
+    {
+        $editor = $this->editor();
+        $this->patchSection($editor, 'images', ['photo' => UploadedFile::fake()->image('me.png')])->assertRedirect();
+        $path = $this->member->refresh()->photo_path;
+        Storage::disk('uploads')->assertExists($path);
+
+        $this->patchSection($editor, 'images', ['remove_photo' => true])->assertRedirect();
+
+        $this->assertNull($this->member->refresh()->photo_path);
+        Storage::disk('uploads')->assertMissing($path);
+
+        $this->patchSection(User::factory()->withPermissions(Permission::MemberView)->create(), 'images', ['remove_photo' => true])
+            ->assertForbidden();
+    }
+
     public function test_a_banner_must_be_an_image_and_needs_member_update()
     {
         $this->patchSection($this->editor(), 'images', ['banner' => UploadedFile::fake()->create('x.pdf', 10, 'application/pdf')])

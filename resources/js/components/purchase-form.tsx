@@ -4,6 +4,7 @@ import { usePage } from '@inertiajs/react';
 import { Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
+import { ImageDropzone } from '@/components/image-dropzone';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -288,13 +289,14 @@ export function PurchaseFields({
                         help={__('JPG, PNG, WebP or PDF, up to :size MB.', {
                             size: Math.floor(mess.maxUploadKb / 1024),
                         })}
-                        error={errors.receipt}
                     >
-                        <Input
-                            id="receipt"
+                        <ImageDropzone
                             name="receipt"
-                            type="file"
-                            accept=".jpg,.jpeg,.png,.webp,.pdf"
+                            id="receipt"
+                            allowPdf
+                            maxWidth={2000}
+                            subject={__('receipt')}
+                            error={errors.receipt}
                         />
                     </Field>
                     {purchase?.has_receipt && (

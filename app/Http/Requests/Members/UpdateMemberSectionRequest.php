@@ -58,10 +58,11 @@ class UpdateMemberSectionRequest extends FormRequest
             'email' => $this->emailRules($member->user_id),
             'banner' => ['nullable', ...$this->uploadRules(['jpg', 'jpeg', 'png', 'webp'])],
             'remove_banner' => ['sometimes', 'boolean'],
+            'remove_photo' => ['sometimes', 'boolean'],
         ];
 
         $fields = match ($this->section()) {
-            'images' => ['photo', 'banner', 'remove_banner'],
+            'images' => ['photo', 'banner', 'remove_banner', 'remove_photo'],
             'personal' => ['first_name', 'last_name', 'phone', 'email'],
             'family' => ['father_name', 'mother_name', 'permanent_address'],
             default => ['nid_number', 'nid_file'],
@@ -119,6 +120,11 @@ class UpdateMemberSectionRequest extends FormRequest
     public function removesBanner(): bool
     {
         return $this->boolean('remove_banner');
+    }
+
+    public function removesPhoto(): bool
+    {
+        return $this->boolean('remove_photo');
     }
 
     private function section(): string

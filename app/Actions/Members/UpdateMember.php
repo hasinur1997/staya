@@ -17,7 +17,7 @@ class UpdateMember
      *
      * @param  array<string, string>  $details  Validated member fields, phone normalized
      */
-    public function handle(Member $member, array $details, string $email, ?UploadedFile $nidFile = null, ?UploadedFile $photo = null, ?UploadedFile $banner = null, bool $removeBanner = false): Member
+    public function handle(Member $member, array $details, string $email, ?UploadedFile $nidFile = null, ?UploadedFile $photo = null, ?UploadedFile $banner = null, bool $removeBanner = false, bool $removePhoto = false): Member
     {
         $uploads = new MemberUploads;
 
@@ -26,7 +26,7 @@ class UpdateMember
             $photoPath = $uploads->store($photo, 'photos');
             $bannerPath = $uploads->store($banner, 'banners');
 
-            $replaced = DB::transaction(function () use ($member, $details, $email, $nidPath, $photoPath, $bannerPath, $removeBanner): array {
+            $replaced = DB::transaction(function () use ($member, $details, $email, $nidPath, $photoPath, $bannerPath, $removeBanner, $removePhoto): array {
                 $member = Member::query()->lockForUpdate()->findOrFail($member->id);
                 $before = $member->auditSnapshot();
                 $replaced = [];
@@ -39,7 +39,7 @@ class UpdateMember
                     $member->nid_file_path = $nidPath;
                 }
 
-                if ($photoPath !== null) {
+                if ($photoPath !== null || $removePhoto) {
                     $replaced[] = $member->photo_path;
                     $member->photo_path = $photoPath;
                 }
@@ -62,7 +62,7 @@ class UpdateMember
 
                 $after = $member->auditSnapshot();
 
-                if ($before !== $after || $nidChanged || $nidPath !== null || $photoPath !== null || $bannerPath !== null || $removeBanner) {
+                if ($before !== $after || $nidChanged || $nidPath !== null || $photoPath !== null || $removePhoto || $bannerPath !== null || $removeBanner) {
                     activity()
                         ->useLog(AuditLog::Member)
                         ->performedOn($member)
@@ -71,7 +71,7 @@ class UpdateMember
                         ->withProperties([
                             'nid_number_changed' => $nidChanged,
                             'nid_file_replaced' => $nidPath !== null,
-                            'photo_replaced' => $photoPath !== null,
+                            'photo_replaced' => $photoPath !== null || $removePhoto,
                             'banner_replaced' => $bannerPath !== null || $removeBanner,
                         ])
                         ->log('member_updated');

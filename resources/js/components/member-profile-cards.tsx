@@ -3,6 +3,7 @@ import { Download, Eye } from 'lucide-react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { EditableCard } from '@/components/editable-card';
+import { ImageDropzone } from '@/components/image-dropzone';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -237,16 +238,14 @@ export function NidDetailsCard({
                             required
                         />
                     </Field>
-                    <Field
-                        id="nid_file"
-                        label={__('New NID copy')}
-                        error={errors.nid_file}
-                    >
-                        <Input
-                            id="nid_file"
+                    <Field id="nid_file" label={__('New NID copy')}>
+                        <ImageDropzone
                             name="nid_file"
-                            type="file"
-                            accept="application/pdf,image/jpeg,image/png"
+                            id="nid_file"
+                            allowPdf
+                            maxWidth={2000}
+                            subject={__('NID copy')}
+                            error={errors.nid_file}
                         />
                         <p className="text-small text-ink-muted">
                             {__('Leave empty to keep the current copy.')}
