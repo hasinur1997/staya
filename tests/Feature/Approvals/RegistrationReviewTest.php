@@ -44,14 +44,9 @@ class RegistrationReviewTest extends TestCase
 
     public function test_the_approvals_entry_point_leads_reviewers_to_registrations()
     {
-        $this->actingAs(User::factory()->admin()->create())
+        $this->actingAs(User::factory()->withPermissions(Permission::MemberApproveRegistration)->create())
             ->get(route('approvals.index'))
             ->assertRedirect(route('approvals.registrations.index'));
-
-        $this->actingAs(User::factory()->withPermissions(Permission::DepositApprove)->create())
-            ->get(route('approvals.index'))
-            ->assertOk()
-            ->assertInertia(fn (Assert $page) => $page->component('upcoming'));
     }
 
     public function test_approval_activates_the_member_assigns_the_role_and_opens_a_stay()

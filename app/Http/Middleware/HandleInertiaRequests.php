@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\DepositStatus;
 use App\Enums\MemberStatus;
+use App\Models\Deposit;
 use App\Models\Fund;
 use App\Models\Member;
 use App\Models\MessSetting;
@@ -76,16 +78,21 @@ class HandleInertiaRequests extends Middleware
     }
 
     /**
-     * Registrations waiting for a decision, for reviewers. Pending deposits
-     * join this count when the deposit queue ships.
+     * Deposits and registrations waiting for a decision, counting only the
+     * queues the user may review; null when they review neither.
      */
     protected function pendingApprovals(Request $request): ?int
     {
-        if (! $request->user()?->can('viewAnyRegistrations', Member::class)) {
+        $user = $request->user();
+        $reviewsDeposits = $user?->can('review', Deposit::class) ?? false;
+        $reviewsRegistrations = $user?->can('viewAnyRegistrations', Member::class) ?? false;
+
+        if (! $reviewsDeposits && ! $reviewsRegistrations) {
             return null;
         }
 
-        return Member::query()->where('status', MemberStatus::Pending)->count();
+        return ($reviewsDeposits ? Deposit::query()->where('status', DepositStatus::Pending)->count() : 0)
+            + ($reviewsRegistrations ? Member::query()->where('status', MemberStatus::Pending)->count() : 0);
     }
 
     /**

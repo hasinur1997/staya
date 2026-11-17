@@ -8,6 +8,7 @@ import {
     MemberStaysCard,
     MemberSummaryCard,
 } from '@/components/member-details';
+import { MemberDepositsCard } from '@/components/member-deposits-card';
 import { MemberStatusBadge } from '@/components/member-status-badge';
 import { DetailTemplate } from '@/components/templates/detail-template';
 import { Button } from '@/components/ui/button';
@@ -29,12 +30,14 @@ import {
     reactivate,
     show,
 } from '@/routes/members';
-import type { MemberProfile, PageAction } from '@/types';
+import type { DepositRow, MemberProfile, PageAction } from '@/types';
 
 type Props = {
     member: MemberProfile;
     /** Present only after the viewer asks to see it. */
     nid?: string;
+    /** Latest deposits; null when the viewer may not see them. */
+    deposits: DepositRow[] | null;
     /** Today in Asia/Dhaka (Y-m-d). */
     today: string;
     can: {
@@ -49,7 +52,13 @@ type Props = {
 
 type OpenDialog = 'deactivate' | 'reactivate' | 'delete' | null;
 
-export default function MembersShow({ member, nid, today, can }: Props) {
+export default function MembersShow({
+    member,
+    nid,
+    deposits,
+    today,
+    can,
+}: Props) {
     const __ = useTranslate();
     const [dialog, setDialog] = useState<OpenDialog>(null);
     const [deleting, setDeleting] = useState(false);
@@ -137,6 +146,7 @@ export default function MembersShow({ member, nid, today, can }: Props) {
             >
                 <MemberDetailsCard member={member} />
                 {can.viewNid && <MemberNidCard member={member} nid={nid} />}
+                {deposits && <MemberDepositsCard deposits={deposits} />}
                 <MemberStaysCard member={member} />
             </DetailTemplate>
 

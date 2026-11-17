@@ -28,6 +28,8 @@ class RegistrationGateTest extends TestCase
             'user' => $member->user_id,
             'role' => Role::member()->id,
             'feature' => 'grocery',
+            // Records that do not exist still redirect: the gate runs first.
+            'deposit' => 999,
         ];
 
         return collect(Router::getRoutes()->getRoutes())

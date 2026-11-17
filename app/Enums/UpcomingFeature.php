@@ -9,9 +9,7 @@ namespace App\Enums;
 enum UpcomingFeature: string
 {
     case Grocery = 'grocery';
-    case Deposits = 'deposits';
     case Reports = 'reports';
-    case Approvals = 'approvals';
     case Payables = 'payables';
     case AuditLog = 'audit-log';
 
@@ -19,9 +17,7 @@ enum UpcomingFeature: string
     {
         return match ($this) {
             self::Grocery => __('Grocery purchases'),
-            self::Deposits => __('Deposits'),
             self::Reports => __('Reports'),
-            self::Approvals => __('Pending approvals'),
             self::Payables => __('Payables'),
             self::AuditLog => __('Audit log'),
         };
@@ -31,9 +27,7 @@ enum UpcomingFeature: string
     {
         return match ($this) {
             self::Grocery => __('Record multi-item grocery purchases with totals worked out for you.'),
-            self::Deposits => __('Submit cash deposits and follow them from pending to approved.'),
             self::Reports => __('Monthly summaries of spending, deposits and each member’s due or credit.'),
-            self::Approvals => __('Deposits waiting for a decision.'),
             self::Payables => __('Money the fund owes buyers, and the reimbursements that settle it.'),
             self::AuditLog => __('A read-only history of every financial and access change.'),
         };
@@ -52,20 +46,10 @@ enum UpcomingFeature: string
                 __('Edit your own purchase within 30 minutes of recording it'),
                 __('Void a purchase with a reason instead of deleting it'),
             ],
-            self::Deposits => [
-                __('Submit a deposit for yourself or, with permission, for another member'),
-                __('Pending and rejected deposits never touch the fund balance'),
-                __('Each approval posts to the ledger exactly once'),
-            ],
             self::Reports => [
                 __('Totals for each month in Asia/Dhaka time'),
                 __('Equal share, deposits and due or credit for every member'),
                 __('Close a month so its figures can no longer change'),
-            ],
-            self::Approvals => [
-                __('Approve or reject pending deposits with a reason'),
-                __('Each approval posts to the ledger exactly once'),
-                __('A count in the sidebar shows what is waiting'),
             ],
             self::Payables => [
                 __('See what the fund owes each buyer after a large purchase'),
@@ -90,10 +74,7 @@ enum UpcomingFeature: string
     {
         return match ($this) {
             self::Grocery => [Permission::GroceryView],
-            self::Deposits => [Permission::DepositViewOwn, Permission::DepositViewAll],
             self::Reports => [Permission::ReportViewOwn, Permission::ReportViewAll],
-            // Registration reviewers already have their queue (ApprovalController).
-            self::Approvals => [Permission::DepositApprove],
             self::Payables => [Permission::LedgerReimburse],
             self::AuditLog => [Permission::AuditView],
         };

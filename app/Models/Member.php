@@ -110,6 +110,17 @@ class Member extends Model
     }
 
     /**
+     * Whether any stay overlaps the month of the given business date (Y-m-d).
+     */
+    public function isActiveInMonthOf(string $date): bool
+    {
+        return static::query()
+            ->whereKey($this->id)
+            ->activeInMonth((int) substr($date, 0, 4), (int) substr($date, 5, 2))
+            ->exists();
+    }
+
+    /**
      * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
@@ -160,13 +171,21 @@ class Member extends Model
     }
 
     /**
-     * Whether the member has purchases, deposits or buyer payables. Phases 5
-     * and 6 add each table's check here; the RESTRICT foreign keys on those
-     * tables back it up.
+     * @return HasMany<Deposit, $this>
+     */
+    public function deposits(): HasMany
+    {
+        return $this->hasMany(Deposit::class);
+    }
+
+    /**
+     * Whether the member has purchases, deposits or buyer payables. Any
+     * deposit counts, whatever its status. Phase 6 adds purchases and
+     * payables; the RESTRICT foreign keys on those tables back it up.
      */
     public function hasFinancialRecords(): bool
     {
-        return false;
+        return $this->deposits()->exists();
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Deposit;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -23,8 +24,14 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        Member::factory()->active()->count(4)->create();
+        $members = Member::factory()->active()->count(4)->create();
         Member::factory()->inactive()->create();
         Member::factory()->count(2)->create();
+
+        foreach ($members as $member) {
+            Deposit::factory()->approved()->create(['member_id' => $member->id]);
+        }
+
+        Deposit::factory()->create(['member_id' => $members->first()?->id]);
     }
 }

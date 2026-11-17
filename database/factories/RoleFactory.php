@@ -19,7 +19,8 @@ class RoleFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->unique()->jobTitle(),
+            // A job title alone can be "Manager", which is a seeded role.
+            'name' => fake()->unique()->jobTitle().' '.fake()->unique()->numerify('####'),
             'guard_name' => config('auth.defaults.guard'),
             'is_system' => false,
         ];

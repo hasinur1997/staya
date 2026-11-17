@@ -8,12 +8,14 @@ use App\Actions\Members\DeleteMember;
 use App\Actions\Members\ReactivateMember;
 use App\Actions\Members\UpdateMember;
 use App\Concerns\BusinessCalendar;
+use App\Concerns\PresentsDeposits;
 use App\Concerns\PresentsMembers;
 use App\Enums\MemberStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Members\StayDateRequest;
 use App\Http\Requests\Members\StoreMemberRequest;
 use App\Http\Requests\Members\UpdateMemberRequest;
+use App\Models\Deposit;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -26,7 +28,7 @@ use Inertia\Response;
 
 class MemberController extends Controller
 {
-    use PresentsMembers;
+    use PresentsDeposits, PresentsMembers;
 
     /**
      * Show the member list.
@@ -126,6 +128,7 @@ class MemberController extends Controller
         return Inertia::render('members/show', [
             'member' => $this->memberProfile($member, $actor),
             ...$this->nidProp($member, $actor, 'profile'),
+            'deposits' => $this->depositHistory($member, $actor),
             'today' => BusinessCalendar::today()->toDateString(),
             'can' => [
                 'update' => $actor->can('update', $member),
@@ -136,6 +139,31 @@ class MemberController extends Controller
                 'viewAny' => $actor->can('viewAny', Member::class),
             ],
         ]);
+    }
+
+    /**
+     * The member's latest deposits, for viewers allowed to see them; null
+     * hides the section.
+     *
+     * @return array<int, array<string, mixed>>|null
+     */
+    private function depositHistory(Member $member, User $viewer): ?array
+    {
+        $visible = $viewer->can('viewAll', Deposit::class)
+            || ($member->user_id === $viewer->id && $viewer->can('viewAny', Deposit::class));
+
+        if (! $visible) {
+            return null;
+        }
+
+        return $member->deposits()
+            ->with('member:id,first_name,last_name,user_id')
+            ->orderByDesc('deposit_date')
+            ->orderByDesc('id')
+            ->limit(20)
+            ->get()
+            ->map(fn (Deposit $deposit) => $this->depositRow($deposit, $viewer))
+            ->all();
     }
 
     /**

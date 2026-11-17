@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import { ApprovalTabs } from '@/components/approval-tabs';
 import { ResponsiveTable } from '@/components/responsive-table';
 import type { ResponsiveColumn } from '@/components/responsive-table';
 import { ListTemplate } from '@/components/templates/list-template';
@@ -70,6 +71,7 @@ export default function RegistrationsIndex({ registrations }: Props) {
                     description: __(
                         'New sign-ups waiting for a decision, oldest first. Applicants have no access until approved.',
                     ),
+                    children: <ApprovalTabs current="registrations" />,
                 }}
                 resultCount={
                     registrations.length === 1

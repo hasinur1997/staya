@@ -4,3 +4,4 @@ export type * from './navigation';
 export type * from './ui';
 export type * from './ledger';
 export type * from './member';
+export type * from './deposit';

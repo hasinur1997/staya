@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Deposit;
 use App\Models\Fund;
 use App\Models\LedgerEntry;
 use App\Models\Member;
@@ -53,6 +54,7 @@ class AppServiceProvider extends ServiceProvider
             'month_closure' => MonthClosure::class,
             'member' => Member::class,
             'member_stay' => MemberStay::class,
+            'deposit' => Deposit::class,
         ]);
     }
 

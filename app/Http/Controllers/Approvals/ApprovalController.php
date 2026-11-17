@@ -2,27 +2,25 @@
 
 namespace App\Http\Controllers\Approvals;
 
-use App\Enums\UpcomingFeature;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\UpcomingFeatureController;
+use App\Models\Deposit;
 use App\Models\Member;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Inertia\Response;
 
 class ApprovalController extends Controller
 {
     /**
-     * The approvals entry point. Registrations are the only queue so far;
-     * reviewers of deposits alone still see the "coming soon" page until
-     * the deposit queue ships.
+     * The approvals entry point: the first queue the user may review.
      */
-    public function __invoke(Request $request, UpcomingFeatureController $upcoming): RedirectResponse|Response
+    public function __invoke(Request $request): RedirectResponse
     {
-        if ($request->user()->can('viewAnyRegistrations', Member::class)) {
-            return to_route('approvals.registrations.index');
-        }
+        $actor = $request->user();
 
-        return $upcoming(UpcomingFeature::Approvals);
+        return match (true) {
+            $actor->can('review', Deposit::class) => to_route('approvals.deposits.index'),
+            $actor->can('viewAnyRegistrations', Member::class) => to_route('approvals.registrations.index'),
+            default => abort(403),
+        };
     }
 }

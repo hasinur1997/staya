@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { dashboard, upcoming } from '@/routes';
 import { index as approvals } from '@/routes/approvals';
+import { index as deposits } from '@/routes/deposits';
 import { index as ledger } from '@/routes/ledger';
 import { index as members } from '@/routes/members';
 import { edit as messSettings } from '@/routes/mess-settings';
@@ -46,7 +47,7 @@ export const appNavigation: AppNavSection[] = [
             },
             {
                 title: 'Deposits',
-                href: upcoming('deposits'),
+                href: deposits(),
                 icon: Wallet,
                 permissions: ['deposit.view_own', 'deposit.view_all'],
             },

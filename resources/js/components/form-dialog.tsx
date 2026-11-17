@@ -31,7 +31,8 @@ type Props = {
     title: string;
     description: string;
     action: RouteDefinition<'post'>;
-    field: Field;
+    /** The one field to post; a plain confirmation when left out. */
+    field?: Field;
     submitLabel: string;
     destructive?: boolean;
 };
@@ -51,7 +52,7 @@ export function FormDialog({
     destructive = false,
 }: Props) {
     const __ = useTranslate();
-    const id = `dialog-${field.name}`;
+    const id = `dialog-${field?.name ?? 'confirm'}`;
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -66,27 +67,34 @@ export function FormDialog({
                 >
                     {({ errors, processing }) => (
                         <>
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor={id}>{field.label}</Label>
-                                {field.type === 'date' ? (
-                                    <Input
-                                        id={id}
-                                        name={field.name}
-                                        type="date"
-                                        defaultValue={field.defaultValue}
-                                        max={field.max}
-                                        required
-                                    />
-                                ) : (
-                                    <Textarea
-                                        id={id}
-                                        name={field.name}
-                                        rows={3}
-                                        required
-                                    />
-                                )}
-                                <InputError message={errors[field.name]} />
-                            </div>
+                            {field && (
+                                <div className="flex flex-col gap-2">
+                                    <Label htmlFor={id}>{field.label}</Label>
+                                    {field.type === 'date' ? (
+                                        <Input
+                                            id={id}
+                                            name={field.name}
+                                            type="date"
+                                            defaultValue={field.defaultValue}
+                                            max={field.max}
+                                            required
+                                        />
+                                    ) : (
+                                        <Textarea
+                                            id={id}
+                                            name={field.name}
+                                            rows={3}
+                                            required
+                                        />
+                                    )}
+                                    <InputError message={errors[field.name]} />
+                                </div>
+                            )}
+                            {Object.values(errors).length > 0 && !field && (
+                                <InputError
+                                    message={Object.values(errors)[0]}
+                                />
+                            )}
                             <DialogFooter className="gap-2">
                                 <DialogClose asChild>
                                     <Button type="button" variant="outline">

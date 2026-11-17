@@ -2,8 +2,10 @@
 
 use App\Enums\UpcomingFeature;
 use App\Http\Controllers\Approvals\ApprovalController;
+use App\Http\Controllers\Approvals\DepositQueueController;
 use App\Http\Controllers\Approvals\RegistrationController;
 use App\Http\Controllers\Auth\RegistrationStatusController;
+use App\Http\Controllers\Deposits\DepositController;
 use App\Http\Controllers\Dev\LayoutPreviewController;
 use App\Http\Controllers\Ledger\AdjustmentController;
 use App\Http\Controllers\Ledger\LedgerController;
@@ -39,7 +41,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('members/{member}/nid', [MemberFileController::class, 'nid'])->name('members.nid');
     Route::get('members/{member}/photo', [MemberFileController::class, 'photo'])->name('members.photo');
 
+    // Deposits are never edited or deleted; mistakes are reversed.
+    Route::resource('deposits', DepositController::class)->only(['index', 'create', 'store', 'show']);
+    Route::post('deposits/{deposit}/cancel', [DepositController::class, 'cancel'])->name('deposits.cancel');
+    Route::post('deposits/{deposit}/approve', [DepositController::class, 'approve'])->name('deposits.approve');
+    Route::post('deposits/{deposit}/reject', [DepositController::class, 'reject'])->name('deposits.reject');
+    Route::post('deposits/{deposit}/reverse', [DepositController::class, 'reverse'])->name('deposits.reverse');
+
     Route::get('approvals', ApprovalController::class)->name('approvals.index');
+    Route::get('approvals/deposits', DepositQueueController::class)->name('approvals.deposits.index');
     Route::get('approvals/registrations', [RegistrationController::class, 'index'])->name('approvals.registrations.index');
     Route::get('approvals/registrations/{member}', [RegistrationController::class, 'show'])->name('approvals.registrations.show');
     Route::post('approvals/registrations/{member}/approve', [RegistrationController::class, 'approve'])->name('approvals.registrations.approve');
