@@ -24,6 +24,29 @@ export type MonthlyFigures = {
     members: MonthlyMemberRow[];
 };
 
+/** Figures behind the charts; null without `report.view_all`. */
+export type DashboardInsights = {
+    /** Six months ending with the chosen one. */
+    trend: {
+        month: string;
+        deposits: string;
+        expenses: string;
+        /** Fund balance at the end of the month. */
+        fund_end: string;
+    }[];
+    /** Against the month before; a leading minus means down. */
+    changes: { deposits: string; expenses: string; fund: string };
+    daily: { day: number; expenses: string; meals: number }[];
+    top_items: { name: string; total: string }[];
+};
+
+export type OwnTrendRow = {
+    month: string;
+    deposits: string;
+    share: string;
+    due_credit: string;
+};
+
 export type DashboardQueues = {
     pendingDeposits: number | null;
     pendingRegistrations: number | null;
@@ -40,6 +63,9 @@ export type DashboardProps = {
     summary: MonthlyMemberRow | null;
     /** Everyone's figures; null without `report.view_all`. */
     report: MonthlyFigures | null;
+    insights: DashboardInsights | null;
+    /** The viewer's own deposits and share by month; null without a member profile or report access. */
+    myTrend: OwnTrendRow[] | null;
     /** The viewer's own totals; null without a member profile. */
     account: {
         /** Approved deposits; null without access to deposits. */

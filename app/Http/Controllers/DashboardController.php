@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Members\SummarizeMemberAccount;
+use App\Actions\Reports\BuildDashboardInsights;
 use App\Actions\Reports\CalculateMonthlyReport;
 use App\Actions\Reports\MonthlyReport;
 use App\Concerns\BusinessCalendar;
@@ -15,6 +16,7 @@ use App\Models\BuyerPayable;
 use App\Models\Deposit;
 use App\Models\GroceryPurchase;
 use App\Models\Member;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -30,7 +32,7 @@ class DashboardController extends Controller
 {
     use PresentsDeposits, PresentsPurchases;
 
-    public function __invoke(Request $request, CalculateMonthlyReport $calculate, SummarizeMemberAccount $summarizeAccount): Response
+    public function __invoke(Request $request, CalculateMonthlyReport $calculate, SummarizeMemberAccount $summarizeAccount, BuildDashboardInsights $buildInsights): Response
     {
         $actor = $request->user();
         $member = $actor->member;
@@ -61,6 +63,8 @@ class DashboardController extends Controller
                 'leftover' => $report->leftover,
                 'members' => $report->members,
             ] : null,
+            'insights' => $report !== null && $viewAll ? $buildInsights->handle($month) : null,
+            'myTrend' => $report !== null && $member !== null ? $this->ownTrend($calculate, $member, $month) : null,
             'account' => $account === null ? null : [
                 'deposited' => $actor->can('viewAny', Deposit::class) ? $account['deposited'] : null,
                 'bajar' => $actor->can('viewAny', GroceryPurchase::class) ? $account['bajar'] : null,
@@ -95,6 +99,29 @@ class DashboardController extends Controller
                 'viewDeposits' => $actor->can('viewAny', Deposit::class),
             ],
         ]);
+    }
+
+    /**
+     * The viewer's own deposits and share for the six months up to the one
+     * shown; months they did not live in the mess are left out.
+     *
+     * @return list<array{month: string, deposits: string, share: string, due_credit: string}>
+     */
+    private function ownTrend(CalculateMonthlyReport $calculate, Member $member, string $month): array
+    {
+        $end = CarbonImmutable::createFromFormat('!Y-m', $month, BusinessCalendar::TIMEZONE);
+        $rows = [];
+
+        for ($step = BuildDashboardInsights::MONTHS - 1; $step >= 0; $step--) {
+            $at = $end->subMonthsNoOverflow($step);
+            $row = $calculate->handle($at->year, $at->month)->rowFor($member->id);
+
+            if ($row !== null) {
+                $rows[] = ['month' => $at->format('Y-m'), 'deposits' => $row['deposits'], 'share' => $row['share'], 'due_credit' => $row['due_credit']];
+            }
+        }
+
+        return $rows;
     }
 
     /**

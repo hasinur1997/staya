@@ -10,6 +10,7 @@ import {
 import { AuditHistoryCard } from '@/components/audit-history-card';
 import { FormDialog } from '@/components/form-dialog';
 import { DetailTemplate } from '@/components/templates/detail-template';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatBusinessDate, formatDateTime } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
@@ -67,25 +68,14 @@ export default function DepositsShow({ deposit, history, can }: Props) {
         ],
     });
 
-    const secondaryActions: PageAction[] = [
-        ...(can.reject
-            ? [
-                  {
-                      label: __('Reject'),
-                      icon: X,
-                      onClick: () => setDialog('reject'),
-                  },
-              ]
-            : []),
-        ...(can.cancel
-            ? [
-                  {
-                      label: __('Cancel deposit'),
-                      onClick: () => setDialog('cancel'),
-                  },
-              ]
-            : []),
-    ];
+    const secondaryActions: PageAction[] = can.cancel
+        ? [
+              {
+                  label: __('Cancel deposit'),
+                  onClick: () => setDialog('cancel'),
+              },
+          ]
+        : [];
     const menuActions: PageAction[] = can.reverse
         ? [
               {
@@ -119,13 +109,6 @@ export default function DepositsShow({ deposit, history, can }: Props) {
                         member: deposit.member_name,
                         date: formatBusinessDate(deposit.deposit_date),
                     }),
-                    primaryAction: can.approve
-                        ? {
-                              label: __('Approve'),
-                              icon: Check,
-                              onClick: () => setDialog('approve'),
-                          }
-                        : undefined,
                     secondaryActions,
                     menuActions,
                 }}
@@ -136,6 +119,51 @@ export default function DepositsShow({ deposit, history, can }: Props) {
                         errors={pageErrors}
                     />
                 )}
+                {deposit.status === 'pending' &&
+                    (can.approve || can.reject) && (
+                        <Card className="border-success/40 bg-success-soft">
+                            <CardContent className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                                <div className="flex flex-col gap-1">
+                                    <p className="text-subhead text-ink">
+                                        {__('Waiting for your decision')}
+                                    </p>
+                                    <p className="text-small text-ink-muted">
+                                        {deposit.is_own
+                                            ? __(
+                                                  'This is your own deposit. Approving it is recorded as a self-approval.',
+                                              )
+                                            : __(
+                                                  'Nothing counts towards the fund until you approve it.',
+                                              )}
+                                    </p>
+                                </div>
+                                <div className="flex gap-2 print:hidden">
+                                    {can.reject && (
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="lg"
+                                            onClick={() => setDialog('reject')}
+                                        >
+                                            <X />
+                                            {__('Reject')}
+                                        </Button>
+                                    )}
+                                    {can.approve && (
+                                        <Button
+                                            type="button"
+                                            variant="success"
+                                            size="lg"
+                                            onClick={() => setDialog('approve')}
+                                        >
+                                            <Check />
+                                            {__('Approve deposit')}
+                                        </Button>
+                                    )}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-subhead">

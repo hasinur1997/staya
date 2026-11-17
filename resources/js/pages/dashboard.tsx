@@ -1,11 +1,22 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Plus, Wallet } from 'lucide-react';
+import {
+    AreaLine,
+    ChartCard,
+    Columns,
+    DivergingBars,
+    EmptyChart,
+    GroupedBars,
+    Legend,
+    RankedBars,
+} from '@/components/charts';
 import { DepositStatusBadge } from '@/components/deposit-status-badge';
 import { PurchaseStatusBadge } from '@/components/purchase-status-badge';
 import { ResponsiveTable } from '@/components/responsive-table';
 import type { ResponsiveColumn } from '@/components/responsive-table';
 import { SignedMoney } from '@/components/signed-money';
 import { StatCard } from '@/components/stat-card';
+import { PageGrid } from '@/components/templates/page-grid';
 import { DashboardTemplate } from '@/components/templates/dashboard-template';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,6 +42,8 @@ export default function Dashboard({
     memberStatus,
     summary,
     report,
+    insights,
+    myTrend,
     account,
     owed,
     recentDeposits,
@@ -79,7 +92,7 @@ export default function Dashboard({
                   />,
               ]
             : []),
-        ...(balance !== null
+        ...(balance !== null && !report
             ? [
                   <StatCard
                       key="balance"
@@ -169,6 +182,260 @@ export default function Dashboard({
         },
     ];
 
+    const shortMonth = (value: string) =>
+        formatMonth(value)
+            .replace(/\s\d{4}$/, '')
+            .slice(0, 3);
+    const previousMonth = (value: string) => {
+        const [year, number] = value.split('-').map(Number);
+
+        return number === 1
+            ? `${year - 1}-12`
+            : `${year}-${String(number - 1).padStart(2, '0')}`;
+    };
+    const against = (change: string) => (
+        <span>
+            <SignedMoney
+                value={change}
+                positiveLabel={__('up')}
+                negativeLabel={__('down')}
+            />{' '}
+            {__('from :month', { month: formatMonth(previousMonth(month)) })}
+        </span>
+    );
+
+    const overview =
+        report && insights
+            ? [
+                  <StatCard
+                      key="fund"
+                      label={__('Fund balance now')}
+                      value={balance !== null ? formatMoney(balance) : '—'}
+                      hint={against(insights.changes.fund)}
+                  />,
+                  <StatCard
+                      key="deposits"
+                      label={__('Deposits in :month', {
+                          month: formatMonth(month),
+                      })}
+                      value={formatMoney(report.deposits)}
+                      hint={against(insights.changes.deposits)}
+                  />,
+                  <StatCard
+                      key="expenses"
+                      label={__('Grocery expenses')}
+                      value={formatMoney(report.expenses)}
+                      hint={against(insights.changes.expenses)}
+                  />,
+                  <StatCard
+                      key="rate"
+                      label={
+                          report.split === 'meals'
+                              ? __('Cost per meal')
+                              : __('Equal share')
+                      }
+                      value={formatMoney(report.share)}
+                      hint={
+                          report.split === 'meals'
+                              ? __(':meals meals · :members', {
+                                    meals: report.total_meals,
+                                    members: countMembers(
+                                        report.active_members,
+                                    ),
+                                })
+                              : countMembers(report.active_members)
+                      }
+                  />,
+              ]
+            : undefined;
+
+    const charts =
+        report && insights ? (
+            <div className="flex flex-col gap-4 md:gap-6">
+                <PageGrid>
+                    <div className="col-span-4 md:col-span-4 lg:col-span-6">
+                        <ChartCard
+                            title={__('Deposits and expenses')}
+                            description={__('The last six months')}
+                            legend={
+                                <Legend
+                                    items={[
+                                        {
+                                            label: __('Deposits'),
+                                            className: 'bg-primary',
+                                        },
+                                        {
+                                            label: __('Expenses'),
+                                            className: 'bg-highlight',
+                                        },
+                                    ]}
+                                />
+                            }
+                        >
+                            <GroupedBars
+                                aLabel={__('Deposits')}
+                                bLabel={__('Expenses')}
+                                data={insights.trend.map((row) => ({
+                                    label: shortMonth(row.month),
+                                    a: row.deposits,
+                                    b: row.expenses,
+                                    aText: formatMoney(row.deposits),
+                                    bText: formatMoney(row.expenses),
+                                }))}
+                            />
+                        </ChartCard>
+                    </div>
+                    <div className="col-span-4 md:col-span-4 lg:col-span-6">
+                        <ChartCard
+                            title={__('Fund balance')}
+                            description={__('At the end of each month')}
+                        >
+                            <AreaLine
+                                name={__('Fund balance')}
+                                data={insights.trend.map((row) => ({
+                                    label: shortMonth(row.month),
+                                    value: row.fund_end,
+                                    text: formatMoney(row.fund_end),
+                                }))}
+                            />
+                        </ChartCard>
+                    </div>
+                </PageGrid>
+                <PageGrid>
+                    <div className="col-span-4 md:col-span-4 lg:col-span-6">
+                        <ChartCard
+                            title={__('Grocery spending by day')}
+                            description={formatMonth(month)}
+                        >
+                            {insights.daily.every(
+                                (day) => day.expenses === '0.00',
+                            ) ? (
+                                <EmptyChart>
+                                    {__('No purchases this month.')}
+                                </EmptyChart>
+                            ) : (
+                                <Columns
+                                    name={__('Grocery spending by day')}
+                                    data={insights.daily.map((day) => ({
+                                        label: String(day.day),
+                                        value: day.expenses,
+                                        text: formatMoney(day.expenses),
+                                    }))}
+                                />
+                            )}
+                        </ChartCard>
+                    </div>
+                    <div className="col-span-4 md:col-span-4 lg:col-span-6">
+                        <ChartCard
+                            title={__('Meals by day')}
+                            description={formatMonth(month)}
+                        >
+                            {report.total_meals === 0 ? (
+                                <EmptyChart>
+                                    {__('No meals recorded this month.')}
+                                </EmptyChart>
+                            ) : (
+                                <Columns
+                                    tone="highlight"
+                                    whole
+                                    name={__('Meals by day')}
+                                    data={insights.daily.map((day) => ({
+                                        label: String(day.day),
+                                        value: String(day.meals),
+                                        text: __(':count meals', {
+                                            count: day.meals,
+                                        }),
+                                    }))}
+                                />
+                            )}
+                        </ChartCard>
+                    </div>
+                </PageGrid>
+                <PageGrid>
+                    <div className="col-span-4 md:col-span-4 lg:col-span-6">
+                        <ChartCard
+                            title={__('Most bought items')}
+                            description={__('By amount spent in :month', {
+                                month: formatMonth(month),
+                            })}
+                        >
+                            {insights.top_items.length === 0 ? (
+                                <EmptyChart>
+                                    {__('No purchases this month.')}
+                                </EmptyChart>
+                            ) : (
+                                <RankedBars
+                                    rows={insights.top_items.map((item) => ({
+                                        label: item.name,
+                                        value: item.total,
+                                        text: formatMoney(item.total),
+                                    }))}
+                                />
+                            )}
+                        </ChartCard>
+                    </div>
+                    <div className="col-span-4 md:col-span-4 lg:col-span-6">
+                        <ChartCard
+                            title={__('Who owes and who is ahead')}
+                            description={__('Deposits minus share, this month')}
+                        >
+                            {report.members.length === 0 ? (
+                                <EmptyChart>
+                                    {__(
+                                        'No members lived in the mess this month.',
+                                    )}
+                                </EmptyChart>
+                            ) : (
+                                <DivergingBars
+                                    dueLabel={__('Due')}
+                                    creditLabel={__('Credit')}
+                                    rows={report.members.map((row) => ({
+                                        label: row.name,
+                                        value: row.due_credit,
+                                        text: (
+                                            <SignedMoney
+                                                value={row.due_credit}
+                                                positiveLabel={__('credit')}
+                                                negativeLabel={__('due')}
+                                            />
+                                        ),
+                                    }))}
+                                />
+                            )}
+                        </ChartCard>
+                    </div>
+                </PageGrid>
+            </div>
+        ) : myTrend && myTrend.length > 0 ? (
+            <ChartCard
+                title={__('Your deposits and share')}
+                description={__('The last six months')}
+                legend={
+                    <Legend
+                        items={[
+                            {
+                                label: __('Deposits'),
+                                className: 'bg-primary',
+                            },
+                            { label: __('Share'), className: 'bg-highlight' },
+                        ]}
+                    />
+                }
+            >
+                <GroupedBars
+                    aLabel={__('Deposits')}
+                    bLabel={__('Share')}
+                    data={myTrend.map((row) => ({
+                        label: shortMonth(row.month),
+                        a: row.deposits,
+                        b: row.share,
+                        aText: formatMoney(row.deposits),
+                        bText: formatMoney(row.share),
+                    }))}
+                />
+            </ChartCard>
+        ) : undefined;
+
     const showQueues =
         queues.pendingDeposits !== null ||
         queues.pendingRegistrations !== null ||
@@ -222,6 +489,8 @@ export default function Dashboard({
                         </div>
                     ),
                 }}
+                overview={overview}
+                charts={charts}
                 glance={glance.length > 0 ? glance : undefined}
                 stats={stats.length > 0 ? stats : undefined}
                 aside={
