@@ -82,7 +82,7 @@ Tablet 768–1023px                      Mobile <768px
 | Footer | Nothing in v1 (the user menu lives in the top bar)                  | —                                                            | Fund balance (moved here from the top bar) |
 
 - Surface: `bg-background`, 1px right border (`border-border`).
-- Active item: 3px terracotta left bar, `bg-primary-soft`, `text-ink`, semibold label,
+- Active item: 3px primary left bar, `bg-primary-soft`, `text-ink`, semibold label,
   `aria-current="page"`. Inactive: `text-ink-muted`, hover `bg-surface-raised`.
 - An item is active when the current URL starts with its URL (so `/grocery/12/edit` keeps
   "Grocery purchases" active).
@@ -369,7 +369,7 @@ on the named parent page, not its own route.
   shows its tooltip on hover **and** focus.
 - Drawer: opened by the menu button (`aria-expanded`, `aria-controls`). Focus moves into the
   drawer on open, is trapped while open, Esc closes it, and focus returns to the menu button.
-- The visible focus ring is the global `:focus-visible` terracotta outline; nothing removes it.
+- The visible focus ring is the global `:focus-visible` primary outline; nothing removes it.
 - The sticky bottom bar never covers focused fields: forms scroll the focused element above it.
 - Status is always a word plus colour; badges never rely on colour alone.
 

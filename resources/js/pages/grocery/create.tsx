@@ -27,7 +27,7 @@ export default function GroceryCreate({ ownMemberId, ...form }: Props) {
                         header={{
                             title: __('New grocery purchase'),
                             description: __(
-                                'Add each item you bought. The fund pays as soon as you save.',
+                                'Add each item you bought and say who paid for it.',
                             ),
                         }}
                         formId="purchase-form"

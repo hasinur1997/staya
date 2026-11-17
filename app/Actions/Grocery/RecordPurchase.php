@@ -4,6 +4,7 @@ namespace App\Actions\Grocery;
 
 use App\Actions\Ledger\BusinessDateGuard;
 use App\Enums\AuditLog;
+use App\Enums\GroceryPaidBy;
 use App\Enums\MemberStatus;
 use App\Models\Fund;
 use App\Models\GroceryPurchase;
@@ -17,6 +18,14 @@ use Throwable;
 
 /**
  * @phpstan-import-type ItemInput from CalculatePurchaseTotals
+ *
+ * @phpstan-type PurchaseInput array{
+ *     purchase_date: string,
+ *     notes: string|null,
+ *     items: array<int, ItemInput>,
+ *     paid_by: GroceryPaidBy,
+ *     payer: Member|null,
+ * }
  */
 class RecordPurchase
 {
@@ -30,9 +39,11 @@ class RecordPurchase
     /**
      * Record a grocery purchase and pay for it from the fund straight
      * away. There is no approval step. The fund pays what it holds; any
-     * shortfall becomes a payable owed to the buyer.
+     * shortfall becomes a payable owed to the buyer. When a member paid
+     * from their own pocket instead, the fund is left alone and owes that
+     * member the whole total.
      *
-     * @param  array{purchase_date: string, notes: string|null, items: array<int, ItemInput>}  $data
+     * @param  PurchaseInput  $data
      */
     public function handle(User $actor, Member $buyer, array $data, ?UploadedFile $receipt = null): GroceryPurchase
     {
@@ -48,6 +59,14 @@ class RecordPurchase
                     ]);
                 }
 
+                $payer = $data['paid_by'] === GroceryPaidBy::Member ? $data['payer'] : null;
+
+                if ($data['paid_by'] === GroceryPaidBy::Member && $payer?->status !== MemberStatus::Active) {
+                    throw ValidationException::withMessages([
+                        'paid_by_member_id' => __('Choose the active member who paid.'),
+                    ]);
+                }
+
                 $this->dateGuard->assertCountable($data['purchase_date'], 'purchase_date');
 
                 $totals = $this->calculateTotals->handle($data['items']);
@@ -56,6 +75,8 @@ class RecordPurchase
                     'purchase_date' => $data['purchase_date'],
                     'buyer_member_id' => $buyer->id,
                     'grand_total' => $totals['grand_total'],
+                    'paid_by' => $data['paid_by'],
+                    'paid_by_member_id' => $payer?->id,
                     'notes' => $data['notes'],
                     'receipt_path' => $receiptPath,
                     'created_by' => $actor->id,

@@ -159,7 +159,10 @@ export default function GroceryShow({ purchase, serverNow, can }: Props) {
                                 {purchase.payable && (
                                     <>
                                         <Amount
-                                            label={__('Owed to the buyer')}
+                                            label={__('Owed to :name', {
+                                                name: purchase.payable
+                                                    .member_name,
+                                            })}
                                             value={purchase.payable.amount}
                                         />
                                         <Amount
@@ -242,6 +245,9 @@ export default function GroceryShow({ purchase, serverNow, can }: Props) {
                                 ) : (
                                     purchase.buyer_name
                                 )}
+                            </Row>
+                            <Row label={__('Paid by')}>
+                                {purchase.paid_by_name}
                             </Row>
                             <Row label={__('Date bought')}>
                                 {formatBusinessDate(purchase.purchase_date)}

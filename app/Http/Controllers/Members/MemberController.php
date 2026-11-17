@@ -183,7 +183,7 @@ class MemberController extends Controller
 
         return $member->purchases()
             ->active()
-            ->with(['buyer:id,first_name,last_name,user_id', 'items'])
+            ->with(['buyer:id,first_name,last_name,user_id', 'payer:id,first_name,last_name', 'items'])
             ->orderByDesc('purchase_date')
             ->orderByDesc('id')
             ->limit(20)

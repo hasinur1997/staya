@@ -69,6 +69,7 @@ export default function GroceryEdit({ purchase, serverNow, ...form }: Props) {
                             {...form}
                             {...draft}
                             purchase={purchase}
+                            ownMemberId={null}
                             errors={errors}
                         />
                     </FormTemplate>

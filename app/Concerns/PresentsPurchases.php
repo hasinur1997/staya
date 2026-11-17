@@ -11,7 +11,7 @@ use App\Policies\GroceryPurchasePolicy;
 /**
  * How a grocery purchase is sent to the frontend: money and quantities as
  * decimal strings, the date as a Y-m-d business date, and what the viewer
- * may do with it. Expects `buyer` and `items` to be loaded.
+ * may do with it. Expects `buyer`, `payer` and `items` to be loaded.
  */
 trait PresentsPurchases
 {
@@ -30,6 +30,10 @@ trait PresentsPurchases
             'buyer_member_id' => $purchase->buyer_member_id,
             'buyer_name' => $purchase->buyer->full_name,
             'grand_total' => $purchase->grand_total,
+            'paid_by' => $purchase->paid_by->value,
+            'paid_by_member_id' => $purchase->paid_by_member_id,
+            // "Fund", or the name of the member who paid.
+            'paid_by_name' => $purchase->payer->full_name ?? $purchase->paid_by->label(),
             'item_count' => $purchase->items->count(),
             'item_names' => $purchase->items->take(3)->pluck('item_name')->all(),
             'status' => $purchase->status->value,
@@ -64,7 +68,7 @@ trait PresentsPurchases
     }
 
     /**
-     * Expects `purchase.buyer` to be loaded.
+     * Expects `purchase` and `member` to be loaded.
      *
      * @return array<string, mixed>
      */
@@ -75,7 +79,8 @@ trait PresentsPurchases
             'grocery_purchase_id' => $payable->grocery_purchase_id,
             'purchase_date' => $payable->purchase->purchase_date->toDateString(),
             'member_id' => $payable->member_id,
-            'member_name' => $payable->purchase->buyer->full_name,
+            'member_name' => $payable->member->full_name,
+            'paid_by' => $payable->purchase->paid_by->value,
             'amount' => $payable->amount,
             'amount_reimbursed' => $payable->amount_reimbursed,
             'outstanding' => $payable->outstanding(),

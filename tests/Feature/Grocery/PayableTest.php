@@ -41,7 +41,7 @@ class PayableTest extends TestCase
         $this->assertFundMatchesLedger('0.00');
 
         $changes = Activity::query()->where('description', 'purchase_created')->sole()->attribute_changes;
-        $this->assertSame(['amount' => '250.00', 'amount_reimbursed' => '0.00'], $changes['attributes']['payable']);
+        $this->assertSame(['member_id' => $member->id, 'amount' => '250.00', 'amount_reimbursed' => '0.00'], $changes['attributes']['payable']);
         $this->assertSame('100.00', $changes['attributes']['fund_paid']);
     }
 

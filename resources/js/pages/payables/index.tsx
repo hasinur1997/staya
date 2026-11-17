@@ -49,9 +49,18 @@ export default function PayablesIndex({ payables, outstanding }: Props) {
     const columns: ResponsiveColumn<PayableRow>[] = [
         { key: 'purchase', header: __('Purchase'), cell: purchase },
         {
-            key: 'buyer',
-            header: __('Buyer'),
+            key: 'member',
+            header: __('Owed to'),
             cell: (payable) => payable.member_name,
+        },
+        {
+            key: 'why',
+            header: __('Why'),
+            cell: (payable) =>
+                payable.paid_by === 'member'
+                    ? __('Paid by member')
+                    : __('Fund fell short'),
+            priority: 'low',
         },
         {
             key: 'amount',
@@ -88,7 +97,7 @@ export default function PayablesIndex({ payables, outstanding }: Props) {
                 header={{
                     title: __('Payables'),
                     description: __(
-                        'What the fund owes buyers for purchases it could not cover. Record a reimbursement when you hand the buyer cash.',
+                        'What the fund owes members who paid for a purchase themselves, or whose purchase it could not cover. Record a reimbursement when you hand over the cash.',
                     ),
                 }}
                 resultCount={countLabel}
@@ -110,7 +119,7 @@ export default function PayablesIndex({ payables, outstanding }: Props) {
             >
                 {payables.length === 0 ? (
                     <p className="text-ink-muted">
-                        {__('Nothing is owed to any buyer.')}
+                        {__('Nothing is owed to any member.')}
                     </p>
                 ) : (
                     <ResponsiveTable
@@ -122,7 +131,12 @@ export default function PayablesIndex({ payables, outstanding }: Props) {
                             title: purchase(payable),
                             value: money(payable.outstanding),
                             status: reimburseButton(payable),
-                            meta: [payable.member_name],
+                            meta: [
+                                payable.member_name,
+                                payable.paid_by === 'member'
+                                    ? __('Paid by member')
+                                    : __('Fund fell short'),
+                            ],
                         })}
                     />
                 )}

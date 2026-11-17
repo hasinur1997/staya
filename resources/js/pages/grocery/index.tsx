@@ -1,3 +1,6 @@
+import { Combobox } from '@/components/ui/combobox';
+import { DatePicker } from '@/components/ui/date-picker';
+import { MonthPicker } from '@/components/ui/month-picker';
 import { Head, Link, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { Pager } from '@/components/pager';
@@ -5,15 +8,7 @@ import { PurchaseStatusBadge } from '@/components/purchase-status-badge';
 import { ResponsiveTable } from '@/components/responsive-table';
 import type { ResponsiveColumn } from '@/components/responsive-table';
 import { ListTemplate } from '@/components/templates/list-template';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { formatBusinessDate } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
@@ -97,6 +92,12 @@ export default function GroceryIndex({
             cell: (purchase) => purchase.buyer_name,
         },
         {
+            key: 'paid_by',
+            header: __('Paid by'),
+            cell: (purchase) => purchase.paid_by_name,
+            priority: 'low',
+        },
+        {
             key: 'items',
             header: __('Items'),
             cell: itemSummary,
@@ -118,7 +119,7 @@ export default function GroceryIndex({
                 header={{
                     title: __('Grocery purchases'),
                     description: __(
-                        'Everything bought for the mess. The fund pays for each purchase when it is saved.',
+                        'Everything bought for the mess, paid by the fund or by a member the fund then repays.',
                     ),
                     primaryAction: can.create
                         ? {
@@ -131,16 +132,14 @@ export default function GroceryIndex({
                 filters={
                     <div className="flex flex-col gap-1">
                         <Label htmlFor="purchase-month">{__('Month')}</Label>
-                        <Input
+                        <MonthPicker
                             id="purchase-month"
-                            type="month"
                             value={filters.month ?? ''}
-                            onChange={(event) =>
-                                applyFilters({
-                                    month: event.target.value || null,
-                                })
+                            onValueChange={(month) =>
+                                applyFilters({ month: month || null })
                             }
-                            className="w-44"
+                            placeholder={__('Any month')}
+                            className="w-48"
                         />
                     </div>
                 }
@@ -148,33 +147,35 @@ export default function GroceryIndex({
                     <>
                         <div className="flex flex-col gap-1">
                             <Label htmlFor="purchase-from">{__('From')}</Label>
-                            <Input
+                            <DatePicker
                                 id="purchase-from"
-                                type="date"
                                 value={filters.from ?? ''}
-                                max={filters.to ?? undefined}
-                                onChange={(event) =>
+                                max={filters.to}
+                                onValueChange={(from) =>
                                     applyFilters({
                                         month: null,
-                                        from: event.target.value || null,
+                                        from: from || null,
                                     })
                                 }
+                                placeholder={__('Any date')}
+                                clearable
                                 className="md:w-44"
                             />
                         </div>
                         <div className="flex flex-col gap-1">
                             <Label htmlFor="purchase-to">{__('To')}</Label>
-                            <Input
+                            <DatePicker
                                 id="purchase-to"
-                                type="date"
                                 value={filters.to ?? ''}
-                                min={filters.from ?? undefined}
-                                onChange={(event) =>
+                                min={filters.from}
+                                onValueChange={(to) =>
                                     applyFilters({
                                         month: null,
-                                        to: event.target.value || null,
+                                        to: to || null,
                                     })
                                 }
+                                placeholder={__('Any date')}
+                                clearable
                                 className="md:w-44"
                             />
                         </div>
@@ -182,7 +183,8 @@ export default function GroceryIndex({
                             <Label htmlFor="purchase-buyer">
                                 {__('Buyer')}
                             </Label>
-                            <Select
+                            <Combobox
+                                id="purchase-buyer"
                                 value={
                                     filters.buyer ? String(filters.buyer) : ALL
                                 }
@@ -192,27 +194,17 @@ export default function GroceryIndex({
                                             next === ALL ? null : Number(next),
                                     })
                                 }
-                            >
-                                <SelectTrigger
-                                    id="purchase-buyer"
-                                    className="md:w-56"
-                                >
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value={ALL}>
-                                        {__('All buyers')}
-                                    </SelectItem>
-                                    {buyers.map((buyer) => (
-                                        <SelectItem
-                                            key={buyer.id}
-                                            value={String(buyer.id)}
-                                        >
-                                            {buyer.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                                options={[
+                                    { value: ALL, label: __('All buyers') },
+                                    ...buyers.map((buyer) => ({
+                                        value: String(buyer.id),
+                                        label: buyer.name,
+                                    })),
+                                ]}
+                                searchPlaceholder={__('Search')}
+                                emptyText={__('Nothing found.')}
+                                className="md:w-56"
+                            />
                         </div>
                     </>
                 }
@@ -246,7 +238,13 @@ export default function GroceryIndex({
                             title: date(purchase),
                             value: amount(purchase),
                             status: status(purchase),
-                            meta: [purchase.buyer_name, itemSummary(purchase)],
+                            meta: [
+                                purchase.buyer_name,
+                                __('Paid by :name', {
+                                    name: purchase.paid_by_name,
+                                }),
+                                itemSummary(purchase),
+                            ],
                         })}
                     />
                 )}

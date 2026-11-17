@@ -205,6 +205,7 @@ class Member extends Model
     {
         return $this->deposits()->exists()
             || $this->purchases()->exists()
+            || GroceryPurchase::query()->where('paid_by_member_id', $this->id)->exists()
             || $this->payables()->exists();
     }
 

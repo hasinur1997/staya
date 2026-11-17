@@ -1,3 +1,5 @@
+import { Combobox } from '@/components/ui/combobox';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Head, Link, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { ResponsiveTable } from '@/components/responsive-table';
@@ -8,15 +10,7 @@ import { ListTemplate } from '@/components/templates/list-template';
 import { StatGrid } from '@/components/templates/page-grid';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { formatBusinessDate } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
@@ -137,28 +131,24 @@ export default function LedgerIndex({
                     <div className="flex flex-wrap items-end gap-3">
                         <div className="flex flex-col gap-1">
                             <Label htmlFor="ledger-from">{__('From')}</Label>
-                            <Input
+                            <DatePicker
                                 id="ledger-from"
-                                type="date"
                                 value={filters.from}
                                 max={filters.to}
-                                onChange={(event) =>
-                                    event.target.value &&
-                                    applyFilters({ from: event.target.value })
+                                onValueChange={(from) =>
+                                    from && applyFilters({ from })
                                 }
                                 className="w-44"
                             />
                         </div>
                         <div className="flex flex-col gap-1">
                             <Label htmlFor="ledger-to">{__('To')}</Label>
-                            <Input
+                            <DatePicker
                                 id="ledger-to"
-                                type="date"
                                 value={filters.to}
                                 min={filters.from}
-                                onChange={(event) =>
-                                    event.target.value &&
-                                    applyFilters({ to: event.target.value })
+                                onValueChange={(to) =>
+                                    to && applyFilters({ to })
                                 }
                                 className="w-44"
                             />
@@ -307,27 +297,22 @@ function FilterSelect<T extends string>({
     options: Option<T>[];
     onChange: (value: T | null) => void;
 }) {
+    const __ = useTranslate();
+
     return (
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
             <Label htmlFor={id}>{label}</Label>
-            <Select
+            <Combobox
+                id={id}
                 value={value ?? ALL}
                 onValueChange={(next) =>
                     onChange(next === ALL ? null : (next as T))
                 }
-            >
-                <SelectTrigger id={id} className="md:w-48">
-                    <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value={ALL}>{allLabel}</SelectItem>
-                    {options.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
+                options={[{ value: ALL, label: allLabel }, ...options]}
+                searchPlaceholder={__('Search')}
+                emptyText={__('Nothing found.')}
+                className="md:w-48"
+            />
         </div>
     );
 }

@@ -1,3 +1,4 @@
+import { DatePicker } from '@/components/ui/date-picker';
 import { Head, useForm, setLayoutProps } from '@inertiajs/react';
 import type { FormEvent, ReactNode } from 'react';
 import InputError from '@/components/input-error';
@@ -163,18 +164,15 @@ export default function MessSettingsEdit({ settings, today, can }: Props) {
                         }
                         error={form.errors.fund_start_date}
                     >
-                        <Input
+                        <DatePicker
                             id="fund_start_date"
-                            type="date"
                             max={today}
-                            readOnly={!can.changeOpeningBalance}
+                            disabled={!can.changeOpeningBalance}
                             value={form.data.fund_start_date}
-                            onChange={(event) =>
-                                form.setData(
-                                    'fund_start_date',
-                                    event.target.value,
-                                )
+                            onValueChange={(date) =>
+                                form.setData('fund_start_date', date)
                             }
+                            aria-invalid={Boolean(form.errors.fund_start_date)}
                         />
                     </Field>
                 </div>

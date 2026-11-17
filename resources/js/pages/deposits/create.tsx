@@ -1,3 +1,5 @@
+import { Combobox } from '@/components/ui/combobox';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
@@ -6,13 +8,6 @@ import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { useTranslate } from '@/lib/i18n';
 import { create, index, store } from '@/routes/deposits';
 import type { MemberOption } from '@/types';
@@ -86,41 +81,27 @@ export default function DepositsCreate({
                                         <Label htmlFor="member_id">
                                             {__('Member')}
                                         </Label>
-                                        <Select
+                                        <Combobox
+                                            id="member_id"
                                             value={memberId}
                                             onValueChange={setMemberId}
-                                        >
-                                            <SelectTrigger
-                                                id="member_id"
-                                                className="w-full md:w-1/2"
-                                            >
-                                                <SelectValue
-                                                    placeholder={__(
-                                                        'Choose a member',
-                                                    )}
-                                                />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {members.map((member) => (
-                                                    <SelectItem
-                                                        key={member.id}
-                                                        value={String(
-                                                            member.id,
-                                                        )}
-                                                    >
-                                                        {member.id ===
-                                                        ownMemberId
-                                                            ? __(
-                                                                  ':name (you)',
-                                                                  {
-                                                                      name: member.name,
-                                                                  },
-                                                              )
-                                                            : member.name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                            options={members.map((member) => ({
+                                                value: String(member.id),
+                                                label:
+                                                    member.id === ownMemberId
+                                                        ? __(':name (you)', {
+                                                              name: member.name,
+                                                          })
+                                                        : member.name,
+                                            }))}
+                                            placeholder={__('Choose a member')}
+                                            searchPlaceholder={__('Search')}
+                                            emptyText={__('Nothing found.')}
+                                            className="md:w-1/2"
+                                            aria-invalid={Boolean(
+                                                errors.member_id,
+                                            )}
+                                        />
                                         <InputError
                                             message={errors.member_id}
                                         />
@@ -147,14 +128,15 @@ export default function DepositsCreate({
                                         <Label htmlFor="deposit_date">
                                             {__('Date paid')}
                                         </Label>
-                                        <Input
+                                        <DatePicker
                                             id="deposit_date"
                                             name="deposit_date"
-                                            type="date"
                                             defaultValue={today}
                                             max={today}
-                                            min={fundStartDate ?? undefined}
-                                            required
+                                            min={fundStartDate}
+                                            aria-invalid={Boolean(
+                                                errors.deposit_date,
+                                            )}
                                         />
                                         <InputError
                                             message={errors.deposit_date}

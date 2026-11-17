@@ -1,3 +1,5 @@
+import { Combobox } from '@/components/ui/combobox';
+import { DatePicker } from '@/components/ui/date-picker';
 import { usePage } from '@inertiajs/react';
 import { Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -8,14 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import type { DraftItem } from '@/hooks/use-purchase-draft';
 import {
     useItemNameSuggestions,
@@ -25,6 +21,7 @@ import { useTranslate } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { receipt as receiptRoute } from '@/routes/grocery';
 import type {
+    GroceryPaidByValue,
     GroceryUnitValue,
     MemberOption,
     Option,
@@ -39,7 +36,10 @@ export type PurchaseFormProps = {
     units: Option<GroceryUnitValue>[];
     /** Members who can be the buyer; empty unless the user may choose. */
     buyers: MemberOption[];
-    can: { chooseBuyer: boolean };
+    /** Members who can be recorded as having paid. */
+    payers: MemberOption[];
+    /** `choosePayer`: may name any member as the one who paid. */
+    can: { chooseBuyer: boolean; choosePayer: boolean };
 };
 
 type Props = PurchaseFormProps & {
@@ -119,6 +119,7 @@ export function PurchaseFields({
     fundStartDate,
     units,
     buyers,
+    payers,
     ownMemberId = null,
     can,
     errors,
@@ -136,7 +137,23 @@ export function PurchaseFields({
     const [buyerId, setBuyerId] = useState(
         String(purchase?.buyer_member_id ?? ownMemberId ?? ''),
     );
+    const [paidBy, setPaidBy] = useState<GroceryPaidByValue>(
+        purchase?.paid_by ?? 'fund',
+    );
+    // Whoever bought it is the likeliest to have paid.
+    const [payerId, setPayerId] = useState(
+        String(purchase?.paid_by_member_id ?? ''),
+    );
+    const payer = payerId || buyerId;
     const [removeReceipt, setRemoveReceipt] = useState(false);
+    const memberOptions = (members: MemberOption[]) =>
+        members.map((member) => ({
+            value: String(member.id),
+            label:
+                member.id === ownMemberId
+                    ? __(':name (you)', { name: member.name })
+                    : member.name,
+        }));
 
     const change = (key: number, changes: Partial<DraftItem>) =>
         setItems((current) =>
@@ -158,14 +175,13 @@ export function PurchaseFields({
                             label={__('Date bought')}
                             error={errors.purchase_date}
                         >
-                            <Input
+                            <DatePicker
                                 id="purchase_date"
                                 name="purchase_date"
-                                type="date"
                                 defaultValue={purchase?.purchase_date ?? today}
                                 max={today}
-                                min={fundStartDate ?? undefined}
-                                required
+                                min={fundStartDate}
+                                aria-invalid={Boolean(errors.purchase_date)}
                             />
                         </Field>
                         {can.chooseBuyer && (
@@ -174,38 +190,82 @@ export function PurchaseFields({
                                 label={__('Buyer')}
                                 error={errors.buyer_member_id}
                             >
-                                <input
-                                    type="hidden"
+                                <Combobox
+                                    id="buyer_member_id"
                                     name="buyer_member_id"
                                     value={buyerId}
-                                />
-                                <Select
-                                    value={buyerId}
                                     onValueChange={setBuyerId}
-                                >
-                                    <SelectTrigger
-                                        id="buyer_member_id"
-                                        className="w-full"
-                                    >
-                                        <SelectValue
-                                            placeholder={__('Choose a member')}
-                                        />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {buyers.map((buyer) => (
-                                            <SelectItem
-                                                key={buyer.id}
-                                                value={String(buyer.id)}
-                                            >
-                                                {buyer.id === ownMemberId
-                                                    ? __(':name (you)', {
-                                                          name: buyer.name,
-                                                      })
-                                                    : buyer.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                    options={memberOptions(buyers)}
+                                    placeholder={__('Choose a member')}
+                                    searchPlaceholder={__('Search')}
+                                    emptyText={__('Nothing found.')}
+                                    aria-invalid={Boolean(
+                                        errors.buyer_member_id,
+                                    )}
+                                />
+                            </Field>
+                        )}
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div className="flex flex-col gap-2">
+                            <Label id="paid-by-label">{__('Paid by')}</Label>
+                            <input
+                                type="hidden"
+                                name="paid_by"
+                                value={paidBy}
+                            />
+                            <ToggleGroup
+                                type="single"
+                                variant="outline"
+                                aria-labelledby="paid-by-label"
+                                value={paidBy}
+                                onValueChange={(value) =>
+                                    value &&
+                                    setPaidBy(value as GroceryPaidByValue)
+                                }
+                                className="w-fit"
+                            >
+                                <ToggleGroupItem value="fund">
+                                    {__('Fund')}
+                                </ToggleGroupItem>
+                                <ToggleGroupItem value="member">
+                                    {__('Member')}
+                                </ToggleGroupItem>
+                            </ToggleGroup>
+                            <p className="text-small text-ink-muted">
+                                {paidBy === 'fund'
+                                    ? __(
+                                          'The fund pays as soon as you save. If it does not hold enough, the rest is owed to the buyer.',
+                                      )
+                                    : can.choosePayer
+                                      ? __(
+                                            'The fund is not touched. It owes this member the full total, repaid later from Payables.',
+                                        )
+                                      : __(
+                                            'You paid from your own pocket. The fund is not touched and owes you the full total, repaid later.',
+                                        )}
+                            </p>
+                            <InputError message={errors.paid_by} />
+                        </div>
+                        {paidBy === 'member' && can.choosePayer && (
+                            <Field
+                                id="paid_by_member_id"
+                                label={__('Member who paid')}
+                                error={errors.paid_by_member_id}
+                            >
+                                <Combobox
+                                    id="paid_by_member_id"
+                                    name="paid_by_member_id"
+                                    value={payer}
+                                    onValueChange={setPayerId}
+                                    options={memberOptions(payers)}
+                                    placeholder={__('Choose a member')}
+                                    searchPlaceholder={__('Search')}
+                                    emptyText={__('Nothing found.')}
+                                    aria-invalid={Boolean(
+                                        errors.paid_by_member_id,
+                                    )}
+                                />
                             </Field>
                         )}
                     </div>
@@ -344,36 +404,19 @@ export function PurchaseFields({
                                         error={error('unit')}
                                         className="md:col-span-2"
                                     >
-                                        <input
-                                            type="hidden"
+                                        <Combobox
+                                            id={id('unit')}
                                             name={name('unit')}
-                                            value={item.unit}
-                                        />
-                                        <Select
                                             value={item.unit}
                                             onValueChange={(unit) =>
                                                 change(item.key, {
                                                     unit: unit as GroceryUnitValue,
                                                 })
                                             }
-                                        >
-                                            <SelectTrigger
-                                                id={id('unit')}
-                                                className="w-full"
-                                            >
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {units.map((unit) => (
-                                                    <SelectItem
-                                                        key={unit.value}
-                                                        value={unit.value}
-                                                    >
-                                                        {unit.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                            options={units}
+                                            searchPlaceholder={__('Search')}
+                                            emptyText={__('Nothing found.')}
+                                        />
                                     </Field>
                                     <Field
                                         id={id('price')}
@@ -457,8 +500,7 @@ export function PurchaseFields({
 }
 
 /**
- * The side panel: the grand total as the server computes it, and what
- * happens when the fund cannot cover it.
+ * The side panel: the grand total as the server computes it.
  */
 export function PurchaseTotalsCard({
     totals,
@@ -498,11 +540,6 @@ export function PurchaseTotalsCard({
                         })}
                     </p>
                 )}
-                <p className="text-small text-ink-muted">
-                    {__(
-                        'The fund pays straight away. If it does not hold enough, the rest is owed to the buyer and repaid later.',
-                    )}
-                </p>
                 {children}
             </CardContent>
         </Card>

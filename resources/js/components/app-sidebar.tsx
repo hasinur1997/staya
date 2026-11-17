@@ -76,7 +76,7 @@ function NavLink({
 }) {
     const className = cn(
         'relative flex h-11 items-center rounded-md text-ink-muted transition-[color,background-color] duration-150 hover:bg-surface-raised hover:text-ink',
-        // 3px terracotta bar on the active item.
+        // 3px primary bar on the active item.
         'before:absolute before:inset-y-2 before:left-0 before:w-0.75 before:rounded-full',
         active && 'bg-primary-soft text-ink before:bg-primary',
         variant === 'full' ? 'gap-3 px-3' : 'justify-center',

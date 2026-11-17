@@ -71,8 +71,11 @@ trait WorksWithPurchases
      */
     protected function recordPurchase(Member $member, array $overrides = []): GroceryPurchase
     {
-        $this->actingAs($member->user)
-            ->post(route('grocery.store'), $this->purchaseForm($overrides))
+        $namesSomeoneElse = isset($overrides['paid_by_member_id']) && $overrides['paid_by_member_id'] !== $member->id;
+
+        // Only staff who may record for others can name another member as the payer.
+        $this->actingAs($namesSomeoneElse ? $this->staff(Permission::GroceryCreateForOthers) : $member->user)
+            ->post(route('grocery.store'), $this->purchaseForm($namesSomeoneElse ? [...$overrides, 'buyer_member_id' => $member->id] : $overrides))
             ->assertSessionHasNoErrors();
 
         return GroceryPurchase::query()->latest('id')->firstOrFail();

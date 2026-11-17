@@ -1,5 +1,7 @@
 export type GroceryUnitValue = 'kg' | 'gm' | 'liter' | 'ml' | 'pcs' | 'dozen';
 
+export type GroceryPaidByValue = 'fund' | 'member';
+
 export type PurchaseRow = {
     id: number;
     /** Y-m-d business date (Asia/Dhaka). */
@@ -8,6 +10,11 @@ export type PurchaseRow = {
     buyer_name: string;
     /** Decimal string computed by the server, e.g. "350.00". */
     grand_total: string;
+    /** Who paid the shop. */
+    paid_by: GroceryPaidByValue;
+    paid_by_member_id: number | null;
+    /** "Fund", or the name of the member who paid. */
+    paid_by_name: string;
     item_count: number;
     /** The first few item names, for list rows. */
     item_names: string[];
@@ -51,6 +58,8 @@ export type PurchaseDetail = PurchaseRow & {
     voided_at: string | null;
     payable: {
         id: number;
+        /** The member the money is owed to. */
+        member_name: string;
         amount: string;
         amount_reimbursed: string;
         outstanding: string;
@@ -71,6 +80,8 @@ export type PayableRow = {
     purchase_date: string;
     member_id: number;
     member_name: string;
+    /** A member paid in full, or the fund fell short. */
+    paid_by: GroceryPaidByValue;
     amount: string;
     amount_reimbursed: string;
     outstanding: string;

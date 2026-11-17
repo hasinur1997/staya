@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Casts\BusinessDate;
+use App\Enums\GroceryPaidBy;
 use App\Enums\GroceryPurchaseStatus;
 use App\Enums\LedgerEntryType;
 use App\Exceptions\ImmutableRecord;
@@ -25,12 +26,16 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * A grocery purchase paid from the shared fund. Its grand total is the sum
  * of its line totals, computed on the server. The fund pays what it holds
  * (the live `grocery_expense` ledger entry); any shortfall is a payable
- * owed to the buyer. Purchases are voided, never deleted.
+ * owed to the buyer. A purchase a member paid for from their own pocket
+ * leaves the fund alone: the whole total is a payable owed to that member.
+ * Purchases are voided, never deleted.
  *
  * @property int $id
  * @property CarbonImmutable $purchase_date
  * @property int $buyer_member_id
  * @property string $grand_total
+ * @property GroceryPaidBy $paid_by
+ * @property int|null $paid_by_member_id
  * @property string|null $notes
  * @property string|null $receipt_path
  * @property GroceryPurchaseStatus $status
@@ -42,10 +47,11 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * @property CarbonImmutable $created_at
  * @property CarbonImmutable|null $updated_at
  * @property-read Member $buyer
+ * @property-read Member|null $payer
  * @property-read Collection<int, GroceryPurchaseItem> $items
  * @property-read BuyerPayable|null $payable
  */
-#[Fillable(['purchase_date', 'buyer_member_id', 'grand_total', 'notes', 'receipt_path', 'created_by', 'updated_by'])]
+#[Fillable(['purchase_date', 'buyer_member_id', 'grand_total', 'paid_by', 'paid_by_member_id', 'notes', 'receipt_path', 'created_by', 'updated_by'])]
 #[Hidden(['receipt_path'])]
 class GroceryPurchase extends Model
 {
@@ -57,6 +63,7 @@ class GroceryPurchase extends Model
      */
     protected $attributes = [
         'status' => 'active',
+        'paid_by' => 'fund',
     ];
 
     protected static function booted(): void
@@ -74,6 +81,7 @@ class GroceryPurchase extends Model
         return [
             'purchase_date' => BusinessDate::class,
             'grand_total' => 'decimal:2',
+            'paid_by' => GroceryPaidBy::class,
             'status' => GroceryPurchaseStatus::class,
             'voided_at' => 'immutable_datetime',
             'created_at' => 'immutable_datetime',
@@ -125,6 +133,32 @@ class GroceryPurchase extends Model
     public function buyer(): BelongsTo
     {
         return $this->belongsTo(Member::class, 'buyer_member_id');
+    }
+
+    /**
+     * The member who paid from their own pocket; null when the fund paid.
+     *
+     * @return BelongsTo<Member, $this>
+     */
+    public function payer(): BelongsTo
+    {
+        return $this->belongsTo(Member::class, 'paid_by_member_id');
+    }
+
+    public function isPaidByMember(): bool
+    {
+        return $this->paid_by === GroceryPaidBy::Member;
+    }
+
+    /**
+     * The member a payable for this purchase is owed to: whoever paid from
+     * their own pocket, otherwise the buyer (for a fund shortfall).
+     */
+    public function payeeMemberId(): int
+    {
+        return $this->isPaidByMember() && $this->paid_by_member_id !== null
+            ? $this->paid_by_member_id
+            : $this->buyer_member_id;
     }
 
     /**
@@ -204,6 +238,8 @@ class GroceryPurchase extends Model
             'purchase_date' => $this->purchase_date->toDateString(),
             'buyer_member_id' => $this->buyer_member_id,
             'grand_total' => $this->grand_total,
+            'paid_by' => $this->paid_by->value,
+            'paid_by_member_id' => $this->paid_by_member_id,
             'notes' => $this->notes,
             'receipt' => $this->receipt_path !== null ? 'on file' : null,
             'status' => $this->status->value,
@@ -217,6 +253,7 @@ class GroceryPurchase extends Model
             ])->all(),
             'fund_paid' => $this->expenseEntry()->first()->amount ?? '0.00',
             'payable' => $payable === null ? null : [
+                'member_id' => $payable->member_id,
                 'amount' => $payable->amount,
                 'amount_reimbursed' => $payable->amount_reimbursed,
             ],

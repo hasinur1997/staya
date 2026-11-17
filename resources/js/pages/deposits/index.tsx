@@ -1,3 +1,5 @@
+import { Combobox } from '@/components/ui/combobox';
+import { MonthPicker } from '@/components/ui/month-picker';
 import { Head, Link, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -11,15 +13,7 @@ import { ResponsiveTable } from '@/components/responsive-table';
 import type { ResponsiveColumn } from '@/components/responsive-table';
 import { ListTemplate } from '@/components/templates/list-template';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { formatBusinessDate } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
@@ -143,16 +137,14 @@ export default function DepositsIndex({
                 filters={
                     <div className="flex flex-col gap-1">
                         <Label htmlFor="deposit-month">{__('Month')}</Label>
-                        <Input
+                        <MonthPicker
                             id="deposit-month"
-                            type="month"
                             value={filters.month ?? ''}
-                            onChange={(event) =>
-                                applyFilters({
-                                    month: event.target.value || null,
-                                })
+                            onValueChange={(month) =>
+                                applyFilters({ month: month || null })
                             }
-                            className="w-44"
+                            placeholder={__('Any month')}
+                            className="w-48"
                         />
                     </div>
                 }
@@ -162,7 +154,8 @@ export default function DepositsIndex({
                             <Label htmlFor="deposit-status">
                                 {__('Status')}
                             </Label>
-                            <Select
+                            <Combobox
+                                id="deposit-status"
                                 value={filters.status ?? ALL}
                                 onValueChange={(next) =>
                                     applyFilters({
@@ -172,34 +165,22 @@ export default function DepositsIndex({
                                                 : (next as DepositStatusValue),
                                     })
                                 }
-                            >
-                                <SelectTrigger
-                                    id="deposit-status"
-                                    className="md:w-44"
-                                >
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value={ALL}>
-                                        {__('All statuses')}
-                                    </SelectItem>
-                                    {statuses.map((option) => (
-                                        <SelectItem
-                                            key={option.value}
-                                            value={option.value}
-                                        >
-                                            {option.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                                options={[
+                                    { value: ALL, label: __('All statuses') },
+                                    ...statuses,
+                                ]}
+                                searchPlaceholder={__('Search')}
+                                emptyText={__('Nothing found.')}
+                                className="md:w-44"
+                            />
                         </div>
                         {can.viewAll && (
                             <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
                                 <Label htmlFor="deposit-member">
                                     {__('Member')}
                                 </Label>
-                                <Select
+                                <Combobox
+                                    id="deposit-member"
                                     value={
                                         filters.member
                                             ? String(filters.member)
@@ -213,27 +194,20 @@ export default function DepositsIndex({
                                                     : Number(next),
                                         })
                                     }
-                                >
-                                    <SelectTrigger
-                                        id="deposit-member"
-                                        className="md:w-56"
-                                    >
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value={ALL}>
-                                            {__('All members')}
-                                        </SelectItem>
-                                        {members.map((member) => (
-                                            <SelectItem
-                                                key={member.id}
-                                                value={String(member.id)}
-                                            >
-                                                {member.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                    options={[
+                                        {
+                                            value: ALL,
+                                            label: __('All members'),
+                                        },
+                                        ...members.map((member) => ({
+                                            value: String(member.id),
+                                            label: member.name,
+                                        })),
+                                    ]}
+                                    searchPlaceholder={__('Search')}
+                                    emptyText={__('Nothing found.')}
+                                    className="md:w-56"
+                                />
                             </div>
                         )}
                     </>

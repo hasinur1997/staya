@@ -57,7 +57,7 @@ class GroceryPurchaseController extends Controller
         }
 
         $purchases = $query
-            ->with(['buyer:id,first_name,last_name,user_id', 'items'])
+            ->with(['buyer:id,first_name,last_name,user_id', 'payer:id,first_name,last_name', 'items'])
             ->orderByDesc('purchase_date')
             ->orderByDesc('id')
             ->paginate(50)
@@ -96,8 +96,9 @@ class GroceryPurchaseController extends Controller
         return Inertia::render('grocery/create', [
             ...$this->formProps(),
             'buyers' => $forOthers ? $this->buyerOptions() : [],
+            'payers' => $forOthers ? $this->buyerOptions() : [],
             'ownMemberId' => $actor->can('create', GroceryPurchase::class) ? $actor->member?->id : null,
-            'can' => ['chooseBuyer' => $forOthers],
+            'can' => ['chooseBuyer' => $forOthers, 'choosePayer' => $forOthers],
         ]);
     }
 
@@ -114,7 +115,9 @@ class GroceryPurchaseController extends Controller
         $payable = $purchase->payable()->first();
 
         Inertia::flash('toast', $payable instanceof BuyerPayable && $payable->isOpen()
-            ? ['type' => 'warning', 'message' => __('Purchase recorded. The fund could not cover :amount, which is now owed to the buyer.', ['amount' => Money::format($payable->outstanding())])]
+            ? ['type' => $purchase->isPaidByMember() ? 'success' : 'warning', 'message' => $purchase->isPaidByMember()
+                ? __('Purchase recorded. The fund owes :name :amount.', ['name' => $payable->member->full_name, 'amount' => Money::format($payable->outstanding())])
+                : __('Purchase recorded. The fund could not cover :amount, which is now owed to the buyer.', ['amount' => Money::format($payable->outstanding())])]
             : ['type' => 'success', 'message' => __('Purchase recorded.')]);
 
         return to_route('grocery.show', $purchase);
@@ -129,7 +132,7 @@ class GroceryPurchaseController extends Controller
         Gate::authorize('view', $purchase);
 
         $actor = $request->user();
-        $purchase->load(['buyer:id,first_name,last_name,user_id', 'items', 'payable', 'creator:id,name', 'updater:id,name', 'voider:id,name']);
+        $purchase->load(['buyer:id,first_name,last_name,user_id', 'payer:id,first_name,last_name', 'items', 'payable.member:id,first_name,last_name', 'creator:id,name', 'updater:id,name', 'voider:id,name']);
 
         return Inertia::render('grocery/show', [
             'purchase' => $this->purchaseDetail($purchase, $actor),
@@ -150,15 +153,16 @@ class GroceryPurchaseController extends Controller
         Gate::authorize('update', $purchase);
 
         $actor = $request->user();
-        $purchase->load(['buyer:id,first_name,last_name,user_id', 'items', 'payable', 'creator:id,name', 'updater:id,name', 'voider:id,name']);
+        $purchase->load(['buyer:id,first_name,last_name,user_id', 'payer:id,first_name,last_name', 'items', 'payable.member:id,first_name,last_name', 'creator:id,name', 'updater:id,name', 'voider:id,name']);
         $changeBuyer = $actor->can('createForOthers', GroceryPurchase::class);
 
         return Inertia::render('grocery/edit', [
             ...$this->formProps(),
             'purchase' => $this->purchaseDetail($purchase, $actor),
             'buyers' => $changeBuyer ? $this->buyerOptions(keep: $purchase->buyer) : [],
+            'payers' => $changeBuyer ? $this->buyerOptions(keep: $purchase->payer) : [],
             'serverNow' => now()->toIso8601String(),
-            'can' => ['chooseBuyer' => $changeBuyer],
+            'can' => ['chooseBuyer' => $changeBuyer, 'choosePayer' => $changeBuyer],
         ]);
     }
 
@@ -248,8 +252,9 @@ class GroceryPurchaseController extends Controller
     }
 
     /**
-     * Members for the buyer field or filter. A new buyer must be active;
-     * `$keep` adds the current buyer of a purchase even after they left.
+     * Members for the buyer and paid-by fields or the filter. A newly
+     * chosen member must be active; `$keep` adds the one a purchase
+     * already has even after they left.
      *
      * @return array<int, array{id: int, name: string, status: string}>
      */
@@ -290,6 +295,7 @@ class GroceryPurchaseController extends Controller
             'voided_at' => $purchase->voided_at?->toIso8601String(),
             'payable' => $payable === null ? null : [
                 'id' => $payable->id,
+                'member_name' => $payable->member->full_name,
                 'amount' => $payable->amount,
                 'amount_reimbursed' => $payable->amount_reimbursed,
                 'outstanding' => $payable->outstanding(),

@@ -13,13 +13,10 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.tsx'],
             refresh: true,
             fonts: [
-                google('Source Sans 3', {
-                    weights: [400, 600],
+                google('Roboto', {
+                    weights: [400, 500],
                 }),
-                google('Playfair Display', {
-                    weights: [700],
-                }),
-                google('Fira Code', {
+                google('Roboto Mono', {
                     weights: [400],
                 }),
                 google('Hind Siliguri', {

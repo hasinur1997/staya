@@ -1,3 +1,4 @@
+import { DatePicker } from '@/components/ui/date-picker';
 import { Form } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -80,13 +81,11 @@ export function FormDialog({
                                 <div className="flex flex-col gap-2">
                                     <Label htmlFor={id}>{field.label}</Label>
                                     {field.type === 'date' ? (
-                                        <Input
+                                        <DatePicker
                                             id={id}
                                             name={field.name}
-                                            type="date"
                                             defaultValue={field.defaultValue}
                                             max={field.max}
-                                            required
                                         />
                                     ) : field.type === 'amount' ? (
                                         <>

@@ -1,3 +1,5 @@
+import { Combobox } from '@/components/ui/combobox';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Form, Head, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
@@ -7,13 +9,6 @@ import { FormTemplate } from '@/components/templates/form-template';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useTranslate } from '@/lib/i18n';
 import { create, index, store } from '@/routes/members';
@@ -134,30 +129,24 @@ export default function MembersCreate({
                                         <Label htmlFor="user_id">
                                             {__('User')}
                                         </Label>
-                                        <Select
+                                        <Combobox
+                                            id="user_id"
                                             name="user_id"
                                             value={userId}
                                             onValueChange={setUserId}
-                                        >
-                                            <SelectTrigger id="user_id">
-                                                <SelectValue
-                                                    placeholder={__(
-                                                        'Choose a user',
-                                                    )}
-                                                />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {linkableUsers.map((user) => (
-                                                    <SelectItem
-                                                        key={user.id}
-                                                        value={String(user.id)}
-                                                    >
-                                                        {user.name} (
-                                                        {user.email})
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                            options={linkableUsers.map(
+                                                (user) => ({
+                                                    value: String(user.id),
+                                                    label: `${user.name} (${user.email})`,
+                                                }),
+                                            )}
+                                            placeholder={__('Choose a user')}
+                                            searchPlaceholder={__('Search')}
+                                            emptyText={__('Nothing found.')}
+                                            aria-invalid={Boolean(
+                                                errors.user_id,
+                                            )}
+                                        />
                                         <p className="text-small text-ink-muted">
                                             {__(
                                                 'Accounts without a member profile. Their name is replaced by the member name.',
@@ -185,13 +174,12 @@ export default function MembersCreate({
                                     <Label htmlFor="joined_on">
                                         {__('Joined on')}
                                     </Label>
-                                    <Input
+                                    <DatePicker
                                         id="joined_on"
                                         name="joined_on"
-                                        type="date"
                                         defaultValue={today}
                                         max={today}
-                                        required
+                                        aria-invalid={Boolean(errors.joined_on)}
                                     />
                                     <InputError message={errors.joined_on} />
                                 </div>

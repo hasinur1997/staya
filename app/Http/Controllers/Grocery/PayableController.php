@@ -29,7 +29,7 @@ class PayableController extends Controller
 
         $payables = BuyerPayable::query()
             ->open()
-            ->with('purchase.buyer:id,first_name,last_name,user_id')
+            ->with(['purchase', 'member:id,first_name,last_name'])
             ->get()
             ->sortBy(fn (BuyerPayable $payable) => [$payable->purchase->purchase_date->toDateString(), $payable->id])
             ->values();

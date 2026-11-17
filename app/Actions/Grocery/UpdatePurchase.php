@@ -5,6 +5,7 @@ namespace App\Actions\Grocery;
 use App\Actions\Ledger\BusinessDateGuard;
 use App\Concerns\Money;
 use App\Enums\AuditLog;
+use App\Enums\GroceryPaidBy;
 use App\Enums\MemberStatus;
 use App\Models\Fund;
 use App\Models\GroceryPurchase;
@@ -17,7 +18,7 @@ use Illuminate\Validation\ValidationException;
 use Throwable;
 
 /**
- * @phpstan-import-type ItemInput from CalculatePurchaseTotals
+ * @phpstan-import-type PurchaseInput from RecordPurchase
  */
 class UpdatePurchase
 {
@@ -34,7 +35,7 @@ class UpdatePurchase
      * The edit window is re-checked under the row lock. Locks the purchase,
      * then its payable, then the fund.
      *
-     * @param  array{purchase_date: string, notes: string|null, items: array<int, ItemInput>}  $data
+     * @param  PurchaseInput  $data
      * @param  Member|null  $buyer  A different buyer, or null to keep the current one.
      */
     public function handle(User $actor, GroceryPurchase $purchase, array $data, ?Member $buyer = null, ?UploadedFile $receipt = null, bool $removeReceipt = false): GroceryPurchase
@@ -50,12 +51,34 @@ class UpdatePurchase
                 $this->dateGuard->assertMonthOpen($purchase->purchase_date->toDateString(), 'purchase_date');
                 $this->dateGuard->assertCountable($data['purchase_date'], 'purchase_date');
 
-                if ($buyer !== null && $buyer->id !== $purchase->buyer_member_id) {
-                    $this->assertBuyerCanChange($actor, $purchase, $buyer);
+                $before = $purchase->auditSnapshot();
+                $oldPaidBy = $purchase->paid_by;
+                $oldPayee = $purchase->payeeMemberId();
+                $buyerChanges = $buyer !== null && $buyer->id !== $purchase->buyer_member_id;
+
+                if ($buyerChanges) {
+                    $this->assertBuyerCanChange($actor, $buyer);
                     $purchase->buyer_member_id = $buyer->id;
                 }
 
-                $before = $purchase->auditSnapshot();
+                $payer = $data['paid_by'] === GroceryPaidBy::Member ? $data['payer'] : null;
+
+                if ($data['paid_by'] === GroceryPaidBy::Member
+                    && ($payer === null || ($payer->id !== $purchase->paid_by_member_id && $payer->status !== MemberStatus::Active))) {
+                    throw ValidationException::withMessages([
+                        'paid_by_member_id' => __('Choose the active member who paid.'),
+                    ]);
+                }
+
+                $purchase->paid_by = $data['paid_by'];
+                $purchase->paid_by_member_id = $payer?->id;
+
+                $whoPaidChanges = $purchase->paid_by !== $oldPaidBy || $purchase->payeeMemberId() !== $oldPayee;
+
+                if ($whoPaidChanges) {
+                    $this->assertNothingReimbursed($purchase, $purchase->paid_by !== $oldPaidBy || ! $buyerChanges ? 'paid_by' : 'buyer_member_id');
+                }
+
                 $balanceBefore = Fund::locked()->balance;
                 $totals = $this->calculateTotals->handle($data['items']);
 
@@ -76,7 +99,7 @@ class UpdatePurchase
                 $purchase->items()->delete();
                 $purchase->items()->createMany($totals['items']);
 
-                $this->settlePurchase->handle($actor, $purchase, $totals['grand_total'], $data['purchase_date'], __('Purchase edited'));
+                $this->settlePurchase->handle($actor, $purchase, $totals['grand_total'], $data['purchase_date'], __('Purchase edited'), afresh: $whoPaidChanges);
 
                 activity()
                     ->useLog(AuditLog::Grocery)
@@ -102,10 +125,10 @@ class UpdatePurchase
     }
 
     /**
-     * The buyer changes only for staff who may record for others, to an
-     * active member, and not once the old buyer has been handed money.
+     * The buyer changes only for staff who may record for others, and to
+     * an active member.
      */
-    private function assertBuyerCanChange(User $actor, GroceryPurchase $purchase, Member $buyer): void
+    private function assertBuyerCanChange(User $actor, Member $buyer): void
     {
         Gate::forUser($actor)->authorize('createForOthers', GroceryPurchase::class);
 
@@ -114,12 +137,19 @@ class UpdatePurchase
                 'buyer_member_id' => __('Only an active member can be the buyer.'),
             ]);
         }
+    }
 
+    /**
+     * Who is owed for the purchase cannot change once someone has been
+     * handed money for it.
+     */
+    private function assertNothingReimbursed(GroceryPurchase $purchase, string $field): void
+    {
         $reimbursed = Money::numeric($purchase->payable()->first()->amount_reimbursed ?? '0.00');
 
         if (bccomp($reimbursed, '0', Money::SCALE) > 0) {
             throw ValidationException::withMessages([
-                'buyer_member_id' => __('The buyer has already been reimbursed for this purchase. Void it and record a new one instead.'),
+                $field => __('Money has already been reimbursed for this purchase. Void it and record a new one instead.'),
             ]);
         }
     }

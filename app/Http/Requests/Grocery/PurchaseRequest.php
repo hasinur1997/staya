@@ -3,9 +3,11 @@
 namespace App\Http\Requests\Grocery;
 
 use App\Actions\Grocery\CalculatePurchaseTotals;
+use App\Actions\Grocery\RecordPurchase;
 use App\Concerns\BusinessDateRules;
 use App\Concerns\MoneyRules;
 use App\Concerns\UploadValidationRules;
+use App\Enums\GroceryPaidBy;
 use App\Enums\GroceryUnit;
 use App\Enums\MemberStatus;
 use App\Models\GroceryPurchase;
@@ -23,6 +25,7 @@ use Illuminate\Validation\Rule;
  * the client: only the items are validated, and the server prices them.
  *
  * @phpstan-import-type ItemInput from CalculatePurchaseTotals
+ * @phpstan-import-type PurchaseInput from RecordPurchase
  */
 class PurchaseRequest extends FormRequest
 {
@@ -70,6 +73,14 @@ class PurchaseRequest extends FormRequest
                 Rule::exists(Member::class, 'id'),
                 $this->activeBuyerRule(),
             ],
+            'paid_by' => ['sometimes', 'required', Rule::enum(GroceryPaidBy::class)],
+            'paid_by_member_id' => [
+                Rule::requiredIf($this->input('paid_by') === GroceryPaidBy::Member->value && $this->canChoosePayer()),
+                'nullable',
+                'integer',
+                Rule::exists(Member::class, 'id'),
+                $this->activePayerRule(),
+            ],
             'notes' => ['nullable', 'string', 'max:2000'],
             'receipt' => ['nullable', ...$this->uploadRules(['jpg', 'jpeg', 'png', 'webp', 'pdf'])],
             'remove_receipt' => ['sometimes', 'boolean'],
@@ -92,6 +103,7 @@ class PurchaseRequest extends FormRequest
             ...$this->businessDateMessages('purchase_date'),
             ...$this->moneyMessages('items.*.unit_price', positive: true),
             'buyer_member_id.required' => __('Choose who made the purchase.'),
+            'paid_by_member_id.required' => __('Choose the member who paid.'),
             'items.required' => __('Add at least one item.'),
             'items.min' => __('Add at least one item.'),
             'items.*.item_name.required' => __('Name the item.'),
@@ -128,7 +140,7 @@ class PurchaseRequest extends FormRequest
     /**
      * The validated purchase without anything the server computes.
      *
-     * @return array{purchase_date: string, notes: string|null, items: array<int, ItemInput>}
+     * @return PurchaseInput
      */
     public function purchaseData(): array
     {
@@ -144,7 +156,74 @@ class PurchaseRequest extends FormRequest
                 'unit' => $item['unit'],
                 'unit_price' => $item['unit_price'],
             ], array_values($items)),
+            'paid_by' => $this->paidBy(),
+            'payer' => $this->paidBy() === GroceryPaidBy::Member ? $this->payer() : null,
         ];
+    }
+
+    /**
+     * Who paid: what the form says, else what the purchase already has,
+     * else the fund.
+     */
+    public function paidBy(): GroceryPaidBy
+    {
+        return $this->enum('paid_by', GroceryPaidBy::class)
+            ?? $this->purchase()->paid_by
+            ?? GroceryPaidBy::Fund;
+    }
+
+    /**
+     * The member who paid from their own pocket: the one chosen, else the
+     * one the purchase already has.
+     */
+    public function payer(): ?Member
+    {
+        if ($this->filled('paid_by_member_id')) {
+            return Member::query()->find($this->integer('paid_by_member_id'));
+        }
+
+        $existing = $this->purchase()?->payer;
+
+        if ($existing !== null || ! $this->has('paid_by') || $this->canChoosePayer()) {
+            return $existing;
+        }
+
+        // Without the right to choose, "paid by member" means oneself.
+        return $this->user()?->member;
+    }
+
+    /**
+     * Only staff who may record for others can name another member as
+     * the one who paid; everyone else can only name themselves.
+     */
+    private function canChoosePayer(): bool
+    {
+        return Gate::allows('createForOthers', GroceryPurchase::class);
+    }
+
+    /**
+     * A payer who is newly chosen must be an active member; the one a
+     * purchase already has may stay after they leave.
+     */
+    private function activePayerRule(): Closure
+    {
+        return function (string $attribute, mixed $value, Closure $fail): void {
+            $payer = $this->payer();
+
+            if ($payer === null || $payer->id === $this->purchase()?->paid_by_member_id) {
+                return;
+            }
+
+            if (! $this->canChoosePayer() && $payer->id !== $this->user()?->member?->id) {
+                $fail(__('You can only record yourself as having paid.'));
+
+                return;
+            }
+
+            if ($payer->status !== MemberStatus::Active) {
+                $fail(__('Only an active member can be recorded as having paid.'));
+            }
+        };
     }
 
     public function receipt(): ?UploadedFile

@@ -1,3 +1,5 @@
+import { DatePicker } from '@/components/ui/date-picker';
+import { MonthPicker } from '@/components/ui/month-picker';
 import { Head, Link, setLayoutProps } from '@inertiajs/react';
 import { Pencil, Plus, Printer, Receipt, Trash2, Wallet } from 'lucide-react';
 import { useEffect } from 'react';
@@ -410,11 +412,11 @@ function ListPreview() {
                     <Label htmlFor="preview-month" className="sr-only">
                         Month
                     </Label>
-                    <Input
+                    <MonthPicker
                         id="preview-month"
-                        type="month"
-                        defaultValue="2026-10"
-                        className="w-44"
+                        value="2026-10"
+                        onValueChange={() => undefined}
+                        className="w-48"
                     />
                 </div>
             }
@@ -616,9 +618,8 @@ function FormPreview() {
                                 <Label htmlFor="preview-date">
                                     Purchase date
                                 </Label>
-                                <Input
+                                <DatePicker
                                     id="preview-date"
-                                    type="date"
                                     defaultValue="2026-10-18"
                                 />
                             </div>
@@ -714,11 +715,11 @@ function ReportPreview() {
                         <Label htmlFor="report-month" className="sr-only">
                             Month
                         </Label>
-                        <Input
+                        <MonthPicker
                             id="report-month"
-                            type="month"
-                            defaultValue="2026-10"
-                            className="w-full md:w-44"
+                            value="2026-10"
+                            onValueChange={() => undefined}
+                            className="w-full md:w-48"
                         />
                     </div>
                     <Button variant="outline">Custom range</Button>

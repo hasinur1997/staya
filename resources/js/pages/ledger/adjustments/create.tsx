@@ -1,3 +1,4 @@
+import { DatePicker } from '@/components/ui/date-picker';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import type { FormEvent, ReactNode } from 'react';
 import InputError from '@/components/input-error';
@@ -149,19 +150,17 @@ export default function AdjustmentsCreate({ today, fundStartDate }: Props) {
                                     }
                                     error={form.errors.entry_date}
                                 >
-                                    <Input
+                                    <DatePicker
                                         id="entry_date"
-                                        type="date"
-                                        min={fundStartDate ?? undefined}
+                                        min={fundStartDate}
                                         max={today}
                                         value={form.data.entry_date}
-                                        onChange={(event) =>
-                                            form.setData(
-                                                'entry_date',
-                                                event.target.value,
-                                            )
+                                        onValueChange={(date) =>
+                                            form.setData('entry_date', date)
                                         }
-                                        required
+                                        aria-invalid={Boolean(
+                                            form.errors.entry_date,
+                                        )}
                                     />
                                 </Field>
                             </div>

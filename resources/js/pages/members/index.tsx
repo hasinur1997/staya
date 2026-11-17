@@ -1,3 +1,4 @@
+import { Combobox } from '@/components/ui/combobox';
 import { Head, Link, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -8,13 +9,6 @@ import type { ResponsiveColumn } from '@/components/responsive-table';
 import { ListTemplate } from '@/components/templates/list-template';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { formatBusinessDate } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
 import { create, index, show } from '@/routes/members';
@@ -137,7 +131,8 @@ export default function MembersIndex({
                 moreFilters={
                     <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
                         <Label htmlFor="member-status">{__('Status')}</Label>
-                        <Select
+                        <Combobox
+                            id="member-status"
                             value={filters.status ?? ALL}
                             onValueChange={(next) =>
                                 applyFilters({
@@ -147,27 +142,14 @@ export default function MembersIndex({
                                             : (next as MemberStatusValue),
                                 })
                             }
-                        >
-                            <SelectTrigger
-                                id="member-status"
-                                className="md:w-48"
-                            >
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value={ALL}>
-                                    {__('All statuses')}
-                                </SelectItem>
-                                {statuses.map((option) => (
-                                    <SelectItem
-                                        key={option.value}
-                                        value={option.value}
-                                    >
-                                        {option.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                            options={[
+                                { value: ALL, label: __('All statuses') },
+                                ...statuses,
+                            ]}
+                            searchPlaceholder={__('Search')}
+                            emptyText={__('Nothing found.')}
+                            className="md:w-48"
+                        />
                     </div>
                 }
                 activeFilterCount={filters.status ? 1 : 0}

@@ -20,7 +20,9 @@ use Illuminate\Support\Facades\DB;
  * voided (a void settles to ৳0), always inside the caller's transaction
  * with the purchase row locked.
  *
- * The fund never goes below ৳0:
+ * A purchase a member paid for themselves never touches the fund: its whole
+ * total is owed to that member. For one the fund pays, the fund never goes
+ * below ৳0:
  * - A higher total is paid from the fund as far as it reaches; the rest is
  *   added to the payable.
  * - A lower total first reduces the unpaid part of the payable, then the
@@ -43,10 +45,13 @@ class SettlePurchase
      * @param  string  $date  The purchase date the new expense is posted on.
      * @param  string  $reason  Recorded on any reversal entries.
      * @param  string  $field  Form field that carries closed-month errors.
+     * @param  bool  $afresh  Split the total from scratch, ignoring how it was
+     *                        split before. For an edit that changes who paid;
+     *                        only valid while nothing has been reimbursed.
      */
-    public function handle(User $actor, GroceryPurchase $purchase, string $total, string $date, string $reason, string $field = 'purchase_date'): void
+    public function handle(User $actor, GroceryPurchase $purchase, string $total, string $date, string $reason, string $field = 'purchase_date', bool $afresh = false): void
     {
-        DB::transaction(function () use ($actor, $purchase, $total, $date, $reason, $field): void {
+        DB::transaction(function () use ($actor, $purchase, $total, $date, $reason, $field, $afresh): void {
             $payable = $purchase->payable()->lockForUpdate()->first();
             $balance = Money::numeric(Fund::locked()->balance);
             $expense = $purchase->expenseEntry()->first();
@@ -60,7 +65,18 @@ class SettlePurchase
             $reimbursed = $oldReimbursed;
             $reverseReimbursements = false;
 
-            if (bccomp($newTotal, $oldTotal, Money::SCALE) >= 0) {
+            if ($purchase->isPaidByMember()) {
+                $fundPaid = '0.00';
+                $owed = $newTotal;
+
+                if (bccomp($oldReimbursed, $newTotal, Money::SCALE) > 0) {
+                    $reverseReimbursements = true;
+                    $reimbursed = '0.00';
+                }
+            } elseif ($afresh) {
+                $fundPaid = self::min($newTotal, bcadd($balance, $oldFundPaid, Money::SCALE));
+                $owed = bcsub($newTotal, $fundPaid, Money::SCALE);
+            } elseif (bccomp($newTotal, $oldTotal, Money::SCALE) >= 0) {
                 $wanted = bcadd($oldFundPaid, bcsub($newTotal, $oldTotal, Money::SCALE), Money::SCALE);
                 $available = bcadd($balance, $oldFundPaid, Money::SCALE);
 
@@ -116,12 +132,12 @@ class SettlePurchase
             if ($payable !== null) {
                 $payable->amount = $owed;
                 $payable->amount_reimbursed = $reimbursed;
-                $payable->member_id = $purchase->buyer_member_id;
+                $payable->member_id = $purchase->payeeMemberId();
                 $payable->save();
             } elseif (bccomp($owed, '0', Money::SCALE) > 0) {
                 BuyerPayable::query()->create([
                     'grocery_purchase_id' => $purchase->id,
-                    'member_id' => $purchase->buyer_member_id,
+                    'member_id' => $purchase->payeeMemberId(),
                     'amount' => $owed,
                 ]);
             }
