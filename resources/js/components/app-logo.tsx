@@ -7,12 +7,7 @@ export default function AppLogo({ showName = true }: { showName?: boolean }) {
 
     return (
         <>
-            <span className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-md bg-primary">
-                <AppLogoIcon
-                    className="size-5 fill-current text-on-primary"
-                    aria-hidden
-                />
-            </span>
+            <AppLogoIcon className="size-8 shrink-0" aria-hidden />
             {showName ? (
                 <span className="truncate text-label text-ink">{name}</span>
             ) : (

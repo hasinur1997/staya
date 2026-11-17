@@ -87,10 +87,18 @@ export default function LedgerIndex({
             header: __('Reason'),
             cell: (entry) => (
                 <span className="flex flex-col">
-                    <span>{entry.reason ?? '—'}</span>
-                    {details(entry) && (
-                        <span className="text-small text-ink-muted">
-                            {details(entry)}
+                    {entry.reason ? (
+                        <>
+                            <span>{entry.reason}</span>
+                            {details(entry) && (
+                                <span className="text-small text-ink-muted">
+                                    {details(entry)}
+                                </span>
+                            )}
+                        </>
+                    ) : (
+                        <span className="text-ink-muted">
+                            {details(entry) || '—'}
                         </span>
                     )}
                 </span>
@@ -300,7 +308,7 @@ function FilterSelect<T extends string>({
     const __ = useTranslate();
 
     return (
-        <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
+        <div className="flex flex-col gap-1">
             <Label htmlFor={id}>{label}</Label>
             <Combobox
                 id={id}

@@ -174,7 +174,7 @@ export default function AuditIndex({
                 }
                 moreFilters={
                     <>
-                        <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
+                        <div className="flex flex-col gap-1">
                             <Label htmlFor="audit-log">{__('Log')}</Label>
                             <Combobox
                                 id="audit-log"
@@ -188,7 +188,7 @@ export default function AuditIndex({
                                 className="md:w-52"
                             />
                         </div>
-                        <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
+                        <div className="flex flex-col gap-1">
                             <Label htmlFor="audit-action">{__('Action')}</Label>
                             <Combobox
                                 id="audit-action"

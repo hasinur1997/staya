@@ -2,7 +2,7 @@
 
 ## Overview
 
-A bright, friendly and professional design system for a mess management tool. A clear blue anchors the brand, surfaces are generous and white, corners are softly rounded and type is a single clean family, Roboto. It adapts the Skylearn system's look (colours, rounded corners, soft shadows, input style, accessibility stance) to a finance tool: compact sizes, dense tables, no illustration or gamification. Light and dark modes both feel intentional.
+A bright, friendly and professional design system for a mess management tool. A clear blue anchors the brand, surfaces are generous and white, corners are softly rounded and type is a single clean family, Open Sans. It adapts the Skylearn system's look (colours, rounded corners, soft shadows, input style, accessibility stance) to a finance tool: compact sizes, dense tables, no illustration or gamification. Light and dark modes both feel intentional.
 
 ## Colors
 
@@ -24,11 +24,11 @@ Dark mode keeps the same slate family: background #0F172A, surface #1E293B, rais
 
 ## Typography
 
-- **Display and Body Font**: Roboto, regular (400) and medium (500) only, loaded from Google Fonts
+- **Display and Body Font**: Open Sans, regular (400) and medium (500) only, loaded from Google Fonts
 - **Code Font**: Roboto Mono
 - **Bangla and the ৳ sign**: Hind Siliguri as fallback
 
-Headings use Roboto medium with slightly tight letter spacing (-0.01em). Body and UI text use regular; labels, subheads and buttons use medium. Money uses tabular figures.
+Headings use Open Sans medium with slightly tight letter spacing (-0.01em). Body and UI text use regular; labels, subheads and buttons use medium. Money uses tabular figures.
 
 Type scale: Display 64px, Headline 48px, Section heading 28px, Subhead 20px, Body 16px, Small 14px, Caption 12px, Overline 11px uppercase tracking-wide.
 
@@ -73,7 +73,7 @@ Contrast targets WCAG AA (4.5:1) on all text. Colour is never the only signal: e
 
 - Do use the primary blue only for interactive elements and active states
 - Do keep one primary button per view
-- Do use Roboto only, at regular and medium weights
+- Do use Open Sans only, at regular and medium weights
 - Do build every dropdown from `Combobox` and every date from `DatePicker` / `MonthPicker`
 - Do use the highlight yellow sparingly, for attention only
 - Don't use more than two font weights on a screen

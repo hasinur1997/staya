@@ -220,9 +220,7 @@ export default function Dashboard({
                   />,
                   <StatCard
                       key="deposits"
-                      label={__('Deposits in :month', {
-                          month: formatMonth(month),
-                      })}
+                      label={__('Approved deposits')}
                       value={formatMoney(report.deposits)}
                       hint={against(insights.changes.deposits)}
                   />,

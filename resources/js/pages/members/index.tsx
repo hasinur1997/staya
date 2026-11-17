@@ -132,7 +132,7 @@ export default function MembersIndex({
                     </form>
                 }
                 moreFilters={
-                    <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
+                    <div className="flex flex-col gap-1">
                         <Label htmlFor="member-status">{__('Status')}</Label>
                         <Combobox
                             id="member-status"

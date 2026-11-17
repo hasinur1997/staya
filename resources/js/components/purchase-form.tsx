@@ -445,7 +445,10 @@ export function PurchaseFields({
                                     </Field>
                                     <div className="flex items-end justify-between gap-2 md:col-span-2">
                                         <div className="flex flex-col gap-2">
-                                            <Label asChild>
+                                            <Label
+                                                asChild
+                                                className="whitespace-nowrap"
+                                            >
                                                 <span>{__('Line total')}</span>
                                             </Label>
                                             <span

@@ -115,7 +115,16 @@ export default function DepositsIndex({
             : []),
         { key: 'status', header: __('Status'), cell: status },
         { key: 'amount', header: __('Amount'), align: 'right', cell: amount },
-        { key: 'actions', header: '', cell: cancelButton, priority: 'low' },
+        ...(deposits.data.some((deposit) => deposit.can.cancel)
+            ? [
+                  {
+                      key: 'actions',
+                      header: '',
+                      cell: cancelButton,
+                      priority: 'low' as const,
+                  },
+              ]
+            : []),
     ];
 
     const newDepositAction =
@@ -156,7 +165,7 @@ export default function DepositsIndex({
                 }
                 moreFilters={
                     <>
-                        <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
+                        <div className="flex flex-col gap-1">
                             <Label htmlFor="deposit-status">
                                 {__('Status')}
                             </Label>
@@ -181,7 +190,7 @@ export default function DepositsIndex({
                             />
                         </div>
                         {can.viewAll && (
-                            <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
+                            <div className="flex flex-col gap-1">
                                 <Label htmlFor="deposit-member">
                                     {__('Member')}
                                 </Label>

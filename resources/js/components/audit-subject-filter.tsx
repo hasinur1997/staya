@@ -31,7 +31,7 @@ export function AuditSubjectFilter({
 
     return (
         <>
-            <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
+            <div className="flex flex-col gap-1">
                 <Label htmlFor="audit-subject">{__('Record')}</Label>
                 <Combobox
                     id="audit-subject"
@@ -50,7 +50,7 @@ export function AuditSubjectFilter({
                 />
             </div>
             {subject && (
-                <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
+                <div className="flex flex-col gap-1">
                     <Label htmlFor="audit-subject-id">{__('Number')}</Label>
                     <Input
                         id="audit-subject-id"

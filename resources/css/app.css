@@ -47,6 +47,8 @@
     --color-ink: var(--ink);
     --color-ink-muted: var(--ink-muted);
     --color-neutral: var(--neutral);
+    --color-logo-house: var(--logo-house);
+    --color-logo-ink: var(--logo-ink);
     --color-primary: var(--primary);
     --color-primary-hover: var(--primary-hover);
     --color-on-primary: var(--on-primary);
@@ -139,6 +141,8 @@
     --ink: #0f172a;
     --ink-muted: #475569;
     --neutral: #64748b;
+    --logo-house: #f2a93b;
+    --logo-ink: #2b211a;
     --primary: #2563eb;
     --primary-hover: #1d4ed8;
     --on-primary: #ffffff;
@@ -187,6 +191,8 @@
     --ink: #f8fafc;
     --ink-muted: #cbd5e1;
     --neutral: #94a3b8;
+    --logo-house: #f2a93b;
+    --logo-ink: #2b211a;
     --primary: #60a5fa;
     --primary-hover: #93c5fd;
     --on-primary: #0f172a;
@@ -213,6 +219,8 @@
         --ink: #f8fafc;
         --ink-muted: #cbd5e1;
         --neutral: #94a3b8;
+        --logo-house: #f2a93b;
+        --logo-ink: #2b211a;
         --primary: #60a5fa;
         --primary-hover: #93c5fd;
         --on-primary: #0f172a;
@@ -232,7 +240,7 @@
 }
 
 /*
- * Type styles. Everything is Roboto at regular (400) or medium (500) only.
+ * Type styles. Everything is Open Sans at regular (400) or medium (500) only.
  */
 @utility text-display {
     font-family: var(--font-display);

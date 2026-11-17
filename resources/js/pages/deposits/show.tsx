@@ -86,6 +86,9 @@ export default function DepositsShow({ deposit, history, can }: Props) {
         <>
             <Head title={__('Deposit')} />
             <DetailTemplate
+                aside={
+                    history ? <AuditHistoryCard history={history} /> : undefined
+                }
                 header={{
                     overline: __('Deposit'),
                     title: formatMoney(deposit.amount),
@@ -230,7 +233,6 @@ export default function DepositsShow({ deposit, history, can }: Props) {
                         </dl>
                     </CardContent>
                 </Card>
-                {history && <AuditHistoryCard history={history} />}
             </DetailTemplate>
 
             <FormDialog

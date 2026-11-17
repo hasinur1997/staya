@@ -6,7 +6,11 @@ import AppLayout from '@/layouts/app-layout';
 import GuestLayout from '@/layouts/guest-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+/** The server renders the mess name as the default <title>; read it before Inertia replaces it. */
+const appName =
+    document.querySelector('title')?.textContent?.trim() ||
+    import.meta.env.VITE_APP_NAME ||
+    'Laravel';
 
 void createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),

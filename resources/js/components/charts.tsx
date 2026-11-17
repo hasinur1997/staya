@@ -1,3 +1,4 @@
+import { useLayoutEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -13,10 +14,35 @@ const WIDTH = 600;
 const HEIGHT = 240;
 const PAD = { top: 12, right: 12, bottom: 28, left: 52 };
 
-const plot = {
-    w: WIDTH - PAD.left - PAD.right,
-    h: HEIGHT - PAD.top - PAD.bottom,
-};
+const plot = { h: HEIGHT - PAD.top - PAD.bottom };
+
+/**
+ * The width of the chart's box. Charts are drawn at that width instead of
+ * being scaled, so axis text stays the same size on a phone.
+ */
+function useChartWidth(): [(node: HTMLDivElement | null) => void, number] {
+    const [width, setWidth] = useState(WIDTH);
+    const [node, setNode] = useState<HTMLDivElement | null>(null);
+
+    useLayoutEffect(() => {
+        if (!node) {
+            return;
+        }
+
+        const update = () =>
+            setWidth(
+                Math.max(240, Math.round(node.getBoundingClientRect().width)),
+            );
+
+        update();
+        const observer = new ResizeObserver(update);
+        observer.observe(node);
+
+        return () => observer.disconnect();
+    }, [node]);
+
+    return [setNode, width];
+}
 
 const size = (value: string | number) => Number(value);
 
@@ -64,9 +90,9 @@ export function ChartCard({
 }) {
     return (
         <Card className={cn('h-full', className)}>
-            <CardHeader className="flex-row items-start justify-between gap-4">
+            <CardHeader className="flex-col items-start gap-2 sm:flex-row sm:justify-between sm:gap-4">
                 <div className="flex flex-col gap-1">
-                    <CardTitle className="text-subhead">{title}</CardTitle>
+                    <CardTitle>{title}</CardTitle>
                     {description && (
                         <p className="text-small text-ink-muted">
                             {description}
@@ -86,7 +112,7 @@ export function Legend({
     items: { label: string; className: string }[];
 }) {
     return (
-        <ul className="flex flex-wrap justify-end gap-x-4 gap-y-1 text-small text-ink-muted">
+        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-small text-ink-muted sm:justify-end">
             {items.map((item) => (
                 <li key={item.label} className="flex items-center gap-2">
                     <span
@@ -108,7 +134,15 @@ export function EmptyChart({ children }: { children: ReactNode }) {
     );
 }
 
-function Grid({ max, min = 0 }: { max: number; min?: number }) {
+function Grid({
+    max,
+    min = 0,
+    width,
+}: {
+    max: number;
+    min?: number;
+    width: number;
+}) {
     const ticks = 4;
     const span = max - min;
 
@@ -122,7 +156,7 @@ function Grid({ max, min = 0 }: { max: number; min?: number }) {
                     <g key={index}>
                         <line
                             x1={PAD.left}
-                            x2={WIDTH - PAD.right}
+                            x2={width - PAD.right}
                             y1={y}
                             y2={y}
                             className="stroke-border"
@@ -161,58 +195,64 @@ export function GroupedBars({
     aLabel: string;
     bLabel: string;
 }) {
+    const [ref, width] = useChartWidth();
+    const plotW = width - PAD.left - PAD.right;
     const max = niceCeil(
         Math.max(...data.flatMap((d) => [size(d.a), size(d.b)])),
     );
-    const slot = plot.w / data.length;
+    const slot = plotW / data.length;
     const bar = Math.min(28, slot / 3);
     const y = (value: number) => PAD.top + plot.h - (plot.h * value) / max;
 
     return (
-        <svg
-            viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-            role="img"
-            aria-label={`${aLabel} and ${bLabel}`}
-            className="w-full"
-        >
-            <Grid max={max} />
-            {data.map((d, index) => {
-                const center = PAD.left + slot * index + slot / 2;
+        <div ref={ref}>
+            <svg
+                width={width}
+                height={HEIGHT}
+                viewBox={`0 0 ${width} ${HEIGHT}`}
+                role="img"
+                aria-label={`${aLabel} and ${bLabel}`}
+                className="block"
+            >
+                <Grid max={max} width={width} />
+                {data.map((d, index) => {
+                    const center = PAD.left + slot * index + slot / 2;
 
-                return (
-                    <g key={d.label}>
-                        <rect
-                            x={center - bar - 2}
-                            y={y(size(d.a))}
-                            width={bar}
-                            height={PAD.top + plot.h - y(size(d.a))}
-                            rx={4}
-                            className="fill-primary"
-                        >
-                            <title>{`${d.label}: ${aLabel} ${d.aText}`}</title>
-                        </rect>
-                        <rect
-                            x={center + 2}
-                            y={y(size(d.b))}
-                            width={bar}
-                            height={PAD.top + plot.h - y(size(d.b))}
-                            rx={4}
-                            className="fill-highlight"
-                        >
-                            <title>{`${d.label}: ${bLabel} ${d.bText}`}</title>
-                        </rect>
-                        <text
-                            x={center}
-                            y={HEIGHT - 8}
-                            textAnchor="middle"
-                            className="fill-ink-muted text-caption"
-                        >
-                            {d.label}
-                        </text>
-                    </g>
-                );
-            })}
-        </svg>
+                    return (
+                        <g key={d.label}>
+                            <rect
+                                x={center - bar - 2}
+                                y={y(size(d.a))}
+                                width={bar}
+                                height={PAD.top + plot.h - y(size(d.a))}
+                                rx={4}
+                                className="fill-primary"
+                            >
+                                <title>{`${d.label}: ${aLabel} ${d.aText}`}</title>
+                            </rect>
+                            <rect
+                                x={center + 2}
+                                y={y(size(d.b))}
+                                width={bar}
+                                height={PAD.top + plot.h - y(size(d.b))}
+                                rx={4}
+                                className="fill-highlight"
+                            >
+                                <title>{`${d.label}: ${bLabel} ${d.bText}`}</title>
+                            </rect>
+                            <text
+                                x={center}
+                                y={HEIGHT - 8}
+                                textAnchor="middle"
+                                className="fill-ink-muted text-caption"
+                            >
+                                {d.label}
+                            </text>
+                        </g>
+                    );
+                })}
+            </svg>
+        </div>
     );
 }
 
@@ -220,6 +260,8 @@ type Point = { label: string; value: string; text: string };
 
 /** A line with a soft area under it; the balance can dip below zero. */
 export function AreaLine({ data, name }: { data: Point[]; name: string }) {
+    const [ref, width] = useChartWidth();
+    const plotW = width - PAD.left - PAD.right;
     const values = data.map((d) => size(d.value));
     const max = niceCeil(Math.max(0, ...values));
     const min =
@@ -227,7 +269,7 @@ export function AreaLine({ data, name }: { data: Point[]; name: string }) {
     const span = max - min;
     const x = (index: number) =>
         PAD.left +
-        (data.length === 1 ? plot.w / 2 : (plot.w * index) / (data.length - 1));
+        (data.length === 1 ? plotW / 2 : (plotW * index) / (data.length - 1));
     const y = (value: number) =>
         PAD.top + plot.h - (plot.h * (value - min)) / span;
 
@@ -240,44 +282,48 @@ export function AreaLine({ data, name }: { data: Point[]; name: string }) {
     const area = `${line} L${x(data.length - 1)},${y(Math.max(min, 0))} L${x(0)},${y(Math.max(min, 0))} Z`;
 
     return (
-        <svg
-            viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-            role="img"
-            aria-label={name}
-            className="w-full"
-        >
-            <Grid max={max} min={min} />
-            <path d={area} className="fill-primary/10" />
-            <path
-                d={line}
-                fill="none"
-                strokeWidth={2.5}
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                className="stroke-primary"
-            />
-            {data.map((d, index) => (
-                <g key={d.label}>
-                    <circle
-                        cx={x(index)}
-                        cy={y(size(d.value))}
-                        r={4}
-                        className="fill-background stroke-primary"
-                        strokeWidth={2}
-                    >
-                        <title>{`${d.label}: ${d.text}`}</title>
-                    </circle>
-                    <text
-                        x={x(index)}
-                        y={HEIGHT - 8}
-                        textAnchor="middle"
-                        className="fill-ink-muted text-caption"
-                    >
-                        {d.label}
-                    </text>
-                </g>
-            ))}
-        </svg>
+        <div ref={ref}>
+            <svg
+                width={width}
+                height={HEIGHT}
+                viewBox={`0 0 ${width} ${HEIGHT}`}
+                role="img"
+                aria-label={name}
+                className="block"
+            >
+                <Grid max={max} min={min} width={width} />
+                <path d={area} className="fill-primary/10" />
+                <path
+                    d={line}
+                    fill="none"
+                    strokeWidth={2.5}
+                    strokeLinejoin="round"
+                    strokeLinecap="round"
+                    className="stroke-primary"
+                />
+                {data.map((d, index) => (
+                    <g key={d.label}>
+                        <circle
+                            cx={x(index)}
+                            cy={y(size(d.value))}
+                            r={4}
+                            className="fill-background stroke-primary"
+                            strokeWidth={2}
+                        >
+                            <title>{`${d.label}: ${d.text}`}</title>
+                        </circle>
+                        <text
+                            x={x(index)}
+                            y={HEIGHT - 8}
+                            textAnchor="middle"
+                            className="fill-ink-muted text-caption"
+                        >
+                            {d.label}
+                        </text>
+                    </g>
+                ))}
+            </svg>
+        </div>
     );
 }
 
@@ -294,57 +340,63 @@ export function Columns({
     /** Counts, so the grid lines fall on whole numbers. */
     whole?: boolean;
 }) {
+    const [ref, width] = useChartWidth();
+    const plotW = width - PAD.left - PAD.right;
     const top = Math.max(...data.map((d) => size(d.value)));
     const max = whole ? Math.max(4, Math.ceil(top / 4) * 4) : niceCeil(top);
-    const slot = plot.w / data.length;
+    const slot = plotW / data.length;
     const bar = Math.max(3, slot * 0.62);
     const y = (value: number) => PAD.top + plot.h - (plot.h * value) / max;
     const every = data.length > 20 ? 5 : 2;
 
     return (
-        <svg
-            viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-            role="img"
-            aria-label={name}
-            className="w-full"
-        >
-            <Grid max={max} />
-            {data.map((d, index) => {
-                const center = PAD.left + slot * index + slot / 2;
-                const value = size(d.value);
+        <div ref={ref}>
+            <svg
+                width={width}
+                height={HEIGHT}
+                viewBox={`0 0 ${width} ${HEIGHT}`}
+                role="img"
+                aria-label={name}
+                className="block"
+            >
+                <Grid max={max} width={width} />
+                {data.map((d, index) => {
+                    const center = PAD.left + slot * index + slot / 2;
+                    const value = size(d.value);
 
-                return (
-                    <g key={d.label}>
-                        {value > 0 && (
-                            <rect
-                                x={center - bar / 2}
-                                y={y(value)}
-                                width={bar}
-                                height={PAD.top + plot.h - y(value)}
-                                rx={2}
-                                className={
-                                    tone === 'primary'
-                                        ? 'fill-primary'
-                                        : 'fill-highlight'
-                                }
-                            >
-                                <title>{`${d.label}: ${d.text}`}</title>
-                            </rect>
-                        )}
-                        {(index === 0 || (index + 1) % every === 0) && (
-                            <text
-                                x={center}
-                                y={HEIGHT - 8}
-                                textAnchor="middle"
-                                className="fill-ink-muted text-caption"
-                            >
-                                {d.label}
-                            </text>
-                        )}
-                    </g>
-                );
-            })}
-        </svg>
+                    return (
+                        <g key={d.label}>
+                            {value > 0 && (
+                                <rect
+                                    x={center - bar / 2}
+                                    y={y(value)}
+                                    width={bar}
+                                    height={PAD.top + plot.h - y(value)}
+                                    rx={2}
+                                    className={
+                                        tone === 'primary'
+                                            ? 'fill-primary'
+                                            : 'fill-highlight'
+                                    }
+                                >
+                                    <title>{`${d.label}: ${d.text}`}</title>
+                                </rect>
+                            )}
+                            {(index === 0 || (index + 1) % every === 0) && (
+                                <text
+                                    x={center}
+                                    y={HEIGHT - 8}
+                                    textAnchor="middle"
+                                    className="fill-ink-muted text-caption"
+                                >
+                                    {d.label}
+                                </text>
+                            )}
+                        </g>
+                    );
+                })}
+            </svg>
+        </div>
     );
 }
 

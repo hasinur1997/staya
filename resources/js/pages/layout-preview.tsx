@@ -424,7 +424,7 @@ function ListPreview() {
                 </div>
             }
             moreFilters={
-                <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
+                <div className="flex flex-col gap-1">
                     <Label htmlFor="preview-buyer">Buyer</Label>
                     <Input
                         id="preview-buyer"
