@@ -54,7 +54,7 @@ jobs:
       # the compiled frontend. Nothing is installed or compiled over there.
       - name: Install PHP dependencies (production only)
         run: |
-            cp .env.example .env
+          cp .env.example .env
           composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
           php artisan key:generate --no-interaction
 
