@@ -88,28 +88,28 @@ Staya is a mess management system for shared houses and hostels. It keeps member
 
 All screenshots use seeded demo data.
 
-| | |
-| --- | --- |
-| ![Sign in](docs/screenshots/login.png)<br>**Sign in** | ![Dashboard in Bangla](docs/screenshots/dashboard-bangla.png)<br>**Dashboard in Bangla** |
-| ![Grocery purchases](docs/screenshots/grocery.png)<br>**Grocery purchases** | ![Deposits](docs/screenshots/deposits.png)<br>**Deposits** |
-| ![Members](docs/screenshots/members.png)<br>**Members** | ![New member](docs/screenshots/members-create.png)<br>**New member** |
-| ![Meals](docs/screenshots/meals.png)<br>**Meals** | ![Ledger](docs/screenshots/ledger.png)<br>**Ledger** |
-| ![Monthly report](docs/screenshots/reports.png)<br>**Monthly report** | ![Payables](docs/screenshots/payables.png)<br>**Payables** |
-| ![Roles](docs/screenshots/roles.png)<br>**Roles and permissions** | ![Settings](docs/screenshots/settings.png)<br>**Settings** |
-| ![Audit log](docs/screenshots/audit-log.png)<br>**Audit log** | |
+|                                                                             |                                                                                          |
+| --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| ![Sign in](docs/screenshots/login.png)<br>**Sign in**                       | ![Dashboard in Bangla](docs/screenshots/dashboard-bangla.png)<br>**Dashboard in Bangla** |
+| ![Grocery purchases](docs/screenshots/grocery.png)<br>**Grocery purchases** | ![Deposits](docs/screenshots/deposits.png)<br>**Deposits**                               |
+| ![Members](docs/screenshots/members.png)<br>**Members**                     | ![New member](docs/screenshots/members-create.png)<br>**New member**                     |
+| ![Meals](docs/screenshots/meals.png)<br>**Meals**                           | ![Ledger](docs/screenshots/ledger.png)<br>**Ledger**                                     |
+| ![Monthly report](docs/screenshots/reports.png)<br>**Monthly report**       | ![Payables](docs/screenshots/payables.png)<br>**Payables**                               |
+| ![Roles](docs/screenshots/roles.png)<br>**Roles and permissions**           | ![Settings](docs/screenshots/settings.png)<br>**Settings**                               |
+| ![Audit log](docs/screenshots/audit-log.png)<br>**Audit log**               |                                                                                          |
 
 ## Tech stack
 
-| Area | Technology |
-| --- | --- |
-| Backend | PHP 8.4, Laravel 13, Laravel Fortify (auth, 2FA, passkeys) |
-| Frontend | React 19, TypeScript, Inertia v3, Tailwind CSS v4, Radix UI, lucide-react |
-| Routing glue | Laravel Wayfinder (typed route functions for the frontend) |
-| Build | Vite via `vite-plus` (`vp`) |
-| Roles and permissions | `spatie/laravel-permission` |
-| Audit log | `spatie/laravel-activitylog` |
-| Quality | PHPUnit 12, Larastan (PHPStan), Pint, `vp check`, `tsc` |
-| Database | SQLite for local development; MySQL or PostgreSQL in production |
+| Area                  | Technology                                                                |
+| --------------------- | ------------------------------------------------------------------------- |
+| Backend               | PHP 8.4, Laravel 13, Laravel Fortify (auth, 2FA, passkeys)                |
+| Frontend              | React 19, TypeScript, Inertia v3, Tailwind CSS v4, Radix UI, lucide-react |
+| Routing glue          | Laravel Wayfinder (typed route functions for the frontend)                |
+| Build                 | Vite via `vite-plus` (`vp`)                                               |
+| Roles and permissions | `spatie/laravel-permission`                                               |
+| Audit log             | `spatie/laravel-activitylog`                                              |
+| Quality               | PHPUnit 12, Larastan (PHPStan), Pint, `vp check`, `tsc`                   |
+| Database              | SQLite for local development; MySQL or PostgreSQL in production           |
 
 ## Development installation
 
@@ -173,8 +173,8 @@ If a frontend change does not show up, or you see "Unable to locate file in Vite
 
 The seeder creates an Admin:
 
-| Email | Password |
-| --- | --- |
+| Email              | Password   |
+| ------------------ | ---------- |
 | `test@example.com` | `password` |
 
 The seeded data is for development only. Do not run `db:seed` in production. To set up a real installation, run the migrations and then the `AccessControlSeeder` and `MessSettingsSeeder`, and create your first Admin user.
@@ -215,20 +215,20 @@ php artisan wayfinder:generate --with-form
 
 ## Project layout
 
-| Path | Contents |
-| --- | --- |
-| `app/Models` | Eloquent models (`Member`, `GroceryPurchase`, `Deposit`, `LedgerEntry`, …) |
-| `app/Http/Controllers` | Thin controllers, grouped by area |
-| `app/Http/Requests` | Form Requests for all validation |
-| `app/Actions` | Single-purpose classes that hold business logic (`Deposits/ApproveDeposit`, `Settings/ResetMessData`, …) |
-| `app/Policies` | One policy per model; the only place authorisation lives |
-| `app/Enums` | Backed enums (`DepositStatus`, `LedgerEntryType`, …) |
-| `database/` | Migrations, factories and seeders |
-| `lang/` | Bangla translations and validation messages |
-| `resources/js/pages` | Inertia pages, grouped by area |
-| `resources/js/components` | Shared components; `components/ui` holds the primitives |
-| `routes/web.php`, `routes/settings.php` | Named routes |
-| `tests/Feature`, `tests/Unit` | PHPUnit tests, mostly feature tests |
+| Path                                    | Contents                                                                                                 |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `app/Models`                            | Eloquent models (`Member`, `GroceryPurchase`, `Deposit`, `LedgerEntry`, …)                               |
+| `app/Http/Controllers`                  | Thin controllers, grouped by area                                                                        |
+| `app/Http/Requests`                     | Form Requests for all validation                                                                         |
+| `app/Actions`                           | Single-purpose classes that hold business logic (`Deposits/ApproveDeposit`, `Settings/ResetMessData`, …) |
+| `app/Policies`                          | One policy per model; the only place authorisation lives                                                 |
+| `app/Enums`                             | Backed enums (`DepositStatus`, `LedgerEntryType`, …)                                                     |
+| `database/`                             | Migrations, factories and seeders                                                                        |
+| `lang/`                                 | Bangla translations and validation messages                                                              |
+| `resources/js/pages`                    | Inertia pages, grouped by area                                                                           |
+| `resources/js/components`               | Shared components; `components/ui` holds the primitives                                                  |
+| `routes/web.php`, `routes/settings.php` | Named routes                                                                                             |
+| `tests/Feature`, `tests/Unit`           | PHPUnit tests, mostly feature tests                                                                      |
 
 ## Documentation
 
