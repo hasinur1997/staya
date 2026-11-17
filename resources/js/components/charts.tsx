@@ -132,7 +132,7 @@ function Grid({ max, min = 0 }: { max: number; min?: number }) {
                             x={PAD.left - 8}
                             y={y + 4}
                             textAnchor="end"
-                            className="fill-ink-muted text-[11px]"
+                            className="fill-ink-muted text-caption"
                         >
                             {compact(value)}
                         </text>
@@ -205,7 +205,7 @@ export function GroupedBars({
                             x={center}
                             y={HEIGHT - 8}
                             textAnchor="middle"
-                            className="fill-ink-muted text-[11px]"
+                            className="fill-ink-muted text-caption"
                         >
                             {d.label}
                         </text>
@@ -271,7 +271,7 @@ export function AreaLine({ data, name }: { data: Point[]; name: string }) {
                         x={x(index)}
                         y={HEIGHT - 8}
                         textAnchor="middle"
-                        className="fill-ink-muted text-[11px]"
+                        className="fill-ink-muted text-caption"
                     >
                         {d.label}
                     </text>
@@ -336,7 +336,7 @@ export function Columns({
                                 x={center}
                                 y={HEIGHT - 8}
                                 textAnchor="middle"
-                                className="fill-ink-muted text-[11px]"
+                                className="fill-ink-muted text-caption"
                             >
                                 {d.label}
                             </text>

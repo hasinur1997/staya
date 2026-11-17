@@ -36,7 +36,7 @@ function Calendar({
           "hover:bg-surface-raised inline-flex size-9 items-center justify-center rounded-sm text-small tabular-nums transition-colors",
         today: "[&>button]:ring-1 [&>button]:ring-inset [&>button]:ring-primary",
         selected:
-          "[&>button]:bg-primary [&>button]:text-on-primary [&>button]:hover:bg-primary-hover [&>button]:font-semibold",
+          "[&>button]:bg-primary [&>button]:text-on-primary [&>button]:hover:bg-primary-hover [&>button]:font-medium",
         outside: "[&>button]:text-neutral",
         disabled: "[&>button]:pointer-events-none [&>button]:opacity-40",
         hidden: "invisible",

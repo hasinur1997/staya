@@ -1,4 +1,5 @@
 import { Head, Link, setLayoutProps } from '@inertiajs/react';
+import { DetailRow } from '@/components/detail-row';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DetailTemplate } from '@/components/templates/detail-template';
@@ -6,21 +7,6 @@ import { formatDateTime } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
 import { index, show } from '@/routes/audit';
 import type { AuditDetail } from '@/types';
-
-function Row({
-    label,
-    children,
-}: {
-    label: string;
-    children: React.ReactNode;
-}) {
-    return (
-        <div className="flex flex-col gap-1 md:grid md:grid-cols-3 md:gap-4">
-            <dt className="text-small text-ink-muted">{label}</dt>
-            <dd className="text-ink md:col-span-2">{children}</dd>
-        </div>
-    );
-}
 
 function Value({ value }: { value: string | null }) {
     return value === null ? (
@@ -65,21 +51,23 @@ export default function AuditShow({ activity }: { activity: AuditDetail }) {
                     </CardHeader>
                     <CardContent>
                         <dl className="flex flex-col gap-4">
-                            <Row label={__('Who')}>
+                            <DetailRow label={__('Who')}>
                                 {activity.actor_name ??
                                     (activity.email_tried
                                         ? __('Not signed in (:email)', {
                                               email: activity.email_tried,
                                           })
                                         : __('System'))}
-                            </Row>
-                            <Row label={__('IP address')}>
+                            </DetailRow>
+                            <DetailRow label={__('IP address')}>
                                 <span className="tabular-nums">
                                     {activity.ip_address ?? '—'}
                                 </span>
-                            </Row>
-                            <Row label={__('Log')}>{activity.log_name}</Row>
-                            <Row label={__('Record')}>
+                            </DetailRow>
+                            <DetailRow label={__('Log')}>
+                                {activity.log_name}
+                            </DetailRow>
+                            <DetailRow label={__('Record')}>
                                 {activity.subject_type_label ? (
                                     activity.subject_url ? (
                                         <Link
@@ -95,9 +83,9 @@ export default function AuditShow({ activity }: { activity: AuditDetail }) {
                                 ) : (
                                     '—'
                                 )}
-                            </Row>
+                            </DetailRow>
                             {properties.map(([key, value]) => (
-                                <Row key={key} label={key}>
+                                <DetailRow key={key} label={key}>
                                     <Value
                                         value={
                                             typeof value === 'string'
@@ -105,7 +93,7 @@ export default function AuditShow({ activity }: { activity: AuditDetail }) {
                                                 : JSON.stringify(value)
                                         }
                                     />
-                                </Row>
+                                </DetailRow>
                             ))}
                         </dl>
                     </CardContent>

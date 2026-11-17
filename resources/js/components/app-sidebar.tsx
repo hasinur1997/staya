@@ -75,7 +75,7 @@ function NavLink({
     count: number | null;
 }) {
     const className = cn(
-        'relative flex h-11 items-center rounded-md text-ink-muted transition-[color,background-color] duration-150 hover:bg-surface-raised hover:text-ink',
+        'relative flex h-11 items-center rounded-md text-label text-ink-muted transition-[color,background-color] duration-150 hover:bg-surface-raised hover:text-ink',
         // 3px primary bar on the active item.
         'before:absolute before:inset-y-2 before:left-0 before:w-0.75 before:rounded-full',
         active && 'bg-primary-soft text-ink before:bg-primary',
@@ -114,7 +114,7 @@ function NavLink({
         <Link
             href={item.href}
             prefetch
-            className={cn(className, active && 'font-semibold')}
+            className={className}
             aria-current={active ? 'page' : undefined}
             aria-label={count ? accessibleName(item, count) : undefined}
         >

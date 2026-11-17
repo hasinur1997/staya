@@ -15,10 +15,10 @@ const EmptyState = () => {
     return (
         <div className="p-8 text-center">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-muted">
-                <KeyRound className="h-7 w-7 text-muted-foreground" />
+                <KeyRound className="h-7 w-7 text-ink-muted" />
             </div>
             <p className="font-medium">No passkeys yet</p>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-1 text-small text-ink-muted">
                 Add a passkey to sign in without a password
             </p>
         </div>

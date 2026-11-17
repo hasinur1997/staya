@@ -30,8 +30,8 @@
  */
 @theme inline {
     /* Hind Siliguri covers Bangla text and the ৳ sign. */
-    --font-sans: 'Roboto', 'Hind Siliguri', system-ui, sans-serif;
-    --font-display: 'Roboto', 'Hind Siliguri', system-ui, sans-serif;
+    --font-sans: 'Open Sans', 'Hind Siliguri', system-ui, sans-serif;
+    --font-display: 'Open Sans', 'Hind Siliguri', system-ui, sans-serif;
     --font-mono: 'Roboto Mono', ui-monospace, monospace;
 
     /*
@@ -310,6 +310,21 @@
 
     body {
         @apply bg-background font-sans text-body text-ink;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Headings never leave a lone word on the last line; paragraphs avoid orphans. */
+    h1,
+    h2,
+    h3,
+    h4 {
+        text-wrap: balance;
+    }
+
+    p {
+        text-wrap: pretty;
     }
 
     code,

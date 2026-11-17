@@ -1,4 +1,5 @@
 import { router } from '@inertiajs/react';
+import { DetailRow } from '@/components/detail-row';
 import { Download, Eye } from 'lucide-react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
@@ -17,12 +18,7 @@ import { update as updateSection } from '@/routes/members/sections';
 import type { MemberProfile } from '@/types';
 
 function Row({ label, children }: { label: string; children: ReactNode }) {
-    return (
-        <div className="flex flex-col gap-1 md:grid md:grid-cols-3 md:gap-4">
-            <dt className="text-small text-ink-muted">{label}</dt>
-            <dd className="text-ink md:col-span-2">{children || '—'}</dd>
-        </div>
-    );
+    return <DetailRow label={label}>{children || '—'}</DetailRow>;
 }
 
 function Field({

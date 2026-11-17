@@ -87,12 +87,12 @@ export default function Profile({
                             {mustVerifyEmail &&
                                 auth.user.email_verified_at === null && (
                                     <div>
-                                        <p className="-mt-4 text-sm text-muted-foreground">
+                                        <p className="-mt-4 text-small text-ink-muted">
                                             Your email address is unverified.{' '}
                                             <Link
                                                 href={send()}
                                                 as="button"
-                                                className="text-foreground underline decoration-border underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current!"
+                                                className="text-ink underline decoration-border underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current!"
                                             >
                                                 Click here to re-send the
                                                 verification email.
@@ -101,7 +101,7 @@ export default function Profile({
 
                                         {status ===
                                             'verification-link-sent' && (
-                                            <div className="mt-2 text-sm font-medium text-success">
+                                            <div className="mt-2 text-label text-success">
                                                 A new verification link has been
                                                 sent to your email address.
                                             </div>

@@ -42,7 +42,7 @@ function GridScanIcon() {
                         />
                     ))}
                 </div>
-                <ScanLine className="relative z-20 size-6 text-foreground" />
+                <ScanLine className="relative z-20 size-6 text-ink" />
             </div>
         </div>
     );
@@ -113,7 +113,7 @@ function TwoFactorSetupStep({
                                         type="text"
                                         readOnly
                                         value={manualSetupKey}
-                                        className="h-full w-full bg-background p-3 text-foreground outline-none"
+                                        className="h-full w-full bg-background p-3 text-ink outline-none"
                                     />
                                     <button
                                         onClick={() => copy(manualSetupKey)}

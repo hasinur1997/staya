@@ -1,7 +1,7 @@
 import { Head, Link, setLayoutProps } from '@inertiajs/react';
+import { DetailRow } from '@/components/detail-row';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import type { ReactNode } from 'react';
 import { AuditHistoryCard } from '@/components/audit-history-card';
 import { FormDialog } from '@/components/form-dialog';
 import { PurchaseStatusBadge } from '@/components/purchase-status-badge';
@@ -36,15 +36,6 @@ type Props = {
     serverNow: string;
     can: { viewAny: boolean; viewBuyer: boolean; viewPayables: boolean };
 };
-
-function Row({ label, children }: { label: string; children: ReactNode }) {
-    return (
-        <div className="flex flex-col gap-1 md:grid md:grid-cols-3 md:gap-4">
-            <dt className="text-small text-ink-muted">{label}</dt>
-            <dd className="text-ink md:col-span-2">{children}</dd>
-        </div>
-    );
-}
 
 function Amount({ label, value }: { label: string; value: string }) {
     return (
@@ -245,7 +236,7 @@ export default function GroceryShow({
                     </CardHeader>
                     <CardContent>
                         <dl className="flex flex-col gap-4">
-                            <Row label={__('Buyer')}>
+                            <DetailRow label={__('Buyer')}>
                                 {can.viewBuyer ? (
                                     <Link
                                         href={showMember(
@@ -258,17 +249,19 @@ export default function GroceryShow({
                                 ) : (
                                     purchase.buyer_name
                                 )}
-                            </Row>
-                            <Row label={__('Paid by')}>
+                            </DetailRow>
+                            <DetailRow label={__('Paid by')}>
                                 {purchase.paid_by_name}
-                            </Row>
-                            <Row label={__('Date bought')}>
+                            </DetailRow>
+                            <DetailRow label={__('Date bought')}>
                                 {formatBusinessDate(purchase.purchase_date)}
-                            </Row>
+                            </DetailRow>
                             {purchase.notes && (
-                                <Row label={__('Notes')}>{purchase.notes}</Row>
+                                <DetailRow label={__('Notes')}>
+                                    {purchase.notes}
+                                </DetailRow>
                             )}
-                            <Row label={__('Receipt')}>
+                            <DetailRow label={__('Receipt')}>
                                 {purchase.has_receipt ? (
                                     <a
                                         href={receipt.url(purchase.id)}
@@ -281,27 +274,27 @@ export default function GroceryShow({
                                 ) : (
                                     __('None')
                                 )}
-                            </Row>
-                            <Row label={__('Recorded')}>
+                            </DetailRow>
+                            <DetailRow label={__('Recorded')}>
                                 {by(purchase.created_at, purchase.created_by)}
-                            </Row>
+                            </DetailRow>
                             {purchase.updated_at && (
-                                <Row label={__('Last edited')}>
+                                <DetailRow label={__('Last edited')}>
                                     {by(
                                         purchase.updated_at,
                                         purchase.updated_by,
                                     )}
-                                </Row>
+                                </DetailRow>
                             )}
                             {purchase.voided_at && (
-                                <Row label={__('Deleted')}>
+                                <DetailRow label={__('Deleted')}>
                                     {by(purchase.voided_at, purchase.voided_by)}
-                                </Row>
+                                </DetailRow>
                             )}
                             {purchase.void_reason && (
-                                <Row label={__('Reason')}>
+                                <DetailRow label={__('Reason')}>
                                     {purchase.void_reason}
-                                </Row>
+                                </DetailRow>
                             )}
                         </dl>
                     </CardContent>

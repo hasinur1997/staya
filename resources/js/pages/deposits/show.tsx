@@ -1,7 +1,7 @@
 import { Head, Link, setLayoutProps, usePage } from '@inertiajs/react';
+import { DetailRow } from '@/components/detail-row';
 import { Check, RotateCcw, X } from 'lucide-react';
 import { useState } from 'react';
-import type { ReactNode } from 'react';
 import AlertError from '@/components/alert-error';
 import {
     DepositStatusBadge,
@@ -41,15 +41,6 @@ type Props = {
 };
 
 type OpenDialog = 'approve' | 'reject' | 'reverse' | 'cancel' | null;
-
-function Row({ label, children }: { label: string; children: ReactNode }) {
-    return (
-        <div className="flex flex-col gap-1 md:grid md:grid-cols-3 md:gap-4">
-            <dt className="text-small text-ink-muted">{label}</dt>
-            <dd className="text-ink md:col-span-2">{children}</dd>
-        </div>
-    );
-}
 
 export default function DepositsShow({ deposit, history, can }: Props) {
     const __ = useTranslate();
@@ -172,7 +163,7 @@ export default function DepositsShow({ deposit, history, can }: Props) {
                     </CardHeader>
                     <CardContent>
                         <dl className="flex flex-col gap-4">
-                            <Row label={__('Member')}>
+                            <DetailRow label={__('Member')}>
                                 {can.viewMember ? (
                                     <Link
                                         href={showMember(deposit.member_id)}
@@ -183,19 +174,19 @@ export default function DepositsShow({ deposit, history, can }: Props) {
                                 ) : (
                                     deposit.member_name
                                 )}
-                            </Row>
-                            <Row label={__('Amount')}>
+                            </DetailRow>
+                            <DetailRow label={__('Amount')}>
                                 <span className="tabular-nums">
                                     {formatMoney(deposit.amount)}
                                 </span>
-                            </Row>
-                            <Row label={__('Date paid')}>
+                            </DetailRow>
+                            <DetailRow label={__('Date paid')}>
                                 {formatBusinessDate(deposit.deposit_date)}
-                            </Row>
-                            <Row label={__('Method')}>
+                            </DetailRow>
+                            <DetailRow label={__('Method')}>
                                 {deposit.method_label}
-                            </Row>
-                            <Row label={__('Submitted')}>
+                            </DetailRow>
+                            <DetailRow label={__('Submitted')}>
                                 {deposit.submitted_at
                                     ? __(':time by :name', {
                                           time: formatDateTime(
@@ -204,9 +195,9 @@ export default function DepositsShow({ deposit, history, can }: Props) {
                                           name: deposit.submitted_by,
                                       })
                                     : deposit.submitted_by}
-                            </Row>
+                            </DetailRow>
                             {deposit.reviewed_at && deposit.reviewed_by && (
-                                <Row
+                                <DetailRow
                                     label={
                                         deposit.status === 'rejected'
                                             ? __('Rejected')
@@ -219,24 +210,28 @@ export default function DepositsShow({ deposit, history, can }: Props) {
                                         ),
                                         name: deposit.reviewed_by,
                                     })}
-                                </Row>
+                                </DetailRow>
                             )}
                             {deposit.cancelled_at && (
-                                <Row label={__('Cancelled')}>
+                                <DetailRow label={__('Cancelled')}>
                                     {formatDateTime(deposit.cancelled_at)}
-                                </Row>
+                                </DetailRow>
                             )}
                             {deposit.reversed_at && deposit.reversed_by && (
-                                <Row label={__('Reversed')}>
+                                <DetailRow label={__('Reversed')}>
                                     {__(':time by :name', {
                                         time: formatDateTime(
                                             deposit.reversed_at,
                                         ),
                                         name: deposit.reversed_by,
                                     })}
-                                </Row>
+                                </DetailRow>
                             )}
-                            {note && <Row label={__('Reason')}>{note}</Row>}
+                            {note && (
+                                <DetailRow label={__('Reason')}>
+                                    {note}
+                                </DetailRow>
+                            )}
                         </dl>
                     </CardContent>
                 </Card>

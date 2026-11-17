@@ -1,7 +1,7 @@
 import { router } from '@inertiajs/react';
+import { DetailRow } from '@/components/detail-row';
 import { Download, Eye } from 'lucide-react';
 import { useState } from 'react';
-import type { ReactNode } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,15 +10,6 @@ import { formatBusinessDate, formatDateTime } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
 import { nid as nidDownload, photo } from '@/routes/members';
 import type { MemberProfile } from '@/types';
-
-function Row({ label, children }: { label: string; children: ReactNode }) {
-    return (
-        <div className="flex flex-col gap-1 md:grid md:grid-cols-3 md:gap-4">
-            <dt className="text-small text-ink-muted">{label}</dt>
-            <dd className="text-ink md:col-span-2">{children}</dd>
-        </div>
-    );
-}
 
 /** Photo, name and contact details, for the aside of a member page. */
 export function MemberSummaryCard({ member }: { member: MemberProfile }) {
@@ -60,32 +51,38 @@ export function MemberDetailsCard({ member }: { member: MemberProfile }) {
             </CardHeader>
             <CardContent>
                 <dl className="flex flex-col gap-4">
-                    <Row label={__('Mobile number')}>{member.phone}</Row>
-                    <Row label={__('Email')}>{member.email}</Row>
-                    <Row label={__("Father's name")}>{member.father_name}</Row>
-                    <Row label={__("Mother's name")}>{member.mother_name}</Row>
-                    <Row label={__('Permanent address')}>
+                    <DetailRow label={__('Mobile number')}>
+                        {member.phone}
+                    </DetailRow>
+                    <DetailRow label={__('Email')}>{member.email}</DetailRow>
+                    <DetailRow label={__("Father's name")}>
+                        {member.father_name}
+                    </DetailRow>
+                    <DetailRow label={__("Mother's name")}>
+                        {member.mother_name}
+                    </DetailRow>
+                    <DetailRow label={__('Permanent address')}>
                         <span className="whitespace-pre-line">
                             {member.permanent_address}
                         </span>
-                    </Row>
+                    </DetailRow>
                     {member.registered_at && (
-                        <Row label={__('Registered')}>
+                        <DetailRow label={__('Registered')}>
                             {formatDateTime(member.registered_at)}
-                        </Row>
+                        </DetailRow>
                     )}
                     {member.reviewed_at && member.reviewed_by && (
-                        <Row label={__('Reviewed')}>
+                        <DetailRow label={__('Reviewed')}>
                             {__(':time by :name', {
                                 time: formatDateTime(member.reviewed_at),
                                 name: member.reviewed_by,
                             })}
-                        </Row>
+                        </DetailRow>
                     )}
                     {member.rejection_reason && (
-                        <Row label={__('Rejection reason')}>
+                        <DetailRow label={__('Rejection reason')}>
                             {member.rejection_reason}
-                        </Row>
+                        </DetailRow>
                     )}
                 </dl>
             </CardContent>
@@ -123,7 +120,7 @@ export function MemberNidCard({
             </CardHeader>
             <CardContent>
                 <dl className="flex flex-col gap-4">
-                    <Row label={__('NID number')}>
+                    <DetailRow label={__('NID number')}>
                         {nid ? (
                             <span className="font-mono tabular-nums">
                                 {nid}
@@ -139,8 +136,8 @@ export function MemberNidCard({
                                 {__('Show NID number')}
                             </Button>
                         )}
-                    </Row>
-                    <Row label={__('NID copy')}>
+                    </DetailRow>
+                    <DetailRow label={__('NID copy')}>
                         {member.has_nid_file ? (
                             <Button variant="outline" size="sm" asChild>
                                 <a href={nidDownload.url(member.id)}>
@@ -151,7 +148,7 @@ export function MemberNidCard({
                         ) : (
                             __('Not on file')
                         )}
-                    </Row>
+                    </DetailRow>
                 </dl>
                 <p className="mt-4 text-small text-ink-muted">
                     {__(

@@ -106,7 +106,7 @@ function MonthPicker({
                 }}
                 className={cn(
                   "hover:bg-surface-raised h-9 rounded-sm text-small transition-colors",
-                  active && "bg-primary text-on-primary hover:bg-primary-hover font-semibold"
+                  active && "bg-primary text-on-primary hover:bg-primary-hover font-medium"
                 )}
               >
                 {short.format(new Date(Date.UTC(year, month, 1)))}

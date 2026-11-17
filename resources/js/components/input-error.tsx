@@ -7,7 +7,7 @@ export default function InputError({
     ...props
 }: HTMLAttributes<HTMLParagraphElement> & { message?: string }) {
     return message ? (
-        <p {...props} className={cn('text-sm text-error', className)}>
+        <p {...props} className={cn('text-small text-error', className)}>
             {message}
         </p>
     ) : null;
