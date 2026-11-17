@@ -41,11 +41,17 @@ function Label({ className, children, required, ...props }: LabelProps) {
       )}
       {...props}
     >
-      {children}
-      {(required || detected) && (
-        <span className="ml-1 text-error" aria-hidden="true">
-          *
-        </span>
+      {props.asChild ? (
+        children
+      ) : (
+        <>
+          {children}
+          {(required || detected) && (
+            <span className="ml-1 text-error" aria-hidden="true">
+              *
+            </span>
+          )}
+        </>
       )}
     </LabelPrimitive.Root>
   )
