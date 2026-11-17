@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useInitials } from '@/hooks/use-initials';
 import { formatBusinessDate, formatDateTime } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
+import { localizedText } from '@/lib/locale';
 import { nid as nidDownload, photo } from '@/routes/members';
 import type { MemberProfile } from '@/types';
 
@@ -58,10 +59,16 @@ export function MemberDetailsCard({ member }: { member: MemberProfile }) {
                     </DetailRow>
                     <DetailRow label={__('Email')}>{member.email}</DetailRow>
                     <DetailRow label={__("Father's name")}>
-                        {member.father_name}
+                        {localizedText(
+                            member.father_name,
+                            member.father_name_bn,
+                        )}
                     </DetailRow>
                     <DetailRow label={__("Mother's name")}>
-                        {member.mother_name}
+                        {localizedText(
+                            member.mother_name,
+                            member.mother_name_bn,
+                        )}
                     </DetailRow>
                     <DetailRow label={__('Permanent address')}>
                         <span className="whitespace-pre-line">

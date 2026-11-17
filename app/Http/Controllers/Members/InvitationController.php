@@ -31,7 +31,7 @@ class InvitationController extends Controller
         $actor = $request->user();
 
         $invitations = MemberInvitation::query()
-            ->with(['inviter:id,name', 'member:id,first_name,last_name'])
+            ->with(['inviter:id,name', 'member:id,first_name,last_name,name_bn'])
             ->latest('id')
             ->paginate(25)
             ->through(function (MemberInvitation $invitation) use ($actor): array {

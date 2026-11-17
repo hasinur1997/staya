@@ -12,6 +12,7 @@ export type UserRow = {
 export type EditableUser = {
     id: number;
     name: string;
+    name_bn: string;
     email: string;
     is_active: boolean;
     last_login_at: string | null;

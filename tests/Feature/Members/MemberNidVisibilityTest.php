@@ -127,10 +127,13 @@ class MemberNidVisibilityTest extends TestCase
         $this->actingAs($admin)->put(route('members.update', $this->member), [
             'first_name' => $this->member->first_name,
             'last_name' => $this->member->last_name,
+            'name_bn' => $this->member->name_bn,
             'phone' => $this->member->phone,
             'nid_number' => '9876543210',
             'father_name' => $this->member->father_name,
+            'father_name_bn' => $this->member->father_name_bn,
             'mother_name' => $this->member->mother_name,
+            'mother_name_bn' => $this->member->mother_name_bn,
             'permanent_address' => $this->member->permanent_address,
             'email' => $this->member->user->email,
         ])->assertSessionHasNoErrors();

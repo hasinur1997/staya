@@ -26,7 +26,7 @@ Dark mode keeps the same slate family: background #0F172A, surface #1E293B, rais
 
 - **Display and Body Font**: Open Sans, regular (400) and medium (500) only, loaded from Google Fonts
 - **Code Font**: Roboto Mono
-- **Bangla and the ৳ sign**: Hind Siliguri as fallback
+- **Bangla and the ৳ sign**: Noto Sans Bengali as fallback
 
 Headings use Open Sans medium with slightly tight letter spacing (-0.01em). Body and UI text use regular; labels, subheads and buttons use medium. Money uses tabular figures.
 

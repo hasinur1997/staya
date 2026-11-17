@@ -77,7 +77,7 @@ class CalculateMonthlyReport
             ->orderBy('first_name')
             ->orderBy('last_name')
             ->orderBy('id')
-            ->get(['id', 'first_name', 'last_name']);
+            ->get(['id', 'first_name', 'last_name', 'name_bn']);
 
         $count = $members->count();
 

@@ -79,7 +79,9 @@ export function FormDialog({
                         <>
                             {field && (
                                 <div className="flex flex-col gap-2">
-                                    <Label htmlFor={id}>{field.label}</Label>
+                                    <Label htmlFor={id} required>
+                                        {field.label}
+                                    </Label>
                                     {field.type === 'date' ? (
                                         <DatePicker
                                             id={id}

@@ -15,11 +15,12 @@ class CreateUser
      *
      * @param  array<int, int>  $roleIds
      */
-    public function handle(string $name, string $email, string $password, array $roleIds): User
+    public function handle(string $name, string $nameBn, string $email, string $password, array $roleIds): User
     {
-        $user = DB::transaction(function () use ($name, $email, $password, $roleIds): User {
+        $user = DB::transaction(function () use ($name, $nameBn, $email, $password, $roleIds): User {
             $user = User::create([
                 'name' => $name,
+                'name_bn' => $nameBn,
                 'email' => $email,
                 'password' => $password,
             ]);

@@ -89,7 +89,7 @@ class RegistrationGateTest extends TestCase
             ->assertForbidden();
 
         $this->actingAs($member->user)
-            ->patch(route('profile.update'), ['name' => 'Taken over', 'email' => $member->user->email])
+            ->patch(route('profile.update'), ['name' => 'Taken over', 'name_bn' => 'নাম', 'email' => $member->user->email])
             ->assertRedirect(route('registration.status'));
 
         $this->assertNotSame('Taken over', $member->user->fresh()->name);

@@ -126,7 +126,7 @@ export default function MembersCreate({
                                     </div>
                                 ) : (
                                     <div className="flex flex-col gap-2">
-                                        <Label htmlFor="user_id">
+                                        <Label htmlFor="user_id" required>
                                             {__('User')}
                                         </Label>
                                         <Combobox
@@ -171,7 +171,7 @@ export default function MembersCreate({
                                     {__('Stay')}
                                 </legend>
                                 <div className="flex flex-col gap-2 md:w-1/2">
-                                    <Label htmlFor="joined_on">
+                                    <Label htmlFor="joined_on" required>
                                         {__('Joined on')}
                                     </Label>
                                     <DatePicker

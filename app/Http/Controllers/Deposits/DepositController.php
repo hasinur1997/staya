@@ -44,7 +44,7 @@ class DepositController extends Controller
         $month = preg_match('/^\d{4}-\d{2}$/', (string) $request->query('month')) === 1 ? (string) $request->query('month') : null;
 
         $deposits = Deposit::query()
-            ->with('member:id,first_name,last_name,user_id')
+            ->with('member:id,first_name,last_name,name_bn,user_id')
             ->when(! $viewAll, fn (Builder $query) => $query->where('member_id', $actor->member->id ?? 0))
             ->when($memberId, fn (Builder $query, int $memberId) => $query->where('member_id', $memberId))
             ->when($status, fn (Builder $query, DepositStatus $status) => $query->where('status', $status))
@@ -126,7 +126,7 @@ class DepositController extends Controller
         Gate::authorize('view', $deposit);
 
         $actor = $request->user();
-        $deposit->load(['member:id,first_name,last_name,user_id', 'submitter:id,name', 'reviewer:id,name', 'reverser:id,name']);
+        $deposit->load(['member:id,first_name,last_name,name_bn,user_id', 'submitter:id,name', 'reviewer:id,name', 'reverser:id,name']);
 
         return Inertia::render('deposits/show', [
             'history' => $this->auditHistory($deposit, $actor),

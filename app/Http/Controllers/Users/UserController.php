@@ -36,7 +36,7 @@ class UserController extends Controller
             ->get()
             ->map(fn (User $user) => [
                 'id' => $user->id,
-                'name' => $user->name,
+                'name' => $user->display_name,
                 'email' => $user->email,
                 'is_active' => $user->is_active,
                 'last_login_at' => $user->last_login_at?->toIso8601String(),
@@ -74,6 +74,7 @@ class UserController extends Controller
     {
         $user = $createUser->handle(
             $request->string('name')->toString(),
+            $request->string('name_bn')->toString(),
             $request->string('email')->toString(),
             $request->string('password')->toString(),
             $request->roleIds(),
@@ -97,6 +98,7 @@ class UserController extends Controller
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
+                'name_bn' => $user->name_bn,
                 'email' => $user->email,
                 'is_active' => $user->is_active,
                 'last_login_at' => $user->last_login_at?->toIso8601String(),
@@ -120,6 +122,7 @@ class UserController extends Controller
             $request->user(),
             $user,
             $request->string('name')->toString(),
+            $request->string('name_bn')->toString(),
             $request->string('email')->toString(),
             $request->roleIds(),
         );

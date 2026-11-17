@@ -94,6 +94,33 @@ class MemberManagementTest extends TestCase
         $this->assertSame([['joined_on' => '2026-10-01', 'left_on' => null]], $activity->attribute_changes['attributes']['stays']);
     }
 
+    public function test_bangla_and_english_names_are_required_for_the_member_and_parents()
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->post(route('members.store'), $this->newMember(['name_bn' => '', 'father_name_bn' => '', 'mother_name_bn' => '']))
+            ->assertSessionHasErrors(['name_bn', 'father_name_bn', 'mother_name_bn']);
+
+        $this->actingAs($admin)
+            ->post(route('members.store'), $this->newMember(['first_name' => '', 'father_name' => '', 'mother_name' => '']))
+            ->assertSessionHasErrors(['first_name', 'father_name', 'mother_name']);
+
+        $this->assertSame(0, Member::query()->count());
+    }
+
+    public function test_the_name_follows_the_language_on_screen()
+    {
+        $member = Member::factory()->create(['first_name' => 'Rahim', 'last_name' => 'Uddin', 'name_bn' => 'রহিম উদ্দিন']);
+
+        app()->setLocale('en');
+        $this->assertSame('Rahim Uddin', $member->full_name);
+
+        app()->setLocale('bn');
+        $this->assertSame('রহিম উদ্দিন', $member->full_name);
+        $this->assertSame('Rahim Uddin', $member->english_name);
+    }
+
     public function test_creating_a_member_requires_member_create()
     {
         $this->actingAs(User::factory()->withPermissions(Permission::MemberView)->create())

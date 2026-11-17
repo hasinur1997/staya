@@ -33,7 +33,7 @@ export default function Profile({
                 <Heading
                     variant="small"
                     title="Profile"
-                    description="Update your name and email address"
+                    description="Update your names and email address"
                 />
 
                 <Form
@@ -46,7 +46,27 @@ export default function Profile({
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
+                                <Label htmlFor="name_bn">Name (Bangla)</Label>
+
+                                <Input
+                                    id="name_bn"
+                                    className="mt-1 block w-full"
+                                    defaultValue={auth.user.name_bn}
+                                    name="name_bn"
+                                    lang="bn"
+                                    required
+                                    autoComplete="off"
+                                    placeholder="পূর্ণ নাম"
+                                />
+
+                                <InputError
+                                    className="mt-2"
+                                    message={errors.name_bn}
+                                />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="name">Name (English)</Label>
 
                                 <Input
                                     id="name"

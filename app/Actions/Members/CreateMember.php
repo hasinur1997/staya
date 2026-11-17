@@ -39,9 +39,9 @@ class CreateMember
 
                 if (isset($account['user_id'])) {
                     $user = User::query()->lockForUpdate()->findOrFail($account['user_id']);
-                    $user->forceFill(['name' => $name])->save();
+                    $user->forceFill(['name' => $name, 'name_bn' => ($details['name_bn'] ?? $name)])->save();
                 } else {
-                    $user = User::create(['name' => $name, 'email' => $account['email'], 'password' => $account['password']]);
+                    $user = User::create(['name' => $name, 'name_bn' => ($details['name_bn'] ?? $name), 'email' => $account['email'], 'password' => $account['password']]);
 
                     if ($account['verified'] ?? false) {
                         $user->forceFill(['email_verified_at' => now()])->save();

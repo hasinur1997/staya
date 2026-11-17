@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -22,6 +23,7 @@ use Spatie\Permission\Traits\HasRoles;
 /**
  * @property int $id
  * @property string $name
+ * @property string $name_bn
  * @property string $email
  * @property Carbon|null $email_verified_at
  * @property string $password
@@ -34,8 +36,9 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Member|null $member
+ * @property-read string $display_name
  */
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'name_bn', 'email', 'password'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {
@@ -66,6 +69,17 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             'last_login_at' => 'datetime',
             'two_factor_confirmed_at' => 'datetime',
         ];
+    }
+
+    /**
+     * The name in the language on screen: Bangla when the app is in Bangla
+     * and a Bangla name is set, otherwise the English name.
+     *
+     * @return Attribute<string, never>
+     */
+    protected function displayName(): Attribute
+    {
+        return Attribute::get(fn (): string => app()->getLocale() === 'bn' && $this->name_bn !== '' ? $this->name_bn : $this->name);
     }
 
     /**
@@ -127,6 +141,7 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     {
         return [
             'name' => $this->name,
+            'name_bn' => $this->name_bn,
             'email' => $this->email,
             'is_active' => $this->is_active,
             'roles' => $this->roles()->pluck('name')->sort()->values()->all(),

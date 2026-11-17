@@ -21,6 +21,11 @@ export function intlLocale(): string {
     return activeLocale === 'bn' ? 'bn-BD' : 'en-GB';
 }
 
+/** The Bangla text when the app is in Bangla and it is filled in, otherwise the English text. */
+export function localizedText(english: string, bangla?: string | null): string {
+    return activeLocale === 'bn' && bangla ? bangla : english;
+}
+
 const BANGLA_DIGITS = '০১২৩৪৫৬৭৮৯';
 
 /** 0 1 2 3 4 5 6 7 8 9 become ০ ১ ২ ৩ ৪ ৫ ৬ ৭ ৮ ৯. */

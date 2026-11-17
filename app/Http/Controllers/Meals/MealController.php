@@ -56,7 +56,7 @@ class MealController extends Controller
         $members = Member::query()
             ->whereHas('stays', fn (Builder $stays) => $stays->overlapping($date, $date))
             ->orderBy('first_name')->orderBy('last_name')->orderBy('id')
-            ->get(['id', 'first_name', 'last_name']);
+            ->get(['id', 'first_name', 'last_name', 'name_bn']);
 
         $month = $calculate->handle((int) substr($date, 0, 4), (int) substr($date, 5, 2));
 

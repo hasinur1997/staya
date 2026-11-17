@@ -25,7 +25,7 @@ class DepositQueueController extends Controller
         $actor = $request->user();
 
         $deposits = Deposit::query()
-            ->with('member:id,first_name,last_name,user_id')
+            ->with('member:id,first_name,last_name,name_bn,user_id')
             ->where('status', DepositStatus::Pending)
             ->orderBy('deposit_date')
             ->orderBy('id')

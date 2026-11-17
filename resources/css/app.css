@@ -29,9 +29,9 @@
  * var(--surface)), so a nested [data-theme] element re-themes its subtree.
  */
 @theme inline {
-    /* Hind Siliguri covers Bangla text and the ৳ sign. */
-    --font-sans: 'Open Sans', 'Hind Siliguri', system-ui, sans-serif;
-    --font-display: 'Open Sans', 'Hind Siliguri', system-ui, sans-serif;
+    /* Noto Sans Bengali covers Bangla text and the ৳ sign. */
+    --font-sans: 'Open Sans', 'Noto Sans Bengali', system-ui, sans-serif;
+    --font-display: 'Open Sans', 'Noto Sans Bengali', system-ui, sans-serif;
     --font-mono: 'Roboto Mono', ui-monospace, monospace;
 
     /*

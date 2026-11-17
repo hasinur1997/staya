@@ -30,10 +30,13 @@ trait MemberValidationRules
         return [
             'first_name' => ['required', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
+            'name_bn' => ['required', 'string', 'max:150'],
             'phone' => ['required', 'string', 'regex:/^(?:\+?88)?01[3-9]\d{8}$/'],
             'nid_number' => [...$nid, 'string', 'regex:/^(?:\d{10}|\d{13}|\d{17})$/', $this->uniqueNidRule($member)],
             'father_name' => ['required', 'string', 'max:150'],
+            'father_name_bn' => ['required', 'string', 'max:150'],
             'mother_name' => ['required', 'string', 'max:150'],
+            'mother_name_bn' => ['required', 'string', 'max:150'],
             'permanent_address' => ['required', 'string', 'max:1000'],
             'nid_file' => match (true) {
                 $member === null => ['required', ...$this->uploadRules(['pdf', 'jpg', 'jpeg', 'png'])],
@@ -84,7 +87,7 @@ trait MemberValidationRules
     {
         $details = [];
 
-        foreach (['first_name', 'last_name', 'phone', 'nid_number', 'father_name', 'mother_name', 'permanent_address'] as $field) {
+        foreach (['first_name', 'last_name', 'name_bn', 'phone', 'nid_number', 'father_name', 'father_name_bn', 'mother_name', 'mother_name_bn', 'permanent_address'] as $field) {
             if (array_key_exists($field, $validated)) {
                 $details[$field] = trim((string) $validated[$field]);
             }

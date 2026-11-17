@@ -39,7 +39,7 @@ class RecordDayMeals
         return DB::transaction(function () use ($actor, $date, $entries): int {
             $members = Member::query()
                 ->whereHas('stays', fn (Builder $stays) => $stays->overlapping($date, $date))
-                ->get(['id', 'first_name', 'last_name'])
+                ->get(['id', 'first_name', 'last_name', 'name_bn'])
                 ->keyBy('id');
             $types = MealType::query()->get()->keyBy('id');
             $saved = Meal::query()->where('meal_date', $date)->lockForUpdate()->get()

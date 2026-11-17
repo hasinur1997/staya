@@ -71,13 +71,13 @@ class DashboardController extends Controller
             ],
             'owed' => $member !== null ? $this->owedTo($member) : null,
             'recentDeposits' => $member !== null && $actor->can('viewAny', Deposit::class)
-                ? Deposit::query()->where('member_id', $member->id)->with('member:id,first_name,last_name,user_id')
+                ? Deposit::query()->where('member_id', $member->id)->with('member:id,first_name,last_name,name_bn,user_id')
                     ->latest('deposit_date')->latest('id')->limit(5)->get()
                     ->map(fn (Deposit $deposit): array => $this->depositRow($deposit, $actor))->all()
                 : [],
             'recentPurchases' => $member !== null && $actor->can('viewAny', GroceryPurchase::class)
                 ? GroceryPurchase::query()->active()->where('buyer_member_id', $member->id)
-                    ->with(['buyer:id,first_name,last_name,user_id', 'payer:id,first_name,last_name', 'items'])
+                    ->with(['buyer:id,first_name,last_name,name_bn,user_id', 'payer:id,first_name,last_name,name_bn', 'items'])
                     ->latest('purchase_date')->latest('id')->limit(5)->get()
                     ->map(fn (GroceryPurchase $purchase): array => $this->purchaseRow($purchase, $actor))->all()
                 : [],

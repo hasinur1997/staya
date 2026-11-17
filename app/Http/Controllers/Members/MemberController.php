@@ -57,6 +57,7 @@ class MemberController extends Controller
             ->when($search !== '', fn (Builder $query) => $query->where(fn (Builder $match) => $match
                 ->where('first_name', 'like', "%{$search}%")
                 ->orWhere('last_name', 'like', "%{$search}%")
+                ->orWhere('name_bn', 'like', "%{$search}%")
                 ->orWhere('phone', 'like', "%{$search}%")))
             ->orderBy('first_name')
             ->orderBy('last_name')
@@ -307,7 +308,7 @@ class MemberController extends Controller
         }
 
         return $member->deposits()
-            ->with('member:id,first_name,last_name,user_id')
+            ->with('member:id,first_name,last_name,name_bn,user_id')
             ->orderByDesc('deposit_date')
             ->orderByDesc('id')
             ->limit(20)
@@ -330,7 +331,7 @@ class MemberController extends Controller
 
         return $member->purchases()
             ->active()
-            ->with(['buyer:id,first_name,last_name,user_id', 'payer:id,first_name,last_name', 'items'])
+            ->with(['buyer:id,first_name,last_name,name_bn,user_id', 'payer:id,first_name,last_name,name_bn', 'items'])
             ->orderByDesc('purchase_date')
             ->orderByDesc('id')
             ->limit(20)

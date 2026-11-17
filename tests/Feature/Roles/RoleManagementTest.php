@@ -47,6 +47,7 @@ class RoleManagementTest extends TestCase
         $this->actingAs($admin)
             ->put(route('users.update', $auditor), [
                 'name' => $auditor->name,
+                'name_bn' => 'নাম',
                 'email' => $auditor->email,
                 'roles' => [Role::findByName('Auditor')->id],
             ])

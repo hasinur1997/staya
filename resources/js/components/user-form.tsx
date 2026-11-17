@@ -19,7 +19,7 @@ type Props = {
     cancelHref: NonNullable<InertiaLinkProps['href']>;
     submitLabel: string;
     roles: RoleOption[];
-    initial: { name: string; email: string; roles: number[] };
+    initial: { name: string; name_bn: string; email: string; roles: number[] };
     /** New accounts set a password; existing ones reset it by email. */
     passwordRules?: string;
     /** Set when roles can't be changed at all; they are then not sent. */
@@ -75,7 +75,28 @@ export function UserForm({
                         </legend>
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="flex flex-col gap-2">
-                                <Label htmlFor="name">{__('Name')}</Label>
+                                <Label htmlFor="name_bn">
+                                    {__('Name (Bangla)')}
+                                </Label>
+                                <Input
+                                    id="name_bn"
+                                    lang="bn"
+                                    value={form.data.name_bn}
+                                    onChange={(event) =>
+                                        form.setData(
+                                            'name_bn',
+                                            event.target.value,
+                                        )
+                                    }
+                                    autoComplete="off"
+                                    required
+                                />
+                                <InputError message={form.errors.name_bn} />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="name">
+                                    {__('Name (English)')}
+                                </Label>
                                 <Input
                                     id="name"
                                     value={form.data.name}

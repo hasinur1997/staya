@@ -26,7 +26,7 @@ export default function UsersCreate({ roles, passwordRules }: Props) {
                 cancelHref={index()}
                 submitLabel={__('Create user')}
                 roles={roles}
-                initial={{ name: '', email: '', roles: [] }}
+                initial={{ name: '', name_bn: '', email: '', roles: [] }}
                 passwordRules={passwordRules}
             />
         </>

@@ -69,6 +69,7 @@ function Field({
     help,
     error,
     className,
+    required,
     children,
 }: {
     id: string;
@@ -76,11 +77,14 @@ function Field({
     help?: string;
     error?: string;
     className?: string;
+    required?: boolean;
     children: ReactNode;
 }) {
     return (
         <div className={`flex flex-col gap-2 ${className ?? ''}`}>
-            <Label htmlFor={id}>{label}</Label>
+            <Label htmlFor={id} required={required}>
+                {label}
+            </Label>
             {children}
             {help && <p className="text-small text-ink-muted">{help}</p>}
             <InputError message={error} />
@@ -174,6 +178,7 @@ export function PurchaseFields({
                         <Field
                             id="purchase_date"
                             label={__('Date bought')}
+                            required
                             error={errors.purchase_date}
                         >
                             <DatePicker
@@ -189,6 +194,7 @@ export function PurchaseFields({
                             <Field
                                 id="buyer_member_id"
                                 label={__('Buyer')}
+                                required
                                 error={errors.buyer_member_id}
                             >
                                 <Combobox
@@ -209,7 +215,9 @@ export function PurchaseFields({
                     </div>
                     <div className="grid gap-4 md:grid-cols-2">
                         <div className="flex flex-col gap-2">
-                            <Label id="paid-by-label">{__('Paid by')}</Label>
+                            <Label id="paid-by-label" required>
+                                {__('Paid by')}
+                            </Label>
                             <input
                                 type="hidden"
                                 name="paid_by"
@@ -252,6 +260,7 @@ export function PurchaseFields({
                             <Field
                                 id="paid_by_member_id"
                                 label={__('Member who paid')}
+                                required
                                 error={errors.paid_by_member_id}
                             >
                                 <Combobox
@@ -403,6 +412,7 @@ export function PurchaseFields({
                                     <Field
                                         id={id('unit')}
                                         label={__('Unit')}
+                                        required
                                         error={error('unit')}
                                         className="md:col-span-2"
                                     >

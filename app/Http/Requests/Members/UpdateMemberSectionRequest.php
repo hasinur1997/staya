@@ -63,8 +63,8 @@ class UpdateMemberSectionRequest extends FormRequest
 
         $fields = match ($this->section()) {
             'images' => ['photo', 'banner', 'remove_banner', 'remove_photo'],
-            'personal' => ['first_name', 'last_name', 'phone', 'email'],
-            'family' => ['father_name', 'mother_name', 'permanent_address'],
+            'personal' => ['first_name', 'last_name', 'name_bn', 'phone', 'email'],
+            'family' => ['father_name', 'father_name_bn', 'mother_name', 'mother_name_bn', 'permanent_address'],
             default => ['nid_number', 'nid_file'],
         };
 

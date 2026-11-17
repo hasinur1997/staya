@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { formatDateTime } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
+import { localizedText } from '@/lib/locale';
 import { nid as nidDownload } from '@/routes/members';
 import { update as updateSection } from '@/routes/members/sections';
 import type { MemberProfile } from '@/types';
@@ -60,6 +61,19 @@ export function PersonalDetailsCard({
             })}
             fields={(errors) => (
                 <>
+                    <Field
+                        id="name_bn"
+                        label={__('Name (Bangla)')}
+                        error={errors.name_bn}
+                    >
+                        <Input
+                            id="name_bn"
+                            name="name_bn"
+                            defaultValue={member.name_bn}
+                            lang="bn"
+                            required
+                        />
+                    </Field>
                     <div className="grid gap-4 md:grid-cols-2">
                         <Field
                             id="first_name"
@@ -146,30 +160,58 @@ export function FamilyDetailsCard({ member, canEdit }: CardProps) {
             form={updateSection.form({ member: member.id, section: 'family' })}
             fields={(errors) => (
                 <>
-                    <Field
-                        id="father_name"
-                        label={__("Father's name")}
-                        error={errors.father_name}
-                    >
-                        <Input
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <Field
                             id="father_name"
-                            name="father_name"
-                            defaultValue={member.father_name}
-                            required
-                        />
-                    </Field>
-                    <Field
-                        id="mother_name"
-                        label={__("Mother's name")}
-                        error={errors.mother_name}
-                    >
-                        <Input
+                            label={__("Father's name (English)")}
+                            error={errors.father_name}
+                        >
+                            <Input
+                                id="father_name"
+                                name="father_name"
+                                defaultValue={member.father_name}
+                                required
+                            />
+                        </Field>
+                        <Field
+                            id="father_name_bn"
+                            label={__("Father's name (Bangla)")}
+                            error={errors.father_name_bn}
+                        >
+                            <Input
+                                id="father_name_bn"
+                                name="father_name_bn"
+                                defaultValue={member.father_name_bn}
+                                lang="bn"
+                                required
+                            />
+                        </Field>
+                        <Field
                             id="mother_name"
-                            name="mother_name"
-                            defaultValue={member.mother_name}
-                            required
-                        />
-                    </Field>
+                            label={__("Mother's name (English)")}
+                            error={errors.mother_name}
+                        >
+                            <Input
+                                id="mother_name"
+                                name="mother_name"
+                                defaultValue={member.mother_name}
+                                required
+                            />
+                        </Field>
+                        <Field
+                            id="mother_name_bn"
+                            label={__("Mother's name (Bangla)")}
+                            error={errors.mother_name_bn}
+                        >
+                            <Input
+                                id="mother_name_bn"
+                                name="mother_name_bn"
+                                defaultValue={member.mother_name_bn}
+                                lang="bn"
+                                required
+                            />
+                        </Field>
+                    </div>
                     <Field
                         id="permanent_address"
                         label={__('Permanent address')}
@@ -187,8 +229,12 @@ export function FamilyDetailsCard({ member, canEdit }: CardProps) {
             )}
         >
             <dl className="flex flex-col gap-4">
-                <Row label={__("Father's name")}>{member.father_name}</Row>
-                <Row label={__("Mother's name")}>{member.mother_name}</Row>
+                <Row label={__("Father's name")}>
+                    {localizedText(member.father_name, member.father_name_bn)}
+                </Row>
+                <Row label={__("Mother's name")}>
+                    {localizedText(member.mother_name, member.mother_name_bn)}
+                </Row>
                 <Row label={__('Permanent address')}>
                     <span className="whitespace-pre-line">
                         {member.permanent_address}

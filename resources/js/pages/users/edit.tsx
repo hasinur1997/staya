@@ -92,6 +92,7 @@ export default function UsersEdit({ user, roles, can }: Props) {
                 roles={roles}
                 initial={{
                     name: user.name,
+                    name_bn: user.name_bn,
                     email: user.email,
                     roles: user.role_ids,
                 }}

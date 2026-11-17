@@ -26,10 +26,13 @@ export type MemberProfile = {
     name: string;
     first_name: string;
     last_name: string;
+    name_bn: string;
     email: string;
     phone: string;
     father_name: string;
+    father_name_bn: string;
     mother_name: string;
+    mother_name_bn: string;
     permanent_address: string;
     status: MemberStatusValue;
     status_label: string;

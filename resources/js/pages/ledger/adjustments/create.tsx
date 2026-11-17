@@ -89,7 +89,7 @@ export default function AdjustmentsCreate({ today, fundStartDate }: Props) {
                                 {__('Adjustment')}
                             </legend>
                             <div className="flex flex-col gap-2">
-                                <Label id="direction-label">
+                                <Label id="direction-label" required>
                                     {__('Direction')}
                                 </Label>
                                 <ToggleGroup
@@ -139,6 +139,7 @@ export default function AdjustmentsCreate({ today, fundStartDate }: Props) {
                                 <Field
                                     id="entry_date"
                                     label={__('Date')}
+                                    required
                                     help={
                                         fundStartDate
                                             ? __('Between :start and today.', {
@@ -206,17 +207,21 @@ function Field({
     label,
     help,
     error,
+    required,
     children,
 }: {
     id: string;
     label: string;
     help?: string;
     error?: string;
+    required?: boolean;
     children: ReactNode;
 }) {
     return (
         <div className="flex flex-col gap-2">
-            <Label htmlFor={id}>{label}</Label>
+            <Label htmlFor={id} required={required}>
+                {label}
+            </Label>
             {children}
             {help && <p className="text-small text-ink-muted">{help}</p>}
             <InputError message={error} />

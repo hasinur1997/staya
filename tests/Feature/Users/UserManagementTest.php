@@ -44,6 +44,7 @@ class UserManagementTest extends TestCase
         $this->actingAs($admin)
             ->post(route('users.store'), [
                 'name' => 'Rahim Uddin',
+                'name_bn' => 'নাম',
                 'email' => 'rahim@example.com',
                 'password' => 'password',
                 'password_confirmation' => 'password',
@@ -68,6 +69,7 @@ class UserManagementTest extends TestCase
         $this->actingAs(User::factory()->withPermissions(Permission::UserView)->create())
             ->post(route('users.store'), [
                 'name' => 'Rahim Uddin',
+                'name_bn' => 'নাম',
                 'email' => 'rahim@example.com',
                 'password' => 'password',
                 'password_confirmation' => 'password',
@@ -85,6 +87,7 @@ class UserManagementTest extends TestCase
         $this->actingAs($actor)
             ->post(route('users.store'), [
                 'name' => 'Rahim Uddin',
+                'name_bn' => 'নাম',
                 'email' => 'rahim@example.com',
                 'password' => 'password',
                 'password_confirmation' => 'password',
@@ -103,6 +106,7 @@ class UserManagementTest extends TestCase
         $this->actingAs($actor)
             ->post(route('users.store'), [
                 'name' => 'Rahim Uddin',
+                'name_bn' => 'নাম',
                 'email' => 'rahim@example.com',
                 'password' => 'password',
                 'password_confirmation' => 'password',
@@ -121,6 +125,7 @@ class UserManagementTest extends TestCase
         $this->actingAs($admin)
             ->put(route('users.update', $admin), [
                 'name' => $admin->name,
+                'name_bn' => 'নাম',
                 'email' => $admin->email,
                 'roles' => [Role::findByName('Member')->id],
             ])
@@ -136,6 +141,7 @@ class UserManagementTest extends TestCase
         $this->actingAs($admin)
             ->put(route('users.update', $admin), [
                 'name' => 'New name',
+                'name_bn' => 'নাম',
                 'email' => $admin->email,
                 'roles' => [Role::admin()->id],
             ])
@@ -154,6 +160,7 @@ class UserManagementTest extends TestCase
         $this->actingAs($actor)
             ->put(route('users.update', $admin), [
                 'name' => $admin->name,
+                'name_bn' => 'নাম',
                 'email' => 'taken-over@example.com',
             ])
             ->assertForbidden();
@@ -169,6 +176,7 @@ class UserManagementTest extends TestCase
         $this->actingAs($admin)
             ->put(route('users.update', $user), [
                 'name' => 'New name',
+                'name_bn' => 'নাম',
                 'email' => $user->email,
                 'roles' => [Role::findByName('Member')->id],
             ])
@@ -191,6 +199,7 @@ class UserManagementTest extends TestCase
         $this->actingAs($actor)
             ->put(route('users.update', $admin), [
                 'name' => $admin->name,
+                'name_bn' => 'নাম',
                 'email' => $admin->email,
                 'roles' => [],
             ])
@@ -207,6 +216,7 @@ class UserManagementTest extends TestCase
         $this->actingAs($actor)
             ->put(route('users.update', $admin), [
                 'name' => $admin->name,
+                'name_bn' => 'নাম',
                 'email' => $admin->email,
                 'roles' => [],
             ])
@@ -224,11 +234,33 @@ class UserManagementTest extends TestCase
             ->withHeader('X-Inertia', 'true')
             ->put(route('users.update', $admin), [
                 'name' => $admin->name,
+                'name_bn' => 'নাম',
                 'email' => $admin->email,
                 'roles' => [],
             ])
             ->assertRedirect(route('users.edit', $admin));
 
         $this->assertTrue($admin->fresh()->hasRole('Admin'));
+    }
+
+    public function test_a_bangla_name_is_required_and_the_display_name_follows_the_language()
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->patch(route('profile.update'), ['name' => 'Rahim Uddin', 'name_bn' => '', 'email' => $admin->email])
+            ->assertSessionHasErrors('name_bn');
+
+        $this->actingAs($admin)
+            ->patch(route('profile.update'), ['name' => 'Rahim Uddin', 'name_bn' => 'রহিম উদ্দিন', 'email' => $admin->email])
+            ->assertSessionHasNoErrors();
+
+        $admin->refresh();
+
+        app()->setLocale('en');
+        $this->assertSame('Rahim Uddin', $admin->display_name);
+
+        app()->setLocale('bn');
+        $this->assertSame('রহিম উদ্দিন', $admin->display_name);
     }
 }

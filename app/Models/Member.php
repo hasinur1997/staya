@@ -27,11 +27,14 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int $user_id
  * @property string $first_name
  * @property string $last_name
+ * @property string $name_bn
  * @property string $phone
  * @property string $nid_number
  * @property string $nid_number_hash
  * @property string $father_name
+ * @property string $father_name_bn
  * @property string $mother_name
+ * @property string $mother_name_bn
  * @property string $permanent_address
  * @property string $nid_file_path
  * @property string|null $photo_path
@@ -43,15 +46,19 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  * @property-read string $full_name
+ * @property-read string $english_name
  */
 #[Fillable([
     'user_id',
     'first_name',
     'last_name',
+    'name_bn',
     'phone',
     'nid_number',
     'father_name',
+    'father_name_bn',
     'mother_name',
+    'mother_name_bn',
     'permanent_address',
     'nid_file_path',
     'photo_path',
@@ -171,11 +178,27 @@ class Member extends Model
     }
 
     /**
-     * "First Last", which `users.name` is kept in sync with.
+     * The name in the language on screen: the Bangla name when the app is in
+     * Bangla, otherwise "First Last". Falls back to English when the Bangla
+     * name was not loaded or is empty.
      *
      * @return Attribute<string, never>
      */
     protected function fullName(): Attribute
+    {
+        return Attribute::get(function (): string {
+            $bangla = trim((string) ($this->attributes['name_bn'] ?? ''));
+
+            return app()->getLocale() === 'bn' && $bangla !== '' ? $bangla : $this->english_name;
+        });
+    }
+
+    /**
+     * "First Last", which `users.name` is kept in sync with.
+     *
+     * @return Attribute<string, never>
+     */
+    protected function englishName(): Attribute
     {
         return Attribute::get(fn (): string => trim($this->first_name.' '.$this->last_name));
     }
@@ -230,10 +253,13 @@ class Member extends Model
         return [
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
+            'name_bn' => $this->name_bn,
             'email' => $this->user->email,
             'phone' => $this->phone,
             'father_name' => $this->father_name,
+            'father_name_bn' => $this->father_name_bn,
             'mother_name' => $this->mother_name,
+            'mother_name_bn' => $this->mother_name_bn,
             'permanent_address' => $this->permanent_address,
             'nid_number' => '[hidden]',
             'nid_file' => $this->nid_file_path !== '' ? 'on file' : null,

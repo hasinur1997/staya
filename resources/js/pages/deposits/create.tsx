@@ -78,7 +78,7 @@ export default function DepositsCreate({
 
                                 {can.createForOthers && (
                                     <div className="flex flex-col gap-2">
-                                        <Label htmlFor="member_id">
+                                        <Label htmlFor="member_id" required>
                                             {__('Member')}
                                         </Label>
                                         <Combobox
@@ -125,7 +125,7 @@ export default function DepositsCreate({
                                         <InputError message={errors.amount} />
                                     </div>
                                     <div className="flex flex-col gap-2">
-                                        <Label htmlFor="deposit_date">
+                                        <Label htmlFor="deposit_date" required>
                                             {__('Date paid')}
                                         </Label>
                                         <DatePicker

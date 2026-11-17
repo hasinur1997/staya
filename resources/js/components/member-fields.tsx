@@ -17,9 +17,12 @@ type Props = {
         MemberProfile,
         | 'first_name'
         | 'last_name'
+        | 'name_bn'
         | 'phone'
         | 'father_name'
+        | 'father_name_bn'
         | 'mother_name'
+        | 'mother_name_bn'
         | 'permanent_address'
     > &
         Partial<Pick<MemberProfile, 'id' | 'has_photo' | 'media_version'>>;
@@ -92,6 +95,19 @@ export function MemberFields({
     return (
         <>
             <Group legend={__('Personal details')} asCard={asCards}>
+                <Field
+                    id="name_bn"
+                    label={__('Name (Bangla)')}
+                    error={errors.name_bn}
+                >
+                    <Input
+                        id="name_bn"
+                        name="name_bn"
+                        defaultValue={member?.name_bn}
+                        lang="bn"
+                        required
+                    />
+                </Field>
                 <div className="grid gap-4 md:grid-cols-2">
                     <Field
                         id="first_name"
@@ -161,7 +177,7 @@ export function MemberFields({
                 <div className="grid gap-4 md:grid-cols-2">
                     <Field
                         id="father_name"
-                        label={__("Father's name")}
+                        label={__("Father's name (English)")}
                         error={errors.father_name}
                     >
                         <Input
@@ -172,14 +188,40 @@ export function MemberFields({
                         />
                     </Field>
                     <Field
+                        id="father_name_bn"
+                        label={__("Father's name (Bangla)")}
+                        error={errors.father_name_bn}
+                    >
+                        <Input
+                            id="father_name_bn"
+                            name="father_name_bn"
+                            defaultValue={member?.father_name_bn}
+                            lang="bn"
+                            required
+                        />
+                    </Field>
+                    <Field
                         id="mother_name"
-                        label={__("Mother's name")}
+                        label={__("Mother's name (English)")}
                         error={errors.mother_name}
                     >
                         <Input
                             id="mother_name"
                             name="mother_name"
                             defaultValue={member?.mother_name}
+                            required
+                        />
+                    </Field>
+                    <Field
+                        id="mother_name_bn"
+                        label={__("Mother's name (Bangla)")}
+                        error={errors.mother_name_bn}
+                    >
+                        <Input
+                            id="mother_name_bn"
+                            name="mother_name_bn"
+                            defaultValue={member?.mother_name_bn}
+                            lang="bn"
                             required
                         />
                     </Field>

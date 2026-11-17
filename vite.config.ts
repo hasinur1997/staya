@@ -19,8 +19,8 @@ export default defineConfig({
                 google('Roboto Mono', {
                     weights: [400],
                 }),
-                google('Hind Siliguri', {
-                    weights: [400, 600],
+                google('Noto Sans Bengali', {
+                    weights: [400, 500],
                     subsets: ['latin', 'bengali'],
                 }),
             ],

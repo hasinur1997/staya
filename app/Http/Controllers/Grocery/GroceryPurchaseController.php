@@ -58,7 +58,7 @@ class GroceryPurchaseController extends Controller
         }
 
         $purchases = $query
-            ->with(['buyer:id,first_name,last_name,user_id', 'payer:id,first_name,last_name', 'items'])
+            ->with(['buyer:id,first_name,last_name,name_bn,user_id', 'payer:id,first_name,last_name,name_bn', 'items'])
             ->orderByDesc('purchase_date')
             ->orderByDesc('id')
             ->paginate(50)
@@ -133,7 +133,7 @@ class GroceryPurchaseController extends Controller
         Gate::authorize('view', $purchase);
 
         $actor = $request->user();
-        $purchase->load(['buyer:id,first_name,last_name,user_id', 'payer:id,first_name,last_name', 'items', 'payable.member:id,first_name,last_name', 'creator:id,name', 'updater:id,name', 'voider:id,name']);
+        $purchase->load(['buyer:id,first_name,last_name,name_bn,user_id', 'payer:id,first_name,last_name,name_bn', 'items', 'payable.member:id,first_name,last_name,name_bn', 'creator:id,name', 'updater:id,name', 'voider:id,name']);
 
         return Inertia::render('grocery/show', [
             'purchase' => $this->purchaseDetail($purchase, $actor),
@@ -155,7 +155,7 @@ class GroceryPurchaseController extends Controller
         Gate::authorize('update', $purchase);
 
         $actor = $request->user();
-        $purchase->load(['buyer:id,first_name,last_name,user_id', 'payer:id,first_name,last_name', 'items', 'payable.member:id,first_name,last_name', 'creator:id,name', 'updater:id,name', 'voider:id,name']);
+        $purchase->load(['buyer:id,first_name,last_name,name_bn,user_id', 'payer:id,first_name,last_name,name_bn', 'items', 'payable.member:id,first_name,last_name,name_bn', 'creator:id,name', 'updater:id,name', 'voider:id,name']);
         $changeBuyer = $actor->can('createForOthers', GroceryPurchase::class);
 
         return Inertia::render('grocery/edit', [

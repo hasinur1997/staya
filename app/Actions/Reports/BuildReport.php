@@ -93,7 +93,7 @@ class BuildReport
     private function selfApproved(string $from, string $to): array
     {
         return Deposit::query()
-            ->with('member:id,first_name,last_name')
+            ->with('member:id,first_name,last_name,name_bn')
             ->where('status', DepositStatus::Approved)
             ->where('is_self_approved', true)
             ->whereBetween('deposit_date', [$from, $to])

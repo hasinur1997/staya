@@ -58,6 +58,7 @@ class MemberProfileTest extends TestCase
         $this->patchSection($editor, 'personal', [
             'first_name' => 'Karim',
             'last_name' => 'Hossain',
+            'name_bn' => 'করিম হোসেন',
             'phone' => '01812-345678',
             'email' => $this->member->user->email,
         ])->assertRedirect();
@@ -74,7 +75,9 @@ class MemberProfileTest extends TestCase
 
         $this->patchSection($this->editor(), 'family', [
             'father_name' => 'New Father',
+            'father_name_bn' => 'নতুন পিতা',
             'mother_name' => 'New Mother',
+            'mother_name_bn' => 'নতুন মাতা',
             'permanent_address' => 'New address',
             'phone' => '01999999999',
         ])->assertRedirect();
@@ -88,12 +91,12 @@ class MemberProfileTest extends TestCase
     public function test_a_card_cannot_be_saved_without_member_update()
     {
         $this->patchSection(User::factory()->withPermissions(Permission::MemberView)->create(), 'family', [
-            'father_name' => 'X', 'mother_name' => 'Y', 'permanent_address' => 'Z',
+            'father_name' => 'X', 'father_name_bn' => 'এক্স', 'mother_name' => 'Y', 'mother_name_bn' => 'ওয়াই', 'permanent_address' => 'Z',
         ])->assertForbidden();
 
         // A member cannot edit their own profile either.
         $this->patchSection($this->member->user, 'family', [
-            'father_name' => 'X', 'mother_name' => 'Y', 'permanent_address' => 'Z',
+            'father_name' => 'X', 'father_name_bn' => 'এক্স', 'mother_name' => 'Y', 'mother_name_bn' => 'ওয়াই', 'permanent_address' => 'Z',
         ])->assertForbidden();
 
         $this->assertNotSame('X', $this->member->refresh()->father_name);
@@ -102,11 +105,11 @@ class MemberProfileTest extends TestCase
     public function test_changing_the_email_needs_the_right_to_edit_the_account()
     {
         $this->patchSection($this->editor(), 'personal', [
-            'first_name' => 'A', 'last_name' => 'B', 'phone' => '01712345678', 'email' => 'new@example.com',
+            'first_name' => 'A', 'last_name' => 'B', 'name_bn' => 'এ বি', 'phone' => '01712345678', 'email' => 'new@example.com',
         ])->assertForbidden();
 
         $this->patchSection(User::factory()->admin()->create(), 'personal', [
-            'first_name' => 'A', 'last_name' => 'B', 'phone' => '01712345678', 'email' => 'new@example.com',
+            'first_name' => 'A', 'last_name' => 'B', 'name_bn' => 'এ বি', 'phone' => '01712345678', 'email' => 'new@example.com',
         ])->assertRedirect();
 
         $this->assertSame('new@example.com', $this->member->user->refresh()->email);

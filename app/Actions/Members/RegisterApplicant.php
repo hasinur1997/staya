@@ -30,6 +30,7 @@ class RegisterApplicant
             return DB::transaction(function () use ($details, $email, $password, $nidPath, $photoPath): User {
                 $user = User::create([
                     'name' => trim($details['first_name'].' '.$details['last_name']),
+                    'name_bn' => $details['name_bn'],
                     'email' => $email,
                     'password' => $password,
                 ]);

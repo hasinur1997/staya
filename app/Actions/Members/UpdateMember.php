@@ -52,7 +52,7 @@ class UpdateMember
                 $member->save();
 
                 $user = $member->user;
-                $user->fill(['name' => $member->full_name, 'email' => $email]);
+                $user->fill(['name' => $member->english_name, 'name_bn' => $member->name_bn, 'email' => $email]);
 
                 if ($user->isDirty('email')) {
                     $user->email_verified_at = null;

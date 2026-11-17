@@ -163,6 +163,7 @@ export default function MessSettingsEdit({
                     <Field
                         id="fund_start_date"
                         label={__('Fund start date')}
+                        required
                         help={
                             can.changeOpeningBalance
                                 ? __(
@@ -350,17 +351,21 @@ function Field({
     label,
     help,
     error,
+    required,
     children,
 }: {
     id: string;
     label: string;
     help?: string;
     error?: string;
+    required?: boolean;
     children: ReactNode;
 }) {
     return (
         <div className="flex flex-col gap-2">
-            <Label htmlFor={id}>{label}</Label>
+            <Label htmlFor={id} required={required}>
+                {label}
+            </Label>
             {children}
             {help && <p className="text-small text-ink-muted">{help}</p>}
             <InputError message={error} />
