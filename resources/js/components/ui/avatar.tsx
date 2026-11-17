@@ -1,4 +1,5 @@
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
+import { UserIcon } from "lucide-react"
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
@@ -32,8 +33,10 @@ function AvatarImage({
   )
 }
 
+/** Shown when there is no picture: the default user icon, unless given other content. */
 function AvatarFallback({
   className,
+  children,
   ...props
 }: React.ComponentProps<typeof AvatarPrimitive.Fallback>) {
   return (
@@ -44,7 +47,9 @@ function AvatarFallback({
         className
       )}
       {...props}
-    />
+    >
+      {children ?? <UserIcon className="size-1/2" aria-hidden="true" />}
+    </AvatarPrimitive.Fallback>
   )
 }
 

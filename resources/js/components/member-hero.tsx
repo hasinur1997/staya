@@ -9,7 +9,6 @@ import { MoreMenu } from '@/components/page-header';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useImageDrop } from '@/hooks/use-image-drop';
-import { useInitials } from '@/hooks/use-initials';
 import { formatBusinessDate } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
@@ -31,7 +30,6 @@ type Props = {
  */
 export function MemberHero({ member, canEdit, actions, menuActions }: Props) {
     const __ = useTranslate();
-    const getInitials = useInitials();
     const currentStay = member.stays.find((stay) => stay.left_on === null);
     const version = member.media_version ?? undefined;
 
@@ -127,9 +125,7 @@ export function MemberHero({ member, canEdit, actions, menuActions }: Props) {
                                 })}
                             />
                         )}
-                        <AvatarFallback className="text-heading">
-                            {getInitials(member.name)}
-                        </AvatarFallback>
+                        <AvatarFallback />
                     </Avatar>
                     {canEdit && (
                         <Button

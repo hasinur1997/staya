@@ -26,7 +26,6 @@ import {
 import { SheetTrigger } from '@/components/ui/sheet';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useCan } from '@/hooks/use-can';
-import { useInitials } from '@/hooks/use-initials';
 import { useTranslate } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { appNavigation, navCount, visibleNavigation } from '@/lib/navigation';
@@ -148,7 +147,6 @@ function WaitingMenu() {
 
 function UserMenu() {
     const { user } = usePage().props.auth;
-    const getInitials = useInitials();
 
     return (
         <DropdownMenu>
@@ -161,9 +159,7 @@ function UserMenu() {
                 >
                     <Avatar className="size-8">
                         <AvatarImage src={user.avatar} alt="" />
-                        <AvatarFallback className="bg-primary-soft text-caption text-ink">
-                            {getInitials(user.name)}
-                        </AvatarFallback>
+                        <AvatarFallback className="bg-primary-soft text-ink" />
                     </Avatar>
                 </Button>
             </DropdownMenuTrigger>

@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useInitials } from '@/hooks/use-initials';
 import { formatBusinessDate, formatDateTime } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
 import { localizedText } from '@/lib/locale';
@@ -15,7 +14,6 @@ import type { MemberProfile } from '@/types';
 /** Photo, name and contact details, for the aside of a member page. */
 export function MemberSummaryCard({ member }: { member: MemberProfile }) {
     const __ = useTranslate();
-    const getInitials = useInitials();
 
     return (
         <Card>
@@ -27,9 +25,7 @@ export function MemberSummaryCard({ member }: { member: MemberProfile }) {
                             alt={__('Photo of :name', { name: member.name })}
                         />
                     )}
-                    <AvatarFallback className="text-title">
-                        {getInitials(member.name)}
-                    </AvatarFallback>
+                    <AvatarFallback />
                 </Avatar>
                 <div className="flex flex-col gap-1">
                     <p className="text-title text-ink capitalize">
