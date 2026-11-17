@@ -216,7 +216,7 @@ php artisan wayfinder:generate --with-form
 
 ## Deployment to cPanel
 
-Every push to `main` that passes the `tests` workflow is deployed automatically by `.github/workflows/deploy.yml`. You can also run it by hand from the Actions tab (**deploy** → **Run workflow**).
+Every push to `main` is deployed automatically by `.github/workflows/deploy.yml`. You can also run it by hand from the Actions tab (**deploy** → **Run workflow**).
 
 The server never installs or compiles anything. GitHub Actions installs the production Composer dependencies, builds the frontend, and sends the result over SSH with `rsync`. Only files whose content changed are uploaded, so a normal deploy moves a few hundred KB and takes about a minute, most of it spent building in CI. Then `deploy/post-deploy.sh` runs on the server: maintenance mode on, `migrate --force`, rebuild the caches, restart the queue worker, maintenance mode off.
 
@@ -308,7 +308,7 @@ Re-run the **deploy** workflow from the last good commit (**Run workflow**, choo
 
 ### If a deploy fails
 
-- The tests must pass first. A red `tests` run means no deploy starts.
+- The deploy does not wait for the `tests` workflow; both start on every push. Check that `tests` is green, or protect `main` with a required status check, so a broken commit is not deployed.
 - If `migrate` fails, the site stays in maintenance mode on purpose, because the new code is live but the database is not ready for it. Fix the cause, then run `bash deploy/post-deploy.sh` on the server (with `PHP_BIN` set) or re-run the workflow.
 - `permission denied (publickey)`: the public key is not authorised in cPanel, or `SSH_PRIVATE_KEY` is missing its final newline or has extra characters.
 - `Host key verification failed`: `SSH_KNOWN_HOSTS` was made for a different host or port.
