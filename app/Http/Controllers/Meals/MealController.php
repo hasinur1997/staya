@@ -12,10 +12,12 @@ use App\Models\Meal;
 use App\Models\MealType;
 use App\Models\Member;
 use App\Models\MonthClosure;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -80,6 +82,7 @@ class MealController extends Controller
                 'record' => $actor->can('record', Meal::class),
                 'viewOwn' => $actor->can('viewOwn', Meal::class),
                 'manageTypes' => $actor->can('viewAny', MealType::class),
+                'viewSheet' => $actor->can('viewAll', Meal::class),
             ],
         ]);
     }
@@ -135,6 +138,73 @@ class MealController extends Controller
                 'split' => $report->split->value,
                 'share' => $row['share'] ?? '0.00',
             ],
+        ]);
+    }
+
+    /**
+     * The monthly meal sheet: one row per member, one column per day, with
+     * row and column totals. Optionally limited to one meal type.
+     */
+    public function sheet(Request $request, CalculateMonthlyReport $calculate): Response
+    {
+        Gate::authorize('viewAll', Meal::class);
+
+        $request->validate([
+            'month' => ['nullable', 'date_format:Y-m'],
+            'type' => ['nullable', 'integer', Rule::exists(MealType::class, 'id')],
+        ]);
+
+        $current = BusinessCalendar::today()->format('Y-m');
+        $month = min($request->string('month')->toString() ?: $current, $current);
+        $year = (int) substr($month, 0, 4);
+        $number = (int) substr($month, 5, 2);
+        [$first, $last] = BusinessCalendar::monthDates($year, $number);
+        $typeId = $request->filled('type') ? $request->integer('type') : null;
+
+        $perMember = [];
+        $perDay = [];
+        $grand = 0;
+
+        $query = Meal::query()->whereBetween('meal_date', [$first, $last])
+            ->when($typeId, fn (Builder $meals, int $id) => $meals->where('meal_type_id', $id));
+
+        foreach ($query->get(['member_id', 'meal_date', 'count']) as $meal) {
+            $day = (int) $meal->meal_date->format('j');
+            $perMember[$meal->member_id][$day] = ($perMember[$meal->member_id][$day] ?? 0) + $meal->count;
+            $perDay[$day] = ($perDay[$day] ?? 0) + $meal->count;
+            $grand += $meal->count;
+        }
+
+        $report = $calculate->handle($year, $number);
+        $daysInMonth = (int) substr($last, 8, 2);
+
+        return Inertia::render('meals/sheet', [
+            'month' => $month,
+            'currentMonth' => $current,
+            'typeId' => $typeId,
+            'types' => MealType::query()->ordered()->get(['id', 'name'])->map(fn (MealType $type): array => ['id' => $type->id, 'name' => $type->name])->all(),
+            'days' => array_map(fn (int $day): array => [
+                'day' => $day,
+                'weekday' => CarbonImmutable::create($year, $number, $day)->dayOfWeek,
+                'total' => $perDay[$day] ?? 0,
+            ], range(1, $daysInMonth)),
+            'rows' => array_map(fn (array $row): array => [
+                'member_id' => $row['member_id'],
+                'name' => $row['name'],
+                'counts' => (object) ($perMember[$row['member_id']] ?? []),
+                'total' => array_sum($perMember[$row['member_id']] ?? []),
+                // Cost is of all meals, so it is left out when one type is shown.
+                'cost' => $typeId === null && $report->totalMeals > 0
+                    ? bcdiv(bcmul(Money::numeric($report->expenses), (string) $row['meals'], 2), (string) $report->totalMeals, 2)
+                    : null,
+            ], $report->members),
+            'total' => $grand,
+            'figures' => [
+                'expenses' => $report->expenses,
+                'total_meals' => $report->totalMeals,
+                'rate' => $report->totalMeals > 0 ? bcdiv(Money::numeric($report->expenses), (string) $report->totalMeals, 2) : null,
+            ],
+            'can' => ['record' => $request->user()->can('record', Meal::class)],
         ]);
     }
 }

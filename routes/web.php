@@ -60,6 +60,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Meal types are switched off, never deleted.
     Route::get('meals', [MealController::class, 'index'])->name('meals.index');
     Route::post('meals', [MealController::class, 'store'])->name('meals.store');
+    Route::get('meals/sheet', [MealController::class, 'sheet'])->name('meals.sheet');
     Route::get('meals/mine', [MealController::class, 'mine'])->name('meals.mine');
     Route::get('meals/types', [MealTypeController::class, 'index'])->name('meal-types.index');
     Route::post('meals/types', [MealTypeController::class, 'store'])->name('meal-types.store');

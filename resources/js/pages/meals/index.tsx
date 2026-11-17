@@ -1,5 +1,5 @@
 import { Head, router, setLayoutProps, useForm } from '@inertiajs/react';
-import { Settings2, User } from 'lucide-react';
+import { Settings2, Table2, User } from 'lucide-react';
 import type { FormEvent } from 'react';
 import InputError from '@/components/input-error';
 import { DetailTemplate } from '@/components/templates/detail-template';
@@ -14,7 +14,7 @@ import { formatBusinessDate, formatMonth } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { dashboard } from '@/routes';
-import { index, mine, store } from '@/routes/meals';
+import { index, mine, sheet, store } from '@/routes/meals';
 import { index as mealTypes } from '@/routes/meal-types';
 import type { MealDayMember, MealMonthFigures, MealTypeOption } from '@/types';
 
@@ -27,7 +27,12 @@ type Props = {
     month: MealMonthFigures;
     monthClosed: boolean;
     maxPerType: number;
-    can: { record: boolean; viewOwn: boolean; manageTypes: boolean };
+    can: {
+        record: boolean;
+        viewOwn: boolean;
+        manageTypes: boolean;
+        viewSheet: boolean;
+    };
 };
 
 export default function MealsIndex(props: Props) {
@@ -310,6 +315,9 @@ function MealsDay({
         secondaryActions: [
             ...(can.viewOwn
                 ? [{ label: __('My meals'), href: mine(), icon: User }]
+                : []),
+            ...(can.viewSheet
+                ? [{ label: __('Monthly sheet'), href: sheet(), icon: Table2 }]
                 : []),
             ...(can.manageTypes
                 ? [

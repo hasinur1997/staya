@@ -15,6 +15,18 @@ export type MealMonthFigures = {
     split: 'equal' | 'meals';
 };
 
+export type MealSheetDay = { day: number; weekday: number; total: number };
+
+export type MealSheetRow = {
+    member_id: number;
+    name: string;
+    /** Day of month to meals that day; missing means none. */
+    counts: Record<string, number>;
+    total: number;
+    /** Money; null when a single meal type is shown. */
+    cost: string | null;
+};
+
 export type MealType = {
     id: number;
     name: string;
