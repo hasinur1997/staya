@@ -29,6 +29,8 @@ export type ResponsiveCard = {
     value?: ReactNode;
     status?: ReactNode;
     meta?: ReactNode[];
+    /** Buttons under the card; kept out of the row link. */
+    actions?: ReactNode;
 };
 
 type Props<T> = {
@@ -118,7 +120,13 @@ export function ResponsiveTable<T>({
                 aria-label={caption}
             >
                 {rows.map((row) => {
-                    const { title, value, status, meta = [] } = card(row);
+                    const {
+                        title,
+                        value,
+                        status,
+                        meta = [],
+                        actions,
+                    } = card(row);
                     const body = (
                         <Card className="min-h-11 gap-1 px-4 transition-shadow duration-150 hover:shadow-card">
                             <div className="flex items-baseline justify-between gap-3">
@@ -142,6 +150,11 @@ export function ResponsiveTable<T>({
                                             {item}
                                         </span>
                                     ))}
+                                </div>
+                            )}
+                            {actions && (
+                                <div className="flex justify-end pt-2">
+                                    {actions}
                                 </div>
                             )}
                         </Card>

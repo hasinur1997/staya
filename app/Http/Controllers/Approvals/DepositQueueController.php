@@ -30,7 +30,10 @@ class DepositQueueController extends Controller
             ->orderBy('deposit_date')
             ->orderBy('id')
             ->get()
-            ->map(fn (Deposit $deposit) => $this->depositRow($deposit, $actor));
+            ->map(fn (Deposit $deposit) => [
+                ...$this->depositRow($deposit, $actor),
+                'can_approve' => $actor->can('approve', $deposit),
+            ]);
 
         return Inertia::render('approvals/deposits/index', [
             'deposits' => $deposits,

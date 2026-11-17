@@ -10,6 +10,7 @@ use App\Enums\Permission;
 use App\Models\Activity;
 use App\Models\Deposit;
 use App\Models\LedgerEntry;
+use App\Models\Member;
 use App\Models\MonthClosure;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -143,6 +144,19 @@ class DepositApprovalTest extends TestCase
         $this->actingAs($this->activeMember()->user)
             ->get(route('approvals.deposits.index'))
             ->assertForbidden();
+    }
+
+    public function test_each_queue_row_says_whether_the_viewer_may_approve_it()
+    {
+        $reviewer = $this->reviewer();
+        $others = Deposit::factory()->create();
+        $ownMember = Member::factory()->active()->create(['user_id' => $reviewer->id]);
+        $own = Deposit::factory()->create(['member_id' => $ownMember->id]);
+
+        $this->actingAs($reviewer)->get(route('approvals.deposits.index'))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('deposits', fn ($rows) => collect($rows)->firstWhere('id', $others->id)['can_approve'] === true
+                    && collect($rows)->firstWhere('id', $own->id)['can_approve'] === false));
     }
 
     public function test_the_approvals_entry_point_opens_the_first_queue_the_user_reviews()
