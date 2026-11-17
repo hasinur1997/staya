@@ -39,7 +39,7 @@ class RegistrationReviewTest extends TestCase
             ->assertInertia(fn (Assert $page) => $page
                 ->component('approvals/registrations/index')
                 ->has('registrations', 1)
-                ->where('nav.counts.pendingApprovals', 1));
+                ->where('nav.counts.pendingRegistrations', 1));
     }
 
     public function test_the_approvals_entry_point_leads_reviewers_to_registrations()

@@ -13,7 +13,10 @@ export type NavItem = {
     isActive?: boolean;
 };
 
-export type NavCountKey = 'pendingApprovals' | 'openPayables';
+export type NavCountKey =
+    | 'pendingDeposits'
+    | 'pendingRegistrations'
+    | 'openPayables';
 
 export type AppNavItem = {
     title: string;
@@ -21,6 +24,8 @@ export type AppNavItem = {
     icon: LucideIcon;
     /** Shown when the user holds any of these. Empty means every signed-in user. */
     permissions: string[];
+    /** Other pages that belong under this item, so it stays highlighted on them. */
+    alsoActiveOn?: NonNullable<InertiaLinkProps['href']>[];
     count?: NavCountKey;
     /** Accessible wording for the count, e.g. "waiting". */
     countLabel?: string;

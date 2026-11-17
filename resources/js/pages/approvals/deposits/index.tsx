@@ -2,7 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { MemberName } from '@/components/member-name';
 import { Check } from 'lucide-react';
 import { useState } from 'react';
-import { ApprovalTabs } from '@/components/approval-tabs';
+import { DepositTabs } from '@/components/review-tabs';
 import { FormDialog } from '@/components/form-dialog';
 import { ResponsiveTable } from '@/components/responsive-table';
 import type { ResponsiveColumn } from '@/components/responsive-table';
@@ -12,7 +12,7 @@ import { formatBusinessDate } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { index } from '@/routes/approvals/deposits';
-import { approve, show } from '@/routes/deposits';
+import { approve, index as allDeposits, show } from '@/routes/deposits';
 import type { DepositRow } from '@/types';
 
 type QueueRow = DepositRow & {
@@ -91,11 +91,11 @@ export default function DepositQueue({ deposits }: Props) {
             <Head title={__('Deposits to review')} />
             <ListTemplate
                 header={{
-                    title: __('Pending approvals'),
+                    title: __('Deposits'),
                     description: __(
                         'Deposits waiting for a decision, oldest first. Nothing counts until it is approved.',
                     ),
-                    children: <ApprovalTabs current="deposits" />,
+                    children: <DepositTabs current="pending" />,
                 }}
                 resultCount={
                     deposits.length === 1
@@ -150,5 +150,8 @@ export default function DepositQueue({ deposits }: Props) {
 }
 
 DepositQueue.layout = {
-    breadcrumbs: [{ title: 'Pending approvals', href: index() }],
+    breadcrumbs: [
+        { title: 'Deposits', href: allDeposits() },
+        { title: 'Pending approval', href: index() },
+    ],
 };

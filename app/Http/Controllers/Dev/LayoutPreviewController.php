@@ -39,7 +39,8 @@ class LayoutPreviewController extends Controller
 
         Inertia::share('auth.permissions', $permissions);
         Inertia::share('nav.counts', [
-            'pendingApprovals' => $holds('deposit.approve', 'member.approve_registration') ? 3 : null,
+            'pendingDeposits' => $holds('deposit.approve') ? 2 : null,
+            'pendingRegistrations' => $holds('member.approve_registration') ? 1 : null,
             'openPayables' => $holds('ledger.reimburse') ? 1 : null,
         ]);
         Inertia::share('fund.balance', $holds('ledger.view_balance') ? '12450.00' : null);

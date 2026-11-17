@@ -12,6 +12,7 @@ import { FormDialog } from '@/components/form-dialog';
 import { Pager } from '@/components/pager';
 import { ResponsiveTable } from '@/components/responsive-table';
 import type { ResponsiveColumn } from '@/components/responsive-table';
+import { DepositTabs } from '@/components/review-tabs';
 import { ListTemplate } from '@/components/templates/list-template';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -148,6 +149,7 @@ export default function DepositsIndex({
                         'Only approved deposits count towards the fund and your monthly share.',
                     ),
                     primaryAction: newDepositAction,
+                    children: <DepositTabs current="all" />,
                 }}
                 filters={
                     <div className="flex flex-col gap-1">

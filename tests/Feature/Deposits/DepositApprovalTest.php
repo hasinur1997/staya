@@ -139,7 +139,7 @@ class DepositApprovalTest extends TestCase
             ->assertInertia(fn (Assert $page) => $page
                 ->component('approvals/deposits/index')
                 ->has('deposits', 2)
-                ->where('nav.counts.pendingApprovals', 2));
+                ->where('nav.counts.pendingDeposits', 2));
 
         $this->actingAs($this->activeMember()->user)
             ->get(route('approvals.deposits.index'))

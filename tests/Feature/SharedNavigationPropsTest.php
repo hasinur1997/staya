@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Enums\Permission;
+use App\Models\Deposit;
+use App\Models\Member;
 use App\Models\User;
 use Database\Seeders\AccessControlSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -22,7 +24,8 @@ class SharedNavigationPropsTest extends TestCase
                 ->component('dashboard')
                 // A user without roles holds nothing.
                 ->where('auth.permissions', [])
-                ->where('nav.counts.pendingApprovals', null)
+                ->where('nav.counts.pendingDeposits', null)
+                ->where('nav.counts.pendingRegistrations', null)
                 ->where('nav.counts.openPayables', null)
                 ->where('fund.balance', null)
                 ->missing('sidebarOpen'));
@@ -36,6 +39,25 @@ class SharedNavigationPropsTest extends TestCase
             ->get(route('dashboard'))
             ->assertInertia(fn (Assert $page) => $page
                 ->where('auth.permissions', fn ($permissions) => collect($permissions)->sort()->values()->all() === ['role.view', 'user.view']));
+    }
+
+    public function test_each_queue_count_is_shared_only_with_the_people_who_review_it(): void
+    {
+        $this->seed(AccessControlSeeder::class);
+        Deposit::factory()->count(2)->create();
+        Member::factory()->create();
+
+        $this->actingAs(User::factory()->withPermissions(Permission::DepositApprove)->create())
+            ->get(route('dashboard'))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('nav.counts.pendingDeposits', 2)
+                ->where('nav.counts.pendingRegistrations', null));
+
+        $this->actingAs(User::factory()->withPermissions(Permission::MemberApproveRegistration)->create())
+            ->get(route('dashboard'))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('nav.counts.pendingDeposits', null)
+                ->where('nav.counts.pendingRegistrations', 1));
     }
 
     public function test_guest_pages_share_no_permissions(): void

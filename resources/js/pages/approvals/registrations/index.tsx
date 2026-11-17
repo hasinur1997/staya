@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import { ApprovalTabs } from '@/components/approval-tabs';
+import { MemberTabs } from '@/components/review-tabs';
 import { ResponsiveTable } from '@/components/responsive-table';
 import type { ResponsiveColumn } from '@/components/responsive-table';
 import { ListTemplate } from '@/components/templates/list-template';
@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatDateTime } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
 import { index, show } from '@/routes/approvals/registrations';
+import { index as allMembers } from '@/routes/members';
 import type { RegistrationRow } from '@/types';
 
 type Props = {
@@ -67,11 +68,11 @@ export default function RegistrationsIndex({ registrations }: Props) {
             <Head title={__('Registrations')} />
             <ListTemplate
                 header={{
-                    title: __('Pending approvals'),
+                    title: __('Members'),
                     description: __(
                         'New sign-ups waiting for a decision, oldest first. Applicants have no access until approved.',
                     ),
-                    children: <ApprovalTabs current="registrations" />,
+                    children: <MemberTabs current="registrations" />,
                 }}
                 resultCount={
                     registrations.length === 1
@@ -111,5 +112,8 @@ export default function RegistrationsIndex({ registrations }: Props) {
 }
 
 RegistrationsIndex.layout = {
-    breadcrumbs: [{ title: 'Pending approvals', href: index() }],
+    breadcrumbs: [
+        { title: 'Members', href: allMembers() },
+        { title: 'Registrations', href: index() },
+    ],
 };

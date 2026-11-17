@@ -50,11 +50,12 @@ function writeCollapsed(ids: string[]) {
 function useIsActive() {
     const { currentUrl } = useCurrentUrl();
 
-    return (item: AppNavItem) => {
-        const path = new URL(toUrl(item.href), 'http://localhost').pathname;
+    return (item: AppNavItem) =>
+        [item.href, ...(item.alsoActiveOn ?? [])].some((href) => {
+            const path = new URL(toUrl(href), 'http://localhost').pathname;
 
-        return currentUrl === path || currentUrl.startsWith(`${path}/`);
-    };
+            return currentUrl === path || currentUrl.startsWith(`${path}/`);
+        });
 }
 
 function accessibleName(item: AppNavItem, count: number | null): string {

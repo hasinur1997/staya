@@ -1,7 +1,6 @@
 import {
     BookOpen,
     ChartColumn,
-    ClipboardCheck,
     HandCoins,
     LayoutGrid,
     ScrollText,
@@ -16,7 +15,8 @@ import {
 import { dashboard } from '@/routes';
 import { index as audit } from '@/routes/audit';
 import { index as meals } from '@/routes/meals';
-import { index as approvals } from '@/routes/approvals';
+import { index as depositQueue } from '@/routes/approvals/deposits';
+import { index as registrationQueue } from '@/routes/approvals/registrations';
 import { index as deposits } from '@/routes/deposits';
 import { index as grocery } from '@/routes/grocery';
 import { index as ledger } from '@/routes/ledger';
@@ -56,6 +56,9 @@ export const appNavigation: AppNavSection[] = [
                 href: deposits(),
                 icon: Wallet,
                 permissions: ['deposit.view_own', 'deposit.view_all'],
+                alsoActiveOn: [depositQueue()],
+                count: 'pendingDeposits',
+                countLabel: 'waiting',
             },
             {
                 title: 'Reports',
@@ -74,20 +77,15 @@ export const appNavigation: AppNavSection[] = [
                 href: members(),
                 icon: Users,
                 permissions: ['member.view'],
+                alsoActiveOn: [registrationQueue()],
+                count: 'pendingRegistrations',
+                countLabel: 'waiting',
             },
             {
                 title: 'Meals',
                 href: meals(),
                 icon: Utensils,
                 permissions: ['meal.view_own', 'meal.view_all', 'meal.record'],
-            },
-            {
-                title: 'Pending approvals',
-                href: approvals(),
-                icon: ClipboardCheck,
-                permissions: ['deposit.approve', 'member.approve_registration'],
-                count: 'pendingApprovals',
-                countLabel: 'waiting',
             },
             {
                 title: 'Ledger',

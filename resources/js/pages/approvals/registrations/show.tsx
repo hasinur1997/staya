@@ -12,6 +12,7 @@ import { DetailTemplate } from '@/components/templates/detail-template';
 import { formatDateTime } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
 import { approve, index, reject, show } from '@/routes/approvals/registrations';
+import { index as allMembers } from '@/routes/members';
 import type { MemberProfile } from '@/types';
 
 type Props = {
@@ -28,7 +29,8 @@ export default function RegistrationShow({ member, nid, today, can }: Props) {
 
     setLayoutProps({
         breadcrumbs: [
-            { title: __('Pending approvals'), href: index() },
+            { title: __('Members'), href: allMembers() },
+            { title: __('Registrations'), href: index() },
             { title: member.name, href: show(member.id) },
         ],
     });

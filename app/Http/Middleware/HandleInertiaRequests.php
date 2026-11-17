@@ -60,7 +60,12 @@ class HandleInertiaRequests extends Middleware
             // unless the user holds the permission it belongs to.
             'nav' => [
                 'counts' => [
-                    'pendingApprovals' => fn (): ?int => $this->pendingApprovals($request),
+                    'pendingDeposits' => fn (): ?int => $request->user()?->can('review', Deposit::class)
+                        ? Deposit::query()->where('status', DepositStatus::Pending)->count()
+                        : null,
+                    'pendingRegistrations' => fn (): ?int => $request->user()?->can('viewAnyRegistrations', Member::class)
+                        ? Member::query()->where('status', MemberStatus::Pending)->count()
+                        : null,
                     'openPayables' => fn (): ?int => $request->user()?->can('viewAny', BuyerPayable::class)
                         ? BuyerPayable::query()->open()->count()
                         : null,
@@ -78,24 +83,6 @@ class HandleInertiaRequests extends Middleware
                     : null,
             ],
         ];
-    }
-
-    /**
-     * Deposits and registrations waiting for a decision, counting only the
-     * queues the user may review; null when they review neither.
-     */
-    protected function pendingApprovals(Request $request): ?int
-    {
-        $user = $request->user();
-        $reviewsDeposits = $user?->can('review', Deposit::class) ?? false;
-        $reviewsRegistrations = $user?->can('viewAnyRegistrations', Member::class) ?? false;
-
-        if (! $reviewsDeposits && ! $reviewsRegistrations) {
-            return null;
-        }
-
-        return ($reviewsDeposits ? Deposit::query()->where('status', DepositStatus::Pending)->count() : 0)
-            + ($reviewsRegistrations ? Member::query()->where('status', MemberStatus::Pending)->count() : 0);
     }
 
     /**

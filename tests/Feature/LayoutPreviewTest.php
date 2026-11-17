@@ -37,7 +37,8 @@ class LayoutPreviewTest extends TestCase
                 ->where('as', 'admin')
                 ->where('template', 'dashboard')
                 ->where('auth.permissions', fn ($permissions) => collect($permissions)->contains('role.view'))
-                ->where('nav.counts.pendingApprovals', 3)
+                ->where('nav.counts.pendingDeposits', 2)
+                ->where('nav.counts.pendingRegistrations', 1)
                 ->where('nav.counts.openPayables', 1)
                 ->where('fund.balance', '12450.00'));
     }
@@ -53,7 +54,8 @@ class LayoutPreviewTest extends TestCase
                 ->where('as', 'member')
                 ->where('template', 'list')
                 ->where('auth.permissions', fn ($permissions) => ! collect($permissions)->contains('member.view'))
-                ->where('nav.counts.pendingApprovals', null)
+                ->where('nav.counts.pendingDeposits', null)
+                ->where('nav.counts.pendingRegistrations', null)
                 ->where('nav.counts.openPayables', null));
     }
 

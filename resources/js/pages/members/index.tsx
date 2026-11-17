@@ -7,6 +7,7 @@ import type { FormEvent } from 'react';
 import { MemberStatusBadge } from '@/components/member-status-badge';
 import { ResponsiveTable } from '@/components/responsive-table';
 import type { ResponsiveColumn } from '@/components/responsive-table';
+import { MemberTabs } from '@/components/review-tabs';
 import { ListTemplate } from '@/components/templates/list-template';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -99,6 +100,7 @@ export default function MembersIndex({
                     description: __(
                         'Everyone who lives or has lived in the mess, with their stays.',
                     ),
+                    children: <MemberTabs current="members" />,
                     secondaryActions: can.create
                         ? [{ label: __('Invitations'), href: invitations() }]
                         : [],
