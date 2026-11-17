@@ -9,6 +9,7 @@ import {
     MemberSummaryCard,
 } from '@/components/member-details';
 import { MemberDepositsCard } from '@/components/member-deposits-card';
+import { AuditHistoryCard } from '@/components/audit-history-card';
 import { MemberMonthlyCard } from '@/components/member-monthly-card';
 import { MemberPurchasesCard } from '@/components/member-purchases-card';
 import { MemberStatusBadge } from '@/components/member-status-badge';
@@ -33,6 +34,7 @@ import {
     show,
 } from '@/routes/members';
 import type {
+    AuditRow,
     DepositRow,
     MemberProfile,
     PageAction,
@@ -50,6 +52,8 @@ type Props = {
     purchases: PurchaseRow[] | null;
     /** Monthly due or credit; null when the viewer may not see it. */
     monthly: MemberMonth[] | null;
+    /** Audit history; null without `audit.view`. */
+    history: AuditRow[] | null;
     /** Today in Asia/Dhaka (Y-m-d). */
     today: string;
     can: {
@@ -70,6 +74,7 @@ export default function MembersShow({
     deposits,
     purchases,
     monthly,
+    history,
     today,
     can,
 }: Props) {
@@ -163,6 +168,7 @@ export default function MembersShow({
                 {deposits && <MemberDepositsCard deposits={deposits} />}
                 {monthly && <MemberMonthlyCard months={monthly} />}
                 {purchases && <MemberPurchasesCard purchases={purchases} />}
+                {history && <AuditHistoryCard history={history} />}
                 <MemberStaysCard member={member} />
             </DetailTemplate>
 

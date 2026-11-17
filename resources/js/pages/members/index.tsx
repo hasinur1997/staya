@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatBusinessDate } from '@/lib/date';
 import { useTranslate } from '@/lib/i18n';
+import { index as invitations } from '@/routes/invitations';
 import { create, index, show } from '@/routes/members';
 import type {
     MemberFilters,
@@ -99,6 +100,9 @@ export default function MembersIndex({
                     description: __(
                         'Everyone who lives or has lived in the mess, with their stays.',
                     ),
+                    secondaryActions: can.create
+                        ? [{ label: __('Invitations'), href: invitations() }]
+                        : [],
                     primaryAction: can.create
                         ? {
                               label: __('New member'),

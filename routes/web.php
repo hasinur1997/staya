@@ -1,9 +1,10 @@
 <?php
 
-use App\Enums\UpcomingFeature;
 use App\Http\Controllers\Approvals\ApprovalController;
 use App\Http\Controllers\Approvals\DepositQueueController;
 use App\Http\Controllers\Approvals\RegistrationController;
+use App\Http\Controllers\Audit\AuditLogController;
+use App\Http\Controllers\Auth\InvitationAcceptController;
 use App\Http\Controllers\Auth\RegistrationStatusController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Deposits\DepositController;
@@ -13,11 +14,11 @@ use App\Http\Controllers\Grocery\PayableController;
 use App\Http\Controllers\Grocery\PurchaseToolsController;
 use App\Http\Controllers\Ledger\AdjustmentController;
 use App\Http\Controllers\Ledger\LedgerController;
+use App\Http\Controllers\Members\InvitationController;
 use App\Http\Controllers\Members\MemberController;
 use App\Http\Controllers\Members\MemberFileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Roles\RoleController;
-use App\Http\Controllers\UpcomingFeatureController;
 use App\Http\Controllers\Users\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,10 @@ Route::inertia('/', 'welcome')->name('home');
 Route::get('registration/status', RegistrationStatusController::class)
     ->middleware('auth')
     ->name('registration.status');
+
+// The invitation link is public: it is the proof, and it works once.
+Route::get('join/{token}', [InvitationAcceptController::class, 'show'])->name('invitations.show');
+Route::post('join/{token}', [InvitationAcceptController::class, 'store'])->middleware('throttle:10,1')->name('invitations.accept');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
@@ -42,6 +47,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('users/{user}/reactivate', [UserController::class, 'reactivate'])->name('users.reactivate');
 
     Route::resource('roles', RoleController::class)->except(['show']);
+
+    // Invitations are cancelled or replaced, never edited or deleted.
+    Route::get('members/invitations', [InvitationController::class, 'index'])->name('invitations.index');
+    Route::post('members/invitations', [InvitationController::class, 'store'])->name('invitations.store');
+    Route::post('members/invitations/{invitation}/resend', [InvitationController::class, 'resend'])->name('invitations.resend');
+    Route::post('members/invitations/{invitation}/revoke', [InvitationController::class, 'revoke'])->name('invitations.revoke');
 
     // Hard delete is refused for members with financial records.
     Route::resource('members', MemberController::class);
@@ -79,10 +90,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('ledger/adjustments/create', [AdjustmentController::class, 'create'])->name('ledger.adjustments.create');
     Route::post('ledger/adjustments', [AdjustmentController::class, 'store'])->name('ledger.adjustments.store');
 
-    // Sidebar screens not built yet show a "coming soon" page.
-    Route::get('{feature}', UpcomingFeatureController::class)
-        ->whereIn('feature', array_column(UpcomingFeature::cases(), 'value'))
-        ->name('upcoming');
+    // The audit log is read-only: list and detail only.
+    Route::get('audit-log', [AuditLogController::class, 'index'])->name('audit.index');
+    Route::get('audit-log/{activity}', [AuditLogController::class, 'show'])->whereNumber('activity')->name('audit.show');
 
     // Temporary: the app shell and page templates with placeholder content.
     // The controller returns 404 outside the local environment.

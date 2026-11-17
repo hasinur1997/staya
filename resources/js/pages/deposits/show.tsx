@@ -7,6 +7,7 @@ import {
     DepositStatusBadge,
     depositNote,
 } from '@/components/deposit-status-badge';
+import { AuditHistoryCard } from '@/components/audit-history-card';
 import { FormDialog } from '@/components/form-dialog';
 import { DetailTemplate } from '@/components/templates/detail-template';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,10 +23,12 @@ import {
     show,
 } from '@/routes/deposits';
 import { show as showMember } from '@/routes/members';
-import type { DepositDetail, PageAction } from '@/types';
+import type { AuditRow, DepositDetail, PageAction } from '@/types';
 
 type Props = {
     deposit: DepositDetail;
+    /** Audit history; null without `audit.view`. */
+    history: AuditRow[] | null;
     can: {
         viewAny: boolean;
         cancel: boolean;
@@ -47,7 +50,7 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
     );
 }
 
-export default function DepositsShow({ deposit, can }: Props) {
+export default function DepositsShow({ deposit, history, can }: Props) {
     const __ = useTranslate();
     const { errors } = usePage().props;
     const [dialog, setDialog] = useState<OpenDialog>(null);
@@ -209,6 +212,7 @@ export default function DepositsShow({ deposit, can }: Props) {
                         </dl>
                     </CardContent>
                 </Card>
+                {history && <AuditHistoryCard history={history} />}
             </DetailTemplate>
 
             <FormDialog

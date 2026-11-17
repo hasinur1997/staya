@@ -10,6 +10,7 @@ use App\Actions\Members\UpdateMember;
 use App\Actions\Reports\CalculateMonthlyReport;
 use App\Actions\Reports\MonthlyReport;
 use App\Concerns\BusinessCalendar;
+use App\Concerns\PresentsAudit;
 use App\Concerns\PresentsDeposits;
 use App\Concerns\PresentsMembers;
 use App\Concerns\PresentsPurchases;
@@ -32,7 +33,7 @@ use Inertia\Response;
 
 class MemberController extends Controller
 {
-    use PresentsDeposits, PresentsMembers, PresentsPurchases;
+    use PresentsAudit, PresentsDeposits, PresentsMembers, PresentsPurchases;
 
     /**
      * Show the member list.
@@ -135,6 +136,7 @@ class MemberController extends Controller
             'deposits' => $this->depositHistory($member, $actor),
             'purchases' => $this->purchaseHistory($member, $actor),
             'monthly' => $this->monthlyHistory($member, $actor),
+            'history' => $this->auditHistory($member, $actor),
             'today' => BusinessCalendar::today()->toDateString(),
             'can' => [
                 'update' => $actor->can('update', $member),

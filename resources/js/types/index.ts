@@ -8,3 +8,5 @@ export type * from './deposit';
 export type * from './grocery';
 export type * from './dashboard';
 export type * from './report';
+export type * from './audit';
+export type * from './invitation';

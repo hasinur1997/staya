@@ -8,6 +8,7 @@ use App\Actions\Grocery\UpdatePurchase;
 use App\Actions\Grocery\VoidPurchase;
 use App\Concerns\BusinessCalendar;
 use App\Concerns\Money;
+use App\Concerns\PresentsAudit;
 use App\Concerns\PresentsPurchases;
 use App\Enums\GroceryUnit;
 use App\Enums\MemberStatus;
@@ -31,7 +32,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class GroceryPurchaseController extends Controller
 {
-    use PresentsPurchases;
+    use PresentsAudit, PresentsPurchases;
 
     /**
      * Show every member's purchases, newest first. Voided ones are hidden.
@@ -136,6 +137,7 @@ class GroceryPurchaseController extends Controller
 
         return Inertia::render('grocery/show', [
             'purchase' => $this->purchaseDetail($purchase, $actor),
+            'history' => $this->auditHistory($purchase, $actor),
             'serverNow' => now()->toIso8601String(),
             'can' => [
                 'viewAny' => $actor->can('viewAny', GroceryPurchase::class),

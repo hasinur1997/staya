@@ -25,7 +25,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatMoney } from '@/lib/money';
 import { cn } from '@/lib/utils';
-import { dashboard, layoutPreview, upcoming } from '@/routes';
+import { dashboard, layoutPreview } from '@/routes';
+import { index as depositsIndex } from '@/routes/deposits';
+import { index as groceryIndex } from '@/routes/grocery';
+import { index as reportsIndex } from '@/routes/reports';
 import type { BreadcrumbItem } from '@/types';
 
 // Temporary page for checking docs/layout.md: the shell and each template
@@ -151,20 +154,20 @@ const titles: Record<Template, string> = {
 
 const breadcrumbsFor: Record<Template, BreadcrumbItem[]> = {
     dashboard: [{ title: 'Dashboard', href: dashboard() }],
-    list: [{ title: 'Grocery purchases', href: upcoming('grocery') }],
+    list: [{ title: 'Grocery purchases', href: groceryIndex() }],
     detail: [
-        { title: 'Grocery purchases', href: upcoming('grocery') },
-        { title: 'October', href: upcoming('grocery') },
-        { title: 'Purchase #41', href: upcoming('grocery') },
+        { title: 'Grocery purchases', href: groceryIndex() },
+        { title: 'October', href: groceryIndex() },
+        { title: 'Purchase #41', href: groceryIndex() },
     ],
     form: [
-        { title: 'Grocery purchases', href: upcoming('grocery') },
-        { title: 'Purchase #41', href: upcoming('grocery') },
-        { title: 'Edit', href: upcoming('grocery') },
+        { title: 'Grocery purchases', href: groceryIndex() },
+        { title: 'Purchase #41', href: groceryIndex() },
+        { title: 'Edit', href: groceryIndex() },
     ],
     report: [
-        { title: 'Reports', href: upcoming('reports') },
-        { title: 'October 2026', href: upcoming('reports') },
+        { title: 'Reports', href: reportsIndex() },
+        { title: 'October 2026', href: reportsIndex() },
     ],
 };
 
@@ -257,7 +260,7 @@ function PurchaseTable() {
             columns={purchaseColumns}
             rows={purchases}
             rowKey={(row) => row.id}
-            rowHref={() => upcoming('grocery')}
+            rowHref={() => groceryIndex()}
             card={(row) => ({
                 title: row.date,
                 value: formatMoney(row.total),
@@ -296,13 +299,13 @@ function DashboardPreview() {
                 primaryAction: {
                     label: 'Add purchase',
                     icon: Plus,
-                    href: upcoming('grocery'),
+                    href: groceryIndex(),
                 },
                 secondaryActions: [
                     {
                         label: 'Submit deposit',
                         icon: Wallet,
-                        href: upcoming('deposits'),
+                        href: depositsIndex(),
                     },
                 ],
             }}
@@ -404,7 +407,7 @@ function ListPreview() {
                 primaryAction: {
                     label: 'Add purchase',
                     icon: Plus,
-                    href: upcoming('grocery'),
+                    href: groceryIndex(),
                 },
             }}
             filters={
@@ -463,13 +466,13 @@ function DetailPreview() {
                 primaryAction: {
                     label: 'Edit purchase',
                     icon: Pencil,
-                    href: upcoming('grocery'),
+                    href: groceryIndex(),
                 },
                 secondaryActions: [
                     {
                         label: 'View receipt',
                         icon: Receipt,
-                        href: upcoming('grocery'),
+                        href: groceryIndex(),
                     },
                 ],
                 menuActions: [
@@ -587,7 +590,7 @@ function FormPreview() {
             }}
             formId="preview-form"
             submitLabel="Save purchase"
-            cancelHref={upcoming('grocery')}
+            cancelHref={groceryIndex()}
             aside={
                 <Card>
                     <CardHeader>

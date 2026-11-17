@@ -12,7 +12,8 @@ import {
     Users,
     Wallet,
 } from 'lucide-react';
-import { dashboard, upcoming } from '@/routes';
+import { dashboard } from '@/routes';
+import { index as audit } from '@/routes/audit';
 import { index as approvals } from '@/routes/approvals';
 import { index as deposits } from '@/routes/deposits';
 import { index as grocery } from '@/routes/grocery';
@@ -121,7 +122,7 @@ export const appNavigation: AppNavSection[] = [
             },
             {
                 title: 'Audit log',
-                href: upcoming('audit-log'),
+                href: audit(),
                 icon: ScrollText,
                 permissions: ['audit.view'],
             },

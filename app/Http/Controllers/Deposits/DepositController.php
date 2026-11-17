@@ -8,6 +8,7 @@ use App\Actions\Deposits\RejectDeposit;
 use App\Actions\Deposits\ReverseDeposit;
 use App\Actions\Deposits\SubmitDeposit;
 use App\Concerns\BusinessCalendar;
+use App\Concerns\PresentsAudit;
 use App\Concerns\PresentsDeposits;
 use App\Enums\DepositStatus;
 use App\Enums\MemberStatus;
@@ -26,7 +27,7 @@ use Inertia\Response;
 
 class DepositController extends Controller
 {
-    use PresentsDeposits;
+    use PresentsAudit, PresentsDeposits;
 
     /**
      * Show the user's own deposits, or everyone's with `deposit.view_all`.
@@ -128,6 +129,7 @@ class DepositController extends Controller
         $deposit->load(['member:id,first_name,last_name,user_id', 'submitter:id,name', 'reviewer:id,name', 'reverser:id,name']);
 
         return Inertia::render('deposits/show', [
+            'history' => $this->auditHistory($deposit, $actor),
             'deposit' => [
                 ...$this->depositRow($deposit, $actor),
                 'submitted_by' => $deposit->submitter->name,

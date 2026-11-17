@@ -23,7 +23,7 @@ class CreateMember
      * profile (`user_id`). Authorization happens in the form request.
      *
      * @param  array<string, string>  $details  Validated member fields, phone normalized
-     * @param  array{user_id: int}|array{email: string, password: string}  $account
+     * @param  array{user_id: int}|array{email: string, password: string, verified?: bool}  $account
      */
     public function handle(User $actor, array $details, array $account, string $joinedOn, UploadedFile $nidFile, ?UploadedFile $photo = null): Member
     {
@@ -42,6 +42,10 @@ class CreateMember
                     $user->forceFill(['name' => $name])->save();
                 } else {
                     $user = User::create(['name' => $name, 'email' => $account['email'], 'password' => $account['password']]);
+
+                    if ($account['verified'] ?? false) {
+                        $user->forceFill(['email_verified_at' => now()])->save();
+                    }
                 }
 
                 $userBefore = $isNewUser ? null : $user->auditSnapshot();
@@ -78,7 +82,7 @@ class CreateMember
             throw $exception;
         }
 
-        if ($isNewUser) {
+        if ($isNewUser && ! ($account['verified'] ?? false)) {
             event(new Registered($member->user));
         }
 

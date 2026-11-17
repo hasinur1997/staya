@@ -66,8 +66,7 @@ class ReportPageTest extends TestCase
                 ->where('report.figures.share', '1000.00')
                 ->where('report.ledger.opening', '1000.00')
                 ->where('report.ledger.closing', '2000.00')
-                ->where('report.members.0.due_credit', '2000.00')
-                ->where('report.members.1.due_credit', '-1000.00')
+                ->where('report.members', fn ($rows) => collect($rows)->pluck('due_credit', 'member_id')->sortKeys()->all() == collect([$a->id => '2000.00', $b->id => '-1000.00'])->sortKeys()->all())
                 ->where('report.closure.status', 'open'));
     }
 

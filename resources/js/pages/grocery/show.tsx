@@ -2,6 +2,7 @@ import { Head, Link, setLayoutProps } from '@inertiajs/react';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
+import { AuditHistoryCard } from '@/components/audit-history-card';
 import { FormDialog } from '@/components/form-dialog';
 import { PurchaseStatusBadge } from '@/components/purchase-status-badge';
 import { ResponsiveTable } from '@/components/responsive-table';
@@ -20,10 +21,17 @@ import {
 } from '@/routes/grocery';
 import { show as showMember } from '@/routes/members';
 import { index as payables } from '@/routes/payables';
-import type { PageAction, PurchaseDetail, PurchaseItem } from '@/types';
+import type {
+    AuditRow,
+    PageAction,
+    PurchaseDetail,
+    PurchaseItem,
+} from '@/types';
 
 type Props = {
     purchase: PurchaseDetail;
+    /** Audit history; null without `audit.view`. */
+    history: AuditRow[] | null;
     /** The server's time when the page was built (ISO 8601). */
     serverNow: string;
     can: { viewAny: boolean; viewBuyer: boolean; viewPayables: boolean };
@@ -47,7 +55,12 @@ function Amount({ label, value }: { label: string; value: string }) {
     );
 }
 
-export default function GroceryShow({ purchase, serverNow, can }: Props) {
+export default function GroceryShow({
+    purchase,
+    history,
+    serverNow,
+    can,
+}: Props) {
     const __ = useTranslate();
     const [voiding, setVoiding] = useState(false);
     const title = __(':date purchase', {
@@ -293,6 +306,7 @@ export default function GroceryShow({ purchase, serverNow, can }: Props) {
                         </dl>
                     </CardContent>
                 </Card>
+                {history && <AuditHistoryCard history={history} />}
             </DetailTemplate>
 
             <FormDialog
