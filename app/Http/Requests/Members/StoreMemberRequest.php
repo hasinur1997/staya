@@ -7,7 +7,6 @@ use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
 use App\Concerns\StayDateRules;
 use App\Models\Member;
-use App\Models\Role;
 use App\Models\User;
 use Closure;
 use Illuminate\Auth\Access\Response;
@@ -23,7 +22,7 @@ class StoreMemberRequest extends FormRequest
 
     /**
      * Determine if the user is authorized to make this request. Linking an
-     * existing account also needs the right to edit that account.
+     * existing account is checked by `MemberPolicy::linkAccount`.
      */
     public function authorize(): Response
     {
@@ -39,11 +38,7 @@ class StoreMemberRequest extends FormRequest
             return $create;
         }
 
-        $update = Gate::inspect('update', $user);
-
-        return $update->denied()
-            ? $update
-            : Gate::inspect('assignRoles', [$user, [...$user->roles()->pluck('id')->all(), Role::member()->id]]);
+        return Gate::inspect('linkAccount', [Member::class, $user]);
     }
 
     /**

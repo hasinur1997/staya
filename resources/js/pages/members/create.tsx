@@ -170,7 +170,9 @@ export default function MembersCreate({
                                                                 value: String(
                                                                     user.id,
                                                                 ),
-                                                                label: `${user.name} (${user.email})`,
+                                                                label: user.is_self
+                                                                    ? `${user.name} (${user.email}) · ${__('You')}`
+                                                                    : `${user.name} (${user.email})`,
                                                             }),
                                                         )}
                                                         placeholder={__(

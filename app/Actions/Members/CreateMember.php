@@ -49,7 +49,10 @@ class CreateMember
                 }
 
                 $userBefore = $isNewUser ? null : $user->auditSnapshot();
-                $user->assignRole(Role::member());
+                // Nobody changes their own roles; an actor adding themselves keeps the ones they hold.
+                if (! $user->is($actor)) {
+                    $user->assignRole(Role::member());
+                }
 
                 $member = new Member([...$details, 'nid_file_path' => $nidPath, 'photo_path' => $photoPath]);
                 $member->user()->associate($user);

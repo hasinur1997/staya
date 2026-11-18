@@ -962,5 +962,7 @@
     "Grocery": "বাজার",
     "The language visitors see until they choose their own.": "দর্শক নিজে ভাষা বেছে না নেওয়া পর্যন্ত যে ভাষা দেখবেন।",
     "Default language": "ডিফল্ট ভাষা",
-    "People who pick a language from the menu keep their own choice.": "যারা মেনু থেকে ভাষা বেছে নেন, তাদের নিজের পছন্দই থাকবে।"
+    "People who pick a language from the menu keep their own choice.": "যারা মেনু থেকে ভাষা বেছে নেন, তাদের নিজের পছন্দই থাকবে।",
+    "You": "আপনি",
+    "You can only add yourself as a member if you already hold every permission a member has.": "একজন সদস্যের সব অনুমতি আগে থেকে থাকলেই কেবল আপনি নিজেকে সদস্য হিসেবে যোগ করতে পারবেন।"
 }

@@ -43,6 +43,30 @@ class MemberPolicy
     }
 
     /**
+     * Determine whether the actor can turn an existing account into a member.
+     * Linking someone else needs the right to edit that account and to grant
+     * the Member role. Linking yourself changes no role (nobody changes their
+     * own): it is open to anyone who already holds every permission the
+     * Member role carries, which is the case for an Admin.
+     */
+    public function linkAccount(User $actor, User $target): Response
+    {
+        if (! $actor->can(Permission::MemberCreate->value)) {
+            return Response::deny();
+        }
+
+        if ($actor->is($target)) {
+            return $actor->holdsAllPermissions(Role::member()->permissions->pluck('name'))
+                ? Response::allow()
+                : Response::deny(__('You can only add yourself as a member if you already hold every permission a member has.'));
+        }
+
+        $update = Gate::forUser($actor)->inspect('update', $target);
+
+        return $update->denied() ? $update : $this->canGrantMemberRole($actor, $target);
+    }
+
+    /**
      * Determine whether the user can edit a member's details.
      */
     public function update(User $actor, Member $member): bool

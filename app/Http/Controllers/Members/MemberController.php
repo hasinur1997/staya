@@ -98,8 +98,8 @@ class MemberController extends Controller
             ->where('is_active', true)
             ->orderBy('name')
             ->get()
-            ->filter(fn (User $user) => $actor->can('update', $user))
-            ->map(fn (User $user) => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email])
+            ->filter(fn (User $user) => $actor->can('linkAccount', [Member::class, $user]))
+            ->map(fn (User $user) => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email, 'is_self' => $user->is($actor)])
             ->values();
 
         return Inertia::render('members/create', [

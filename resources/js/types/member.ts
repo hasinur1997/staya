@@ -59,6 +59,8 @@ export type LinkableUser = {
     id: number;
     name: string;
     email: string;
+    /** The signed-in user's own account. */
+    is_self: boolean;
 };
 
 export type RegistrationRow = {

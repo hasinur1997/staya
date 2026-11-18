@@ -156,6 +156,41 @@ class MemberManagementTest extends TestCase
         $this->assertTrue($manager->hasRole('Member'));
     }
 
+    public function test_an_admin_can_add_themselves_as_a_member_without_changing_their_roles()
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->get(route('members.create'))
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('linkableUsers', 1)
+                ->where('linkableUsers.0.id', $admin->id)
+                ->where('linkableUsers.0.is_self', true));
+
+        $this->actingAs($admin)
+            ->post(route('members.store'), $this->newMember(['account' => 'existing', 'user_id' => $admin->id]))
+            ->assertSessionHasNoErrors();
+
+        $admin->refresh();
+        $this->assertTrue($admin->member->is(Member::query()->sole()));
+        $this->assertSame(MemberStatus::Active, $admin->member->status);
+        $this->assertTrue($admin->hasRole('Admin'));
+        $this->assertFalse($admin->hasRole('Member'));
+        $this->assertSame($admin->id, $admin->member->reviewed_by);
+        $this->assertTrue($admin->isActiveMember());
+    }
+
+    public function test_adding_yourself_as_a_member_still_needs_member_create()
+    {
+        $user = User::factory()->withPermissions(...SystemRole::Member->defaultPermissions())->create();
+
+        $this->actingAs($user)
+            ->post(route('members.store'), $this->newMember(['account' => 'existing', 'user_id' => $user->id]))
+            ->assertForbidden();
+
+        $this->assertDatabaseCount('members', 0);
+    }
+
     public function test_an_account_with_a_member_profile_cannot_be_linked_again()
     {
         $admin = User::factory()->admin()->create();
