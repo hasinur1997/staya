@@ -132,7 +132,7 @@ class GroceryPurchase extends Model
      */
     public function buyer(): BelongsTo
     {
-        return $this->belongsTo(Member::class, 'buyer_member_id');
+        return $this->belongsTo(Member::class, 'buyer_member_id')->withTrashed();
     }
 
     /**
@@ -142,7 +142,7 @@ class GroceryPurchase extends Model
      */
     public function payer(): BelongsTo
     {
-        return $this->belongsTo(Member::class, 'paid_by_member_id');
+        return $this->belongsTo(Member::class, 'paid_by_member_id')->withTrashed();
     }
 
     public function isPaidByMember(): bool

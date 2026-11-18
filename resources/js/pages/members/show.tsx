@@ -284,7 +284,7 @@ export default function MembersShow({
                     </DialogTitle>
                     <DialogDescription>
                         {__(
-                            'The profile, stays and files are removed for good. Their account is deleted too unless other records refer to it.',
+                            'The member is removed from every list. A member with deposits or purchases is hidden, not erased, so the ledger and reports stay correct. Their account is deleted or deactivated.',
                         )}
                     </DialogDescription>
                     <DialogFooter className="gap-2">

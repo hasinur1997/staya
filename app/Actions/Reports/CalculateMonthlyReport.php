@@ -70,7 +70,7 @@ class CalculateMonthlyReport
             $totalMeals += $meal->count;
         }
 
-        $members = Member::query()
+        $members = Member::withTrashed()
             ->where(fn (Builder $query) => $query
                 ->whereHas('stays', fn (Builder $stays) => $stays->overlapping($first, $last))
                 ->orWhereIn('id', array_keys($mealsByMember)))

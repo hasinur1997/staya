@@ -97,14 +97,15 @@ class DepositRecordTest extends TestCase
             ->assertInertia(fn (Assert $page) => $page->where('deposits', null));
     }
 
-    public function test_a_member_with_deposits_cannot_be_hard_deleted()
+    public function test_deleting_a_member_with_deposits_keeps_the_deposit()
     {
         $deposit = Deposit::factory()->cancelled()->create();
 
         $this->actingAs(User::factory()->admin()->create())
             ->delete(route('members.destroy', $deposit->member))
-            ->assertForbidden();
+            ->assertRedirect(route('members.index'));
 
-        $this->assertModelExists($deposit->member);
+        $this->assertSoftDeleted($deposit->member);
+        $this->assertModelExists($deposit);
     }
 }

@@ -118,10 +118,6 @@ class MemberPolicy
             return Response::deny(__('You cannot delete your own member profile.'));
         }
 
-        if ($member->hasFinancialRecords()) {
-            return Response::deny(__('This member has financial records, so they can only be deactivated.'));
-        }
-
         return $actor->holdsAllPermissions($member->user->getAllPermissions()->pluck('name'))
             ? Response::allow()
             : Response::deny(__('You cannot change a user who holds permissions you do not have.'));

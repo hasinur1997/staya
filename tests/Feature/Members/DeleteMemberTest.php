@@ -4,11 +4,11 @@ namespace Tests\Feature\Members;
 
 use App\Enums\Permission;
 use App\Models\Activity;
+use App\Models\Deposit;
 use App\Models\LedgerEntry;
 use App\Models\Member;
 use App\Models\MemberInvitation;
 use App\Models\User;
-use App\Policies\MemberPolicy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\Concerns\SeedsAccessControl;
@@ -107,14 +107,18 @@ class DeleteMemberTest extends TestCase
         $this->assertModelExists($member);
     }
 
-    public function test_hard_delete_is_refused_when_the_member_has_financial_records()
+    public function test_a_member_with_financial_records_is_soft_deleted_and_their_history_stays()
     {
         $admin = User::factory()->admin()->create();
-        $member = $this->partialMock(Member::class, fn ($mock) => $mock->shouldReceive('hasFinancialRecords')->andReturn(true));
+        $member = Member::factory()->active()->create(['nid_number' => '1234567890']);
+        $deposit = Deposit::factory()->create(['member_id' => $member->id]);
 
-        $response = (new MemberPolicy)->delete($admin, $member);
+        $this->actingAs($admin)->delete(route('members.destroy', $member))->assertRedirect(route('members.index'));
 
-        $this->assertTrue($response->denied());
-        $this->assertSame('This member has financial records, so they can only be deactivated.', $response->message());
+        $this->assertSoftDeleted($member);
+        $this->assertFalse($member->user->fresh()->is_active);
+        $this->assertSame($member->id, $deposit->fresh()->member->id);
+        $this->assertFalse(Member::query()->where('nid_number_hash', Member::nidHash('1234567890'))->exists());
+        $this->assertTrue(Activity::query()->where('description', 'member_deleted')->sole()->properties['soft']);
     }
 }

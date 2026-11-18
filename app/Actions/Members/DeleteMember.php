@@ -13,10 +13,12 @@ use Illuminate\Support\Str;
 class DeleteMember
 {
     /**
-     * Hard-delete a member with no financial records, with their stays and
-     * files. The account goes too when it holds nothing but the Member role
-     * and nothing else points at it; an account with other history is
-     * deactivated instead, and a staff account (other roles) is kept.
+     * Delete a member. With no financial records they are hard-deleted with
+     * their stays and files. With financial records they are soft-deleted
+     * instead (hidden, history and files kept, NID number freed) and their
+     * account is deactivated. The account of a hard-deleted member goes too
+     * when it holds nothing but the Member role and nothing else points at
+     * it; otherwise it is deactivated, and a staff account (other roles) is kept.
      *
      * @return 'deleted'|'deactivated'|'kept' What happened to the account
      */
@@ -28,16 +30,21 @@ class DeleteMember
             Gate::forUser($actor)->authorize('delete', $member);
 
             $snapshot = $member->auditSnapshot();
-            $files = [$member->nid_file_path, $member->photo_path];
             $user = $member->user;
+            $soft = $member->hasFinancialRecords();
+            $files = $soft ? [] : [$member->nid_file_path, $member->photo_path];
 
-            DB::table('member_invitations')->where('member_id', $member->id)->update(['member_id' => null]);
-
-            $member->delete();
+            if ($soft) {
+                $member->forceFill(['nid_number_hash' => hash('sha256', 'deleted-member-'.$member->id)])->saveQuietly();
+                $member->delete();
+            } else {
+                DB::table('member_invitations')->where('member_id', $member->id)->update(['member_id' => null]);
+                $member->forceDelete();
+            }
 
             $outcome = match (true) {
                 ! $this->holdsOnlyTheMemberRole($user) => 'kept',
-                $this->hasOtherHistory($user) => 'deactivated',
+                $soft || $this->hasOtherHistory($user) => 'deactivated',
                 default => 'deleted',
             };
 
@@ -50,7 +57,7 @@ class DeleteMember
                 ->performedOn($member)
                 ->event('deleted')
                 ->withChanges(['old' => $snapshot])
-                ->withProperties(['account' => $outcome, 'user_id' => $user->id])
+                ->withProperties(['account' => $outcome, 'user_id' => $user->id, 'soft' => $soft])
                 ->log('member_deleted');
 
             if ($outcome === 'deleted') {

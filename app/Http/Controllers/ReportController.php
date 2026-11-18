@@ -37,7 +37,7 @@ class ReportController extends Controller
             'report' => $report,
             'filters' => ['month' => $month, 'from' => $month === null ? $from : null, 'to' => $month === null ? $to : null, 'member' => $memberId],
             'members' => Gate::allows('viewAll', MonthlyReport::class)
-                ? Member::query()->orderBy('first_name')->orderBy('last_name')->get(['id', 'first_name', 'last_name', 'name_bn', 'status'])
+                ? Member::withTrashed()->orderBy('first_name')->orderBy('last_name')->get(['id', 'first_name', 'last_name', 'name_bn', 'status'])
                     ->map(fn (Member $member): array => ['id' => $member->id, 'name' => $member->full_name, 'status' => $member->status->value])->all()
                 : [],
             'currentMonth' => BusinessCalendar::today()->format('Y-m'),
