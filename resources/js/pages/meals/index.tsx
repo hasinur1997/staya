@@ -162,7 +162,7 @@ function MealsDay({
             0,
         );
 
-    const columns = `minmax(0, 1fr) repeat(${types.length}, minmax(0, 10rem)) 4rem`;
+    const columns = `minmax(14rem, 1fr) repeat(${types.length}, minmax(0, 7rem)) 3.5rem`;
 
     const grid = (
         <Card>
@@ -295,7 +295,7 @@ function MealsDay({
                                                         type="button"
                                                         size="sm"
                                                         variant="outline"
-                                                        className="w-8 px-0"
+                                                        className="w-7 px-0"
                                                         aria-label={`${__('Decrease')} ${type.name}`}
                                                         disabled={
                                                             locked ||
@@ -330,7 +330,7 @@ function MealsDay({
                                                                     .value,
                                                             )
                                                         }
-                                                        className={`h-8 w-14 [appearance:textfield] px-1 text-center tabular-nums [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
+                                                        className={`h-8 w-12 [appearance:textfield] px-1 text-center tabular-nums [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
                                                             Number(value) > 0
                                                                 ? 'text-label text-ink'
                                                                 : 'text-ink-muted'
@@ -340,7 +340,7 @@ function MealsDay({
                                                         type="button"
                                                         size="sm"
                                                         variant="outline"
-                                                        className="w-8 px-0"
+                                                        className="w-7 px-0"
                                                         aria-label={`${__('Increase')} ${type.name}`}
                                                         disabled={
                                                             locked ||
