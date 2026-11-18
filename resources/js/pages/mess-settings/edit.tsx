@@ -24,6 +24,7 @@ type Props = {
     /** Today in Asia/Dhaka (Y-m-d); the latest allowed fund start date. */
     today: string;
     costSplits: { value: string; label: string }[];
+    locales: { value: string; label: string }[];
     can: {
         update: boolean;
         resetData: boolean;
@@ -35,6 +36,7 @@ export default function MessSettingsEdit({
     settings,
     today,
     costSplits,
+    locales,
     can,
 }: Props) {
     const __ = useTranslate();
@@ -49,6 +51,7 @@ export default function MessSettingsEdit({
         members_can_view_balance: settings.members_can_view_balance,
         max_upload_kb: String(settings.max_upload_kb),
         cost_split: settings.cost_split as string,
+        default_locale: settings.default_locale,
     });
 
     setLayoutProps({
@@ -287,6 +290,35 @@ export default function MessSettingsEdit({
                         'A closed month keeps the setting it was closed with. Changing this affects open months only.',
                     )}
                 </p>
+            </SettingsSection>
+
+            <SettingsSection
+                title={__('Language')}
+                description={__(
+                    'The language visitors see until they choose their own.',
+                )}
+            >
+                <div className="md:max-w-md">
+                    <Field
+                        id="default_locale"
+                        label={__('Default language')}
+                        help={__(
+                            'People who pick a language from the menu keep their own choice.',
+                        )}
+                        error={form.errors.default_locale}
+                    >
+                        <Combobox
+                            id="default_locale"
+                            value={form.data.default_locale}
+                            onValueChange={(value) =>
+                                form.setData('default_locale', value)
+                            }
+                            options={locales}
+                            searchPlaceholder={__('Search')}
+                            emptyText={__('Nothing found.')}
+                        />
+                    </Field>
+                </div>
             </SettingsSection>
 
             <SettingsSection

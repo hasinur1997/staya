@@ -44,6 +44,7 @@ class OpeningBalanceTest extends TestCase
             'members_can_view_balance' => true,
             'max_upload_kb' => 5120,
             'cost_split' => 'equal',
+            'default_locale' => 'en',
             ...$overrides,
         ];
     }

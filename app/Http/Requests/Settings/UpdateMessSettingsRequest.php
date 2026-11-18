@@ -42,6 +42,7 @@ class UpdateMessSettingsRequest extends FormRequest
             'members_can_view_balance' => ['required', 'boolean'],
             'max_upload_kb' => ['required', 'integer', 'min:100', 'max:20480'],
             'cost_split' => ['required', Rule::enum(CostSplit::class)],
+            'default_locale' => ['required', Rule::in(array_keys(config('app.supported_locales', [])))],
         ];
     }
 
@@ -62,7 +63,7 @@ class UpdateMessSettingsRequest extends FormRequest
     /**
      * The validated settings, with the opening balance at scale 2.
      *
-     * @return array{mess_name: string|null, mess_address: string|null, opening_balance: string, fund_start_date: string|null, grocery_edit_window_minutes: int, members_can_view_balance: bool, max_upload_kb: int, cost_split: string}
+     * @return array{mess_name: string|null, mess_address: string|null, opening_balance: string, fund_start_date: string|null, grocery_edit_window_minutes: int, members_can_view_balance: bool, max_upload_kb: int, cost_split: string, default_locale: string}
      */
     public function settings(): array
     {
@@ -78,6 +79,7 @@ class UpdateMessSettingsRequest extends FormRequest
             'members_can_view_balance' => $this->boolean('members_can_view_balance'),
             'max_upload_kb' => $this->integer('max_upload_kb'),
             'cost_split' => $this->string('cost_split')->toString(),
+            'default_locale' => $this->string('default_locale')->toString(),
         ];
     }
 }

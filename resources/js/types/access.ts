@@ -70,6 +70,8 @@ export type MessSettings = {
     members_can_view_balance: boolean;
     max_upload_kb: number;
     cost_split: 'equal' | 'meals';
+    /** Language for visitors who have not chosen one, e.g. "en" or "bn". */
+    default_locale: string;
     /** ISO 8601, UTC. */
     updated_at: string | null;
     updated_by: string | null;

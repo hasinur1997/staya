@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property bool $members_can_view_balance
  * @property int $max_upload_kb
  * @property CostSplit $cost_split
+ * @property string $default_locale
  * @property int|null $updated_by
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
@@ -39,6 +40,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'members_can_view_balance',
     'max_upload_kb',
     'cost_split',
+    'default_locale',
 ])]
 class MessSetting extends Model
 {
@@ -104,6 +106,7 @@ class MessSetting extends Model
             'members_can_view_balance' => $this->members_can_view_balance,
             'max_upload_kb' => $this->max_upload_kb,
             'cost_split' => $this->cost_split->value,
+            'default_locale' => $this->default_locale,
         ];
     }
 }

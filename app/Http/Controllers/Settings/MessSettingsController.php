@@ -40,10 +40,12 @@ class MessSettingsController extends Controller
                 'members_can_view_balance' => $settings->members_can_view_balance,
                 'max_upload_kb' => $settings->max_upload_kb,
                 'cost_split' => $settings->cost_split->value,
+                'default_locale' => $settings->default_locale,
                 'updated_at' => $settings->updated_at?->toIso8601String(),
                 'updated_by' => $settings->updatedBy?->name,
             ],
             'costSplits' => CostSplit::options(),
+            'locales' => $this->localeOptions(),
             'today' => BusinessCalendar::today()->toDateString(),
             'can' => [
                 'update' => $request->user()->can('update', $settings),
@@ -76,5 +78,24 @@ class MessSettingsController extends Controller
         Inertia::flash('toast', ['type' => 'success', 'message' => __('All financial and meal data was erased. You are starting from zero.')]);
 
         return to_route('mess-settings.edit');
+    }
+
+    /**
+     * The supported languages as combobox options.
+     *
+     * @return list<array{value: string, label: string}>
+     */
+    private function localeOptions(): array
+    {
+        /** @var array<string, string> $locales */
+        $locales = config('app.supported_locales', []);
+
+        $options = [];
+
+        foreach ($locales as $code => $label) {
+            $options[] = ['value' => $code, 'label' => $label];
+        }
+
+        return $options;
     }
 }

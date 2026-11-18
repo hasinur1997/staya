@@ -201,7 +201,7 @@ class MealCostSplitTest extends TestCase
     {
         $payload = [
             'mess_name' => 'Mess', 'mess_address' => null, 'opening_balance' => '0', 'fund_start_date' => null,
-            'grocery_edit_window_minutes' => 30, 'members_can_view_balance' => true, 'max_upload_kb' => 5120,
+            'grocery_edit_window_minutes' => 30, 'members_can_view_balance' => true, 'max_upload_kb' => 5120, 'default_locale' => 'en',
         ];
         $viewer = User::factory()->withPermissions(Permission::SettingsView)->create();
         $admin = User::factory()->withPermissions(Permission::SettingsView, Permission::SettingsUpdate)->create();

@@ -959,5 +959,8 @@
     "Sample monthly summary": "নমুনা মাসিক সারসংক্ষেপ",
     "Monthly summary": "মাসিক সারসংক্ষেপ",
     "Sample": "নমুনা",
-    "Grocery": "বাজার"
+    "Grocery": "বাজার",
+    "The language visitors see until they choose their own.": "দর্শক নিজে ভাষা বেছে না নেওয়া পর্যন্ত যে ভাষা দেখবেন।",
+    "Default language": "ডিফল্ট ভাষা",
+    "People who pick a language from the menu keep their own choice.": "যারা মেনু থেকে ভাষা বেছে নেন, তাদের নিজের পছন্দই থাকবে।"
 }

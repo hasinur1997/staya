@@ -32,6 +32,7 @@ class MessSettingsTest extends TestCase
             'members_can_view_balance' => false,
             'max_upload_kb' => 2048,
             'cost_split' => 'equal',
+            'default_locale' => 'en',
             ...$overrides,
         ];
     }
@@ -217,5 +218,47 @@ class MessSettingsTest extends TestCase
 
         $settings->update(['max_upload_kb' => 4096]);
         $this->assertTrue(Validator::make(['file' => $file], ['file' => $rules->rules()])->passes());
+    }
+
+    public function test_the_default_language_is_saved_logged_and_used_for_visitors_without_a_choice()
+    {
+        $this->assertSame('en', MessSetting::current()->default_locale);
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->put(route('mess-settings.update'), $this->validPayload(['default_locale' => 'bn']))
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame('bn', MessSetting::current()->default_locale);
+
+        $activity = Activity::query()->where('description', 'settings_updated')->sole();
+        $this->assertSame('en', $activity->attribute_changes['old']['default_locale']);
+        $this->assertSame('bn', $activity->attribute_changes['attributes']['default_locale']);
+
+        auth()->logout();
+
+        $this->get(route('login'))
+            ->assertInertia(fn (Assert $page) => $page->where('locale', 'bn'));
+
+        $this->withUnencryptedCookie('locale', 'en')
+            ->get(route('login'))
+            ->assertInertia(fn (Assert $page) => $page->where('locale', 'en'));
+    }
+
+    public function test_an_unsupported_default_language_is_rejected()
+    {
+        $this->actingAs(User::factory()->admin()->create())
+            ->put(route('mess-settings.update'), $this->validPayload(['default_locale' => 'fr']))
+            ->assertSessionHasErrors('default_locale');
+
+        $this->assertSame('en', MessSetting::current()->default_locale);
+    }
+
+    public function test_changing_the_default_language_requires_settings_update()
+    {
+        $this->actingAs(User::factory()->create())
+            ->put(route('mess-settings.update'), $this->validPayload(['default_locale' => 'bn']))
+            ->assertForbidden();
+
+        $this->assertSame('en', MessSetting::current()->default_locale);
     }
 }
