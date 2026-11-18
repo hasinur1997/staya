@@ -8,6 +8,7 @@ use App\Models\Deposit;
 use App\Models\Fund;
 use App\Models\GroceryPurchase;
 use App\Models\LedgerEntry;
+use App\Models\MailSetting;
 use App\Models\MealType;
 use App\Models\Member;
 use App\Models\MemberInvitation;
@@ -47,6 +48,9 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
         $this->configureMorphMap();
         $this->configureAuthMail();
+
+        // An Admin's email settings (Settings → Email) override .env.
+        MailSetting::applyToConfig();
 
         // Monthly figures are not a model; the policy is keyed by their class.
         Gate::policy(MonthlyReport::class, ReportPolicy::class);
@@ -88,6 +92,7 @@ class AppServiceProvider extends ServiceProvider
             'role' => Role::class,
             'permission' => Permission::class,
             'mess_setting' => MessSetting::class,
+            'mail_setting' => MailSetting::class,
             'fund' => Fund::class,
             'ledger_entry' => LedgerEntry::class,
             'month_closure' => MonthClosure::class,

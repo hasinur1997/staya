@@ -98,6 +98,7 @@ trait PresentsAudit
             'role' => __('Role'),
             'permission' => __('Permission'),
             'mess_setting' => __('Settings'),
+            'mail_setting' => __('Email settings'),
             'fund' => __('Fund'),
             'ledger_entry' => __('Ledger entry'),
             'month_closure' => __('Month'),

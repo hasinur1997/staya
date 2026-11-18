@@ -57,6 +57,22 @@ export type PermissionGroup = {
     permissions: PermissionOption[];
 };
 
+export type MailSettings = {
+    enabled: boolean;
+    host: string | null;
+    port: number;
+    /** "ssl" (implicit TLS) or "tls" (STARTTLS). */
+    encryption: 'ssl' | 'tls';
+    username: string | null;
+    /** The password itself is never sent to the browser. */
+    has_password: boolean;
+    from_address: string | null;
+    from_name: string | null;
+    /** ISO 8601, UTC. */
+    updated_at: string | null;
+    updated_by: string | null;
+};
+
 export type MessSettings = {
     mess_name: string | null;
     mess_address: string | null;

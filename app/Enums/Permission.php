@@ -57,6 +57,7 @@ enum Permission: string
     case SettingsView = 'settings.view';
     case SettingsUpdate = 'settings.update';
     case SettingsResetData = 'settings.reset_data';
+    case SettingsManageMail = 'settings.manage_mail';
 
     case AuditView = 'audit.view';
 
@@ -115,6 +116,7 @@ enum Permission: string
             self::SettingsView => __('View mess settings'),
             self::SettingsUpdate => __('Change mess settings'),
             self::SettingsResetData => __('Erase all financial and meal data and start from zero'),
+            self::SettingsManageMail => __('Manage how email is sent (SMTP host and password)'),
             self::AuditView => __('View the audit log'),
         };
     }

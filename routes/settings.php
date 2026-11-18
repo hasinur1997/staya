@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Settings\MailSettingsController;
 use App\Http\Controllers\Settings\MessSettingsController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
@@ -30,6 +31,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('mess-settings/reset', [MessSettingsController::class, 'reset'])
         ->middleware('throttle:3,1')
         ->name('mess-settings.reset');
+
+    // How the app sends email (SMTP), instead of MAIL_* in .env.
+    Route::get('mail-settings', [MailSettingsController::class, 'edit'])->name('mail-settings.edit');
+    Route::put('mail-settings', [MailSettingsController::class, 'update'])->name('mail-settings.update');
+    Route::post('mail-settings/test', [MailSettingsController::class, 'test'])
+        ->middleware('throttle:5,1')
+        ->name('mail-settings.test');
 });
 
 Route::get('.well-known/passkey-endpoints', function () {

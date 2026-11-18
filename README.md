@@ -278,16 +278,7 @@ SESSION_SECURE_COOKIE=true
 QUEUE_CONNECTION=database
 CACHE_STORE=database
 
-# Real email (invitations, password reset, verification). Create a mailbox in
-# cPanel → Email Accounts, then look at its "Connect Devices" settings.
-MAIL_MAILER=smtp
-MAIL_HOST=mail.your-domain.example
-MAIL_PORT=465
-MAIL_SCHEME=smtps
-MAIL_USERNAME=no-reply@your-domain.example
-MAIL_PASSWORD=...
-MAIL_FROM_ADDRESS=no-reply@your-domain.example
-MAIL_FROM_NAME="${APP_NAME}"
+# Email is set up in the app (Settings → Email), not here. Leave MAIL_MAILER=log.
 
 # First Admin: created on deploy only while no Admin exists (min 8 characters).
 STAYA_OWNER_NAME=Your Name
@@ -303,15 +294,15 @@ Variables, unlike secrets, can be read by anyone with write access to the reposi
 
 ### Real email
 
-Invitations, password resets and verification links are real emails, so the live site needs working SMTP settings (the `MAIL_*` lines in `ENV_FILE` above). Use a mailbox on your own domain as `MAIL_FROM_ADDRESS` so SPF and DKIM pass (cPanel → **Email Deliverability** shows whether they do); mail from an address on another domain is often marked as spam. Port 465 with `MAIL_SCHEME=smtps` works on most cPanel hosts, or use 587 with `MAIL_SCHEME=null`.
+Invitations, password resets and verification links are real emails. You do not put SMTP details in `ENV_FILE`: an Admin enters them in the app under **Admin → Email** (host, port, encryption, username, password, sender). The password is stored encrypted and is never shown again.
 
-After a deploy, check delivery from the server:
+1. Create a mailbox in cPanel → **Email Accounts** (for example `no-reply@your-domain.example`) and open its **Connect Devices** settings for the host and port.
+2. Sign in as an Admin, open **Email**, switch on **Send email with these settings**, fill the form and save. Port 465 with **SSL / TLS** works on most cPanel hosts; port 587 uses **STARTTLS**.
+3. Press **Send test email**. It sends a real message to your own address and shows the server's error if something is wrong.
 
-```bash
-php artisan staya:test-mail you@example.com
-```
+Use an address on your own domain as the sender so SPF and DKIM pass (cPanel → **Email Deliverability** shows whether they do); mail from another domain is often marked as spam. Only roles with the `settings.manage_mail` permission (Admin by default) can see or change this page. While the setting is off, the `MAIL_*` values in `.env` are used, and the default `log` mailer delivers nothing.
 
-It sends one email immediately and prints the error if the host, port or password is wrong. A deploy also warns when `MAIL_MAILER` is `log`. Emails are written in the default language set in **Settings → Language**.
+From the server you can also check delivery with `php artisan staya:test-mail you@example.com`. A deploy warns when no real mailer is active. Emails are written in the default language set in **Settings → Language**.
 
 ### First deploy
 

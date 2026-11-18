@@ -26,7 +26,7 @@ class SendTestMail extends Command
         $this->components->twoColumnDetail('From', $from);
 
         if (in_array($mailer, ['log', 'array'], true)) {
-            $this->components->warn("MAIL_MAILER is '{$mailer}': nothing is delivered. Set MAIL_MAILER=smtp and the MAIL_* values.");
+            $this->components->warn("MAIL_MAILER is '{$mailer}': nothing is delivered. Turn on sending in Admin → Email (or set the MAIL_* values in .env).");
 
             return self::FAILURE;
         }
