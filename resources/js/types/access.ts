@@ -58,7 +58,8 @@ export type PermissionGroup = {
 };
 
 export type MailSettings = {
-    enabled: boolean;
+    /** "default" leaves the server's .env in charge. */
+    mailer: 'default' | 'smtp' | 'sendmail' | 'log';
     host: string | null;
     port: number;
     /** "ssl" (implicit TLS) or "tls" (STARTTLS). */

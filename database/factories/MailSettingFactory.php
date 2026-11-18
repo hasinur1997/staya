@@ -21,7 +21,7 @@ class MailSettingFactory extends Factory
     {
         return [
             'id' => 1,
-            'enabled' => true,
+            'mailer' => MailSetting::SMTP,
             'host' => 'mail.example.com',
             'port' => 465,
             'encryption' => MailSetting::SSL,

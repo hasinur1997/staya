@@ -47,7 +47,7 @@ MAILER="$(artisan config:show mail.default 2>/dev/null | tr -d '[:space:]' || tr
 case "$MAILER" in
     log|array|"")
         echo "WARNING: MAIL_MAILER is '${MAILER:-unknown}', so no real email is sent (invitations, password resets)." >&2
-        echo "         Sign in as an Admin, open Admin → Email, turn on sending and press "Send test email"." >&2
+        echo "         Sign in as an Admin, open Admin → Email, choose a mailer and press "Send test email"." >&2
         ;;
 esac
 

@@ -294,13 +294,13 @@ Variables, unlike secrets, can be read by anyone with write access to the reposi
 
 ### Real email
 
-Invitations, password resets and verification links are real emails. You do not put SMTP details in `ENV_FILE`: an Admin enters them in the app under **Admin → Email** (host, port, encryption, username, password, sender). The password is stored encrypted and is never shown again.
+Invitations, password resets and verification links are real emails. You do not put SMTP details in `ENV_FILE`: an Admin enters them in the app under **Admin → Email** (host, port, encryption, username, password, sender). The password is stored encrypted; it is sent to the page only when an Admin presses the eye icon (and that view is logged).
 
 1. Create a mailbox in cPanel → **Email Accounts** (for example `no-reply@your-domain.example`) and open its **Connect Devices** settings for the host and port.
-2. Sign in as an Admin, open **Email**, switch on **Send email with these settings**, fill the form and save. Port 465 with **SSL / TLS** works on most cPanel hosts; port 587 uses **STARTTLS**.
+2. Sign in as an Admin, open **Email**, choose the **Mailer** (**SMTP** for a mailbox, **Sendmail** for the server's own mail program, **Server default** to keep `.env`), fill the form and save. For SMTP, port 465 with **SSL / TLS** works on most cPanel hosts; port 587 uses **STARTTLS**.
 3. Press **Send test email**. It sends a real message to your own address and shows the server's error if something is wrong.
 
-Use an address on your own domain as the sender so SPF and DKIM pass (cPanel → **Email Deliverability** shows whether they do); mail from another domain is often marked as spam. Only roles with the `settings.manage_mail` permission (Admin by default) can see or change this page. While the setting is off, the `MAIL_*` values in `.env` are used, and the default `log` mailer delivers nothing.
+Use an address on your own domain as the sender so SPF and DKIM pass (cPanel → **Email Deliverability** shows whether they do); mail from another domain is often marked as spam. Only roles with the `settings.manage_mail` permission (Admin by default) can see or change this page. While the mailer is **Server default**, the `MAIL_*` values in `.env` are used, and the default `log` mailer delivers nothing.
 
 From the server you can also check delivery with `php artisan staya:test-mail you@example.com`. A deploy warns when no real mailer is active. Emails are written in the default language set in **Settings → Language**.
 

@@ -11,13 +11,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * The single row of email delivery settings. While `enabled`, it overrides
- * the MAIL_* values from .env (see `applyToConfig()`). The password is
+ * The single row of email delivery settings. Unless its mailer is
+ * `default`, it overrides the MAIL_* values from .env (see `applyToConfig()`). The password is
  * encrypted at rest and never leaves the server: controllers send only
  * whether one is saved.
  *
  * @property int $id
- * @property bool $enabled
+ * @property string $mailer
  * @property string|null $host
  * @property int $port
  * @property string $encryption
@@ -29,12 +29,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  */
-#[Fillable(['enabled', 'host', 'port', 'encryption', 'username', 'password', 'from_address', 'from_name'])]
+#[Fillable(['mailer', 'host', 'port', 'encryption', 'username', 'password', 'from_address', 'from_name'])]
 #[Hidden(['password'])]
 class MailSetting extends Model
 {
     /** @use HasFactory<MailSettingFactory> */
     use HasFactory;
+
+    /** Leave the server's .env in charge. */
+    public const string USE_ENV = 'default';
+
+    public const string SMTP = 'smtp';
+
+    public const string SENDMAIL = 'sendmail';
+
+    /** Deliver nothing: emails are only written to the log. */
+    public const string LOG = 'log';
 
     /** Implicit TLS, usually port 465. */
     public const string SSL = 'ssl';
@@ -52,9 +62,18 @@ class MailSetting extends Model
     }
 
     /**
-     * Point Laravel's mail config at these settings when they are switched on
-     * and complete. Otherwise the .env values stay in force. Tolerates the
-     * table not being migrated yet.
+     * The mailers an Admin can choose.
+     *
+     * @return list<string>
+     */
+    public static function mailers(): array
+    {
+        return [self::USE_ENV, self::SMTP, self::SENDMAIL, self::LOG];
+    }
+
+    /**
+     * Point Laravel's mail config at these settings unless they leave it to
+     * .env or are incomplete. Tolerates the table not being migrated yet.
      */
     public static function applyToConfig(): void
     {
@@ -64,24 +83,37 @@ class MailSetting extends Model
             return;
         }
 
-        config([
-            'mail.default' => 'smtp',
-            'mail.mailers.smtp.host' => $settings->host,
-            'mail.mailers.smtp.port' => $settings->port,
-            'mail.mailers.smtp.scheme' => $settings->encryption === self::SSL ? 'smtps' : 'smtp',
-            'mail.mailers.smtp.username' => $settings->username,
-            'mail.mailers.smtp.password' => $settings->password,
-            'mail.from.address' => $settings->from_address,
-            'mail.from.name' => $settings->from_name ?: config('mail.from.name'),
-        ]);
+        config(['mail.default' => $settings->mailer]);
+
+        if (filled($settings->from_address)) {
+            config([
+                'mail.from.address' => $settings->from_address,
+                'mail.from.name' => $settings->from_name ?: config('mail.from.name'),
+            ]);
+        }
+
+        if ($settings->mailer === self::SMTP) {
+            config([
+                'mail.mailers.smtp.host' => $settings->host,
+                'mail.mailers.smtp.port' => $settings->port,
+                'mail.mailers.smtp.scheme' => $settings->encryption === self::SSL ? 'smtps' : 'smtp',
+                'mail.mailers.smtp.username' => $settings->username,
+                'mail.mailers.smtp.password' => $settings->password,
+            ]);
+        }
     }
 
     /**
-     * Whether these settings are on and have what sending needs.
+     * Whether these settings take over from .env and have what their mailer needs.
      */
     public function isUsable(): bool
     {
-        return $this->enabled && filled($this->host) && filled($this->from_address);
+        return match ($this->mailer) {
+            self::SMTP => filled($this->host) && filled($this->from_address),
+            self::SENDMAIL => filled($this->from_address),
+            self::LOG => true,
+            default => false,
+        };
     }
 
     /**
@@ -92,7 +124,6 @@ class MailSetting extends Model
     protected function casts(): array
     {
         return [
-            'enabled' => 'boolean',
             'port' => 'integer',
             'password' => 'encrypted',
         ];
@@ -115,7 +146,7 @@ class MailSetting extends Model
     public function auditSnapshot(): array
     {
         return [
-            'enabled' => $this->enabled,
+            'mailer' => $this->mailer,
             'host' => $this->host,
             'port' => $this->port,
             'encryption' => $this->encryption,

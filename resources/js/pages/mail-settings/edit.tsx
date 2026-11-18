@@ -6,7 +6,6 @@ import PasswordInput from '@/components/password-input';
 import { SettingsSection } from '@/components/settings-section';
 import { FormTemplate } from '@/components/templates/form-template';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Combobox } from '@/components/ui/combobox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,7 +17,10 @@ import type { MailSettings } from '@/types';
 
 type Props = {
     settings: MailSettings;
+    mailers: { value: string; label: string }[];
     encryptions: { value: string; label: string }[];
+    /** Present only after the person pressed "show" on the password. */
+    password?: string | null;
     /** Whether the app currently sends real email, from here or from .env. */
     delivering: boolean;
     /** The signed-in user's email: where the test message goes. */
@@ -27,13 +29,14 @@ type Props = {
 
 export default function MailSettingsEdit({
     settings,
+    mailers,
     encryptions,
     delivering,
     testRecipient,
 }: Props) {
     const __ = useTranslate();
     const form = useForm({
-        enabled: settings.enabled,
+        mailer: settings.mailer as string,
         host: settings.host ?? '',
         port: String(settings.port),
         encryption: settings.encryption as string,
@@ -51,9 +54,28 @@ export default function MailSettingsEdit({
         event.preventDefault();
         form.submit(update(), {
             preserveScroll: true,
-            onSuccess: () => form.setData('password', ''),
+            onSuccess: () => form.setDefaults(),
         });
     };
+
+    const showPassword = () => {
+        if (!settings.has_password || form.data.password !== '') {
+            return;
+        }
+
+        router.reload({
+            only: ['password'],
+            onSuccess: (page) => {
+                const saved = (page.props as unknown as Props).password ?? '';
+
+                form.setDefaults('password', saved);
+                form.setData('password', saved);
+            },
+        });
+    };
+
+    const usesSmtp = form.data.mailer === 'smtp';
+    const sendsFromAddress = usesSmtp || form.data.mailer === 'sendmail';
 
     const sendTest = () =>
         router.post(test.url(), {}, { preserveScroll: true });
@@ -89,26 +111,28 @@ export default function MailSettingsEdit({
                     className="flex flex-col gap-4 md:gap-6"
                 >
                     <SettingsSection
-                        title={__('Sending')}
+                        title={__('Mailer')}
                         description={__(
-                            'Turn this on to send real email through your own mail server. While it is off, the server configuration is used.',
+                            'How the app sends email. "Server default" keeps whatever the server is configured with.',
                         )}
                     >
-                        <div className="flex items-start gap-3">
-                            <Checkbox
-                                id="enabled"
-                                checked={form.data.enabled}
-                                onCheckedChange={(state) =>
-                                    form.setData('enabled', state === true)
-                                }
-                                className="mt-1"
-                            />
-                            <div className="flex min-w-0 flex-col gap-1">
-                                <Label htmlFor="enabled">
-                                    {__('Send email with these settings')}
-                                </Label>
-                                <InputError message={form.errors.enabled} />
-                            </div>
+                        <div className="md:max-w-md">
+                            <Field
+                                id="mailer"
+                                label={__('Mailer')}
+                                error={form.errors.mailer}
+                            >
+                                <Combobox
+                                    id="mailer"
+                                    value={form.data.mailer}
+                                    onValueChange={(value) =>
+                                        form.setData('mailer', value)
+                                    }
+                                    options={mailers}
+                                    searchPlaceholder={__('Search')}
+                                    emptyText={__('Nothing found.')}
+                                />
+                            </Field>
                         </div>
                         <p className="flex items-start gap-2 rounded-md bg-surface-raised p-3 text-caption text-ink-muted">
                             <Info
@@ -123,152 +147,168 @@ export default function MailSettingsEdit({
                         </p>
                     </SettingsSection>
 
-                    <SettingsSection
-                        title={__('Mail server')}
-                        description={__(
-                            'The SMTP details from your email provider or cPanel mailbox.',
-                        )}
-                    >
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <Field
-                                id="host"
-                                label={__('Host')}
-                                error={form.errors.host}
-                            >
-                                <Input
-                                    id="host"
-                                    value={form.data.host}
-                                    onChange={(event) =>
-                                        form.setData('host', event.target.value)
-                                    }
-                                    placeholder="mail.example.com"
-                                    autoComplete="off"
-                                />
-                            </Field>
-                            <Field
-                                id="port"
-                                label={__('Port')}
-                                error={form.errors.port}
-                            >
-                                <Input
-                                    id="port"
-                                    type="number"
-                                    min={1}
-                                    max={65535}
-                                    value={form.data.port}
-                                    onChange={(event) =>
-                                        form.setData('port', event.target.value)
-                                    }
-                                />
-                            </Field>
-                            <Field
-                                id="encryption"
-                                label={__('Encryption')}
-                                error={form.errors.encryption}
-                            >
-                                <Combobox
-                                    id="encryption"
-                                    value={form.data.encryption}
-                                    onValueChange={(value) =>
-                                        form.setData('encryption', value)
-                                    }
-                                    options={encryptions}
-                                    searchPlaceholder={__('Search')}
-                                    emptyText={__('Nothing found.')}
-                                />
-                            </Field>
-                            <Field
-                                id="username"
-                                label={__('Username')}
-                                error={form.errors.username}
-                            >
-                                <Input
-                                    id="username"
-                                    value={form.data.username}
-                                    onChange={(event) =>
-                                        form.setData(
-                                            'username',
-                                            event.target.value,
-                                        )
-                                    }
-                                    autoComplete="off"
-                                />
-                            </Field>
-                            <div className="md:col-span-2">
+                    {usesSmtp && (
+                        <SettingsSection
+                            title={__('Mail server')}
+                            description={__(
+                                'The SMTP details from your email provider or cPanel mailbox.',
+                            )}
+                        >
+                            <div className="grid gap-4 md:grid-cols-2">
                                 <Field
-                                    id="password"
-                                    label={__('Password')}
-                                    help={
-                                        settings.has_password
-                                            ? __(
-                                                  'A password is saved. Leave this blank to keep it.',
-                                              )
-                                            : undefined
-                                    }
-                                    error={form.errors.password}
+                                    id="host"
+                                    label={__('Host')}
+                                    error={form.errors.host}
                                 >
-                                    <PasswordInput
-                                        id="password"
-                                        value={form.data.password}
+                                    <Input
+                                        id="host"
+                                        value={form.data.host}
                                         onChange={(event) =>
                                             form.setData(
-                                                'password',
+                                                'host',
                                                 event.target.value,
                                             )
                                         }
-                                        autoComplete="new-password"
+                                        placeholder="mail.example.com"
+                                        autoComplete="off"
+                                    />
+                                </Field>
+                                <Field
+                                    id="port"
+                                    label={__('Port')}
+                                    error={form.errors.port}
+                                >
+                                    <Input
+                                        id="port"
+                                        type="number"
+                                        min={1}
+                                        max={65535}
+                                        value={form.data.port}
+                                        onChange={(event) =>
+                                            form.setData(
+                                                'port',
+                                                event.target.value,
+                                            )
+                                        }
+                                    />
+                                </Field>
+                                <Field
+                                    id="encryption"
+                                    label={__('Encryption')}
+                                    error={form.errors.encryption}
+                                >
+                                    <Combobox
+                                        id="encryption"
+                                        value={form.data.encryption}
+                                        onValueChange={(value) =>
+                                            form.setData('encryption', value)
+                                        }
+                                        options={encryptions}
+                                        searchPlaceholder={__('Search')}
+                                        emptyText={__('Nothing found.')}
+                                    />
+                                </Field>
+                                <Field
+                                    id="username"
+                                    label={__('Username')}
+                                    error={form.errors.username}
+                                >
+                                    <Input
+                                        id="username"
+                                        value={form.data.username}
+                                        onChange={(event) =>
+                                            form.setData(
+                                                'username',
+                                                event.target.value,
+                                            )
+                                        }
+                                        autoComplete="off"
+                                    />
+                                </Field>
+                                <div className="md:col-span-2">
+                                    <Field
+                                        id="password"
+                                        label={__('Password')}
+                                        help={
+                                            settings.has_password
+                                                ? __(
+                                                      'A password is saved. Press the eye to show it, or type a new one to replace it.',
+                                                  )
+                                                : undefined
+                                        }
+                                        error={form.errors.password}
+                                    >
+                                        <PasswordInput
+                                            id="password"
+                                            value={form.data.password}
+                                            onChange={(event) =>
+                                                form.setData(
+                                                    'password',
+                                                    event.target.value,
+                                                )
+                                            }
+                                            autoComplete="new-password"
+                                            placeholder={
+                                                settings.has_password
+                                                    ? '••••••••'
+                                                    : undefined
+                                            }
+                                            onReveal={showPassword}
+                                        />
+                                    </Field>
+                                </div>
+                            </div>
+                        </SettingsSection>
+                    )}
+
+                    {sendsFromAddress && (
+                        <SettingsSection
+                            title={__('Sender')}
+                            description={__(
+                                'Who the email appears to come from. Use an address on your own domain so it does not land in spam.',
+                            )}
+                        >
+                            <div className="grid gap-4 md:grid-cols-2">
+                                <Field
+                                    id="from_address"
+                                    label={__('From address')}
+                                    error={form.errors.from_address}
+                                >
+                                    <Input
+                                        id="from_address"
+                                        type="email"
+                                        value={form.data.from_address}
+                                        onChange={(event) =>
+                                            form.setData(
+                                                'from_address',
+                                                event.target.value,
+                                            )
+                                        }
+                                        placeholder="no-reply@example.com"
+                                        autoComplete="off"
+                                    />
+                                </Field>
+                                <Field
+                                    id="from_name"
+                                    label={__('From name')}
+                                    error={form.errors.from_name}
+                                >
+                                    <Input
+                                        id="from_name"
+                                        value={form.data.from_name}
+                                        onChange={(event) =>
+                                            form.setData(
+                                                'from_name',
+                                                event.target.value,
+                                            )
+                                        }
+                                        maxLength={150}
+                                        autoComplete="off"
                                     />
                                 </Field>
                             </div>
-                        </div>
-                    </SettingsSection>
-
-                    <SettingsSection
-                        title={__('Sender')}
-                        description={__(
-                            'Who the email appears to come from. Use an address on your own domain so it does not land in spam.',
-                        )}
-                    >
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <Field
-                                id="from_address"
-                                label={__('From address')}
-                                error={form.errors.from_address}
-                            >
-                                <Input
-                                    id="from_address"
-                                    type="email"
-                                    value={form.data.from_address}
-                                    onChange={(event) =>
-                                        form.setData(
-                                            'from_address',
-                                            event.target.value,
-                                        )
-                                    }
-                                    placeholder="no-reply@example.com"
-                                    autoComplete="off"
-                                />
-                            </Field>
-                            <Field
-                                id="from_name"
-                                label={__('From name')}
-                                error={form.errors.from_name}
-                            >
-                                <Input
-                                    id="from_name"
-                                    value={form.data.from_name}
-                                    onChange={(event) =>
-                                        form.setData(
-                                            'from_name',
-                                            event.target.value,
-                                        )
-                                    }
-                                    maxLength={150}
-                                    autoComplete="off"
-                                />
-                            </Field>
-                        </div>
-                    </SettingsSection>
+                        </SettingsSection>
+                    )}
 
                     <SettingsSection
                         title={__('Test')}

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Settings;
 
 use App\Enums\Permission;
+use App\Http\Middleware\HandleInertiaRequests;
 use App\Mail\TestMail;
 use App\Models\Activity;
 use App\Models\MailSetting;
@@ -25,7 +26,7 @@ class MailSettingsTest extends TestCase
     private function validPayload(array $overrides = []): array
     {
         return [
-            'enabled' => true,
+            'mailer' => 'smtp',
             'host' => 'mail.example.com',
             'port' => 465,
             'encryption' => 'ssl',
@@ -73,7 +74,7 @@ class MailSettingsTest extends TestCase
             ->put(route('mail-settings.update'), $this->validPayload())
             ->assertForbidden();
 
-        $this->assertFalse(MailSetting::current()->enabled);
+        $this->assertSame('default', MailSetting::current()->mailer);
     }
 
     public function test_the_password_is_encrypted_at_rest_and_kept_out_of_the_audit_log()
@@ -124,7 +125,7 @@ class MailSettingsTest extends TestCase
         $this->assertStringNotContainsString('another-one', json_encode($activity->attribute_changes));
     }
 
-    public function test_host_and_sender_are_required_only_while_sending_is_on()
+    public function test_host_and_sender_are_required_only_for_the_mailers_that_need_them()
     {
         $manager = $this->manager();
 
@@ -133,23 +134,36 @@ class MailSettingsTest extends TestCase
             ->assertSessionHasErrors(['host', 'from_address']);
 
         $this->actingAs($manager)
-            ->put(route('mail-settings.update'), $this->validPayload(['enabled' => false, 'host' => '', 'from_address' => '', 'password' => '']))
+            ->put(route('mail-settings.update'), $this->validPayload(['mailer' => 'default', 'host' => '', 'from_address' => '', 'password' => '']))
             ->assertSessionHasNoErrors();
 
         $this->actingAs($manager)
             ->put(route('mail-settings.update'), $this->validPayload(['encryption' => 'plain', 'port' => 70000, 'from_address' => 'not-an-email']))
             ->assertSessionHasErrors(['encryption', 'port', 'from_address']);
+
+        $this->actingAs($manager)
+            ->put(route('mail-settings.update'), $this->validPayload(['mailer' => 'sendmail', 'host' => '', 'from_address' => '']))
+            ->assertSessionHasErrors(['from_address'])
+            ->assertSessionDoesntHaveErrors(['host']);
+
+        $this->actingAs($manager)
+            ->put(route('mail-settings.update'), $this->validPayload(['mailer' => 'log', 'host' => '', 'from_address' => '']))
+            ->assertSessionHasNoErrors();
+
+        $this->actingAs($manager)
+            ->put(route('mail-settings.update'), $this->validPayload(['mailer' => 'pigeon']))
+            ->assertSessionHasErrors(['mailer']);
     }
 
     public function test_enabled_settings_replace_the_env_mail_config()
     {
         config(['mail.default' => 'log', 'mail.from.address' => 'env@example.com']);
 
-        MailSetting::factory()->create(['enabled' => false]);
+        MailSetting::factory()->create(['mailer' => 'default']);
         MailSetting::applyToConfig();
         $this->assertSame('log', config('mail.default'));
 
-        MailSetting::current()->forceFill(['enabled' => true, 'port' => 587, 'encryption' => 'tls'])->save();
+        MailSetting::current()->forceFill(['mailer' => 'smtp', 'port' => 587, 'encryption' => 'tls'])->save();
         MailSetting::applyToConfig();
 
         $this->assertSame('smtp', config('mail.default'));
@@ -164,6 +178,21 @@ class MailSettingsTest extends TestCase
         $this->assertSame('smtps', config('mail.mailers.smtp.scheme'));
     }
 
+    public function test_sendmail_and_log_mailers_are_applied_without_smtp_details()
+    {
+        config(['mail.default' => 'smtp', 'mail.mailers.smtp.host' => 'env-host']);
+        MailSetting::factory()->create(['mailer' => 'sendmail', 'host' => null, 'password' => null]);
+
+        MailSetting::applyToConfig();
+        $this->assertSame('sendmail', config('mail.default'));
+        $this->assertSame('no-reply@example.com', config('mail.from.address'));
+        $this->assertSame('env-host', config('mail.mailers.smtp.host'));
+
+        MailSetting::current()->forceFill(['mailer' => 'log'])->save();
+        MailSetting::applyToConfig();
+        $this->assertSame('log', config('mail.default'));
+    }
+
     public function test_incomplete_settings_do_not_override_the_env()
     {
         config(['mail.default' => 'log']);
@@ -172,6 +201,26 @@ class MailSettingsTest extends TestCase
         MailSetting::applyToConfig();
 
         $this->assertSame('log', config('mail.default'));
+    }
+
+    public function test_the_saved_password_is_sent_only_when_asked_for_and_the_view_is_logged()
+    {
+        MailSetting::factory()->create();
+        $manager = $this->manager();
+
+        $this->actingAs($manager)
+            ->get(route('mail-settings.edit'))
+            ->assertInertia(fn (Assert $page) => $page->missing('password'));
+        $this->assertDatabaseMissing('activity_log', ['description' => 'mail_password_viewed']);
+
+        $this->actingAs($manager)
+            ->get(route('mail-settings.edit'), ['X-Inertia' => 'true', 'X-Inertia-Partial-Component' => 'mail-settings/edit', 'X-Inertia-Partial-Data' => 'password', 'X-Inertia-Version' => $this->inertiaVersion()])
+            ->assertOk()
+            ->assertJsonPath('props.password', 'secret-password');
+
+        $activity = Activity::query()->where('description', 'mail_password_viewed')->sole();
+        $this->assertTrue($activity->causer->is($manager));
+        $this->assertStringNotContainsString('secret-password', json_encode($activity->attribute_changes));
     }
 
     public function test_saving_switches_the_running_app_over_straight_away()
@@ -183,6 +232,11 @@ class MailSettingsTest extends TestCase
             ->assertSessionHasNoErrors();
 
         $this->assertSame('smtp', config('mail.default'));
+    }
+
+    private function inertiaVersion(): string
+    {
+        return (string) app(HandleInertiaRequests::class)->version(request());
     }
 
     public function test_the_test_email_goes_to_the_signed_in_user_through_the_saved_settings()

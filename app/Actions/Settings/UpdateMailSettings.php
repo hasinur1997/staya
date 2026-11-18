@@ -13,7 +13,7 @@ class UpdateMailSettings
      * Save the email settings, switch the running app over to them and log
      * what changed. The password is logged only as "saved" or "not set".
      *
-     * @param  array{enabled: bool, host: string|null, port: int, encryption: string, username: string|null, from_address: string|null, from_name: string|null, password?: string}  $values
+     * @param  array{mailer: string, host: string|null, port: int, encryption: string, username: string|null, from_address: string|null, from_name: string|null, password?: string}  $values
      */
     public function handle(User $actor, array $values): MailSetting
     {

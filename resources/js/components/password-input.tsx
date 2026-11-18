@@ -7,8 +7,13 @@ import { cn } from '@/lib/utils';
 export default function PasswordInput({
     className,
     ref,
+    onReveal,
     ...props
-}: Omit<ComponentProps<'input'>, 'type'> & { ref?: Ref<HTMLInputElement> }) {
+}: Omit<ComponentProps<'input'>, 'type'> & {
+    ref?: Ref<HTMLInputElement>;
+    /** Called when the person asks to show the password, before it is shown. */
+    onReveal?: () => void;
+}) {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
@@ -21,7 +26,13 @@ export default function PasswordInput({
             />
             <button
                 type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
+                onClick={() => {
+                    if (!showPassword) {
+                        onReveal?.();
+                    }
+
+                    setShowPassword((prev) => !prev);
+                }}
                 className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-3 text-ink-muted hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
                 tabIndex={-1}

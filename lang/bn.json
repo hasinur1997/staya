@@ -992,9 +992,6 @@
     "The test email could not be sent: :error": "পরীক্ষামূলক ইমেইল পাঠানো যায়নি: :error",
     "Test email sent to :email. Check the inbox and the spam folder.": ":email ঠিকানায় পরীক্ষামূলক ইমেইল পাঠানো হয়েছে। ইনবক্স ও স্প্যাম ফোল্ডার দেখুন।",
     "How the app sends invitations, password resets and other email": "অ্যাপ কীভাবে আমন্ত্রণ, পাসওয়ার্ড রিসেট ও অন্যান্য ইমেইল পাঠায়",
-    "Sending": "পাঠানো",
-    "Turn this on to send real email through your own mail server. While it is off, the server configuration is used.": "নিজের মেইল সার্ভার দিয়ে আসল ইমেইল পাঠাতে এটি চালু করুন। বন্ধ থাকলে সার্ভারের কনফিগারেশন ব্যবহার হবে।",
-    "Send email with these settings": "এই সেটিংস দিয়ে ইমেইল পাঠান",
     "The app is sending real email now.": "অ্যাপ এখন আসল ইমেইল পাঠাচ্ছে।",
     "No real email is being sent now. Invitations and password resets are not delivered.": "এখন কোনো আসল ইমেইল যাচ্ছে না। আমন্ত্রণ ও পাসওয়ার্ড রিসেট পৌঁছাবে না।",
     "Mail server": "মেইল সার্ভার",
@@ -1011,5 +1008,13 @@
     "Test": "পরীক্ষা",
     "Save your changes first, then send yourself a real email to check they work.": "আগে পরিবর্তন সংরক্ষণ করুন, তারপর নিজেকে একটি আসল ইমেইল পাঠিয়ে দেখুন কাজ করছে কি না।",
     "Send test email": "পরীক্ষামূলক ইমেইল পাঠান",
-    "Sent to :email": ":email ঠিকানায় যাবে"
+    "Sent to :email": ":email ঠিকানায় যাবে",
+    "Server default (.env)": "সার্ভারের ডিফল্ট (.env)",
+    "SMTP": "SMTP",
+    "Sendmail (the server's own mail program)": "Sendmail (সার্ভারের নিজস্ব মেইল প্রোগ্রাম)",
+    "Log only (nothing is delivered)": "শুধু লগ (কিছুই পৌঁছায় না)",
+    "Email password viewed": "ইমেইলের পাসওয়ার্ড দেখা হয়েছে",
+    "Mailer": "মেইলার",
+    "How the app sends email. \"Server default\" keeps whatever the server is configured with.": "অ্যাপ কীভাবে ইমেইল পাঠায়। \"সার্ভারের ডিফল্ট\" বেছে নিলে সার্ভারের কনফিগারেশনই চলবে।",
+    "A password is saved. Press the eye to show it, or type a new one to replace it.": "একটি পাসওয়ার্ড সংরক্ষিত আছে। দেখতে চোখের চিহ্নে চাপ দিন, অথবা নতুন একটি লিখে বদলান।"
 }

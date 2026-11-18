@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Actions\Settings\UpdateMailSettings;
+use App\Enums\AuditLog;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\UpdateMailSettingsRequest;
 use App\Mail\TestMail;
@@ -29,7 +30,7 @@ class MailSettingsController extends Controller
 
         return Inertia::render('mail-settings/edit', [
             'settings' => [
-                'enabled' => $settings->enabled,
+                'mailer' => $settings->mailer,
                 'host' => $settings->host,
                 'port' => $settings->port,
                 'encryption' => $settings->encryption,
@@ -40,6 +41,22 @@ class MailSettingsController extends Controller
                 'updated_at' => $settings->updated_at?->toIso8601String(),
                 'updated_by' => $settings->updatedBy?->name,
             ],
+            'mailers' => [
+                ['value' => MailSetting::USE_ENV, 'label' => __('Server default (.env)')],
+                ['value' => MailSetting::SMTP, 'label' => __('SMTP')],
+                ['value' => MailSetting::SENDMAIL, 'label' => __('Sendmail (the server\'s own mail program)')],
+                ['value' => MailSetting::LOG, 'label' => __('Log only (nothing is delivered)')],
+            ],
+            // Sent only when the person presses "show" on the password field.
+            'password' => Inertia::optional(function () use ($settings): ?string {
+                activity()
+                    ->useLog(AuditLog::Settings)
+                    ->performedOn($settings)
+                    ->event('viewed')
+                    ->log('mail_password_viewed');
+
+                return $settings->password;
+            }),
             'encryptions' => [
                 ['value' => MailSetting::SSL, 'label' => __('SSL / TLS (usually port 465)')],
                 ['value' => MailSetting::TLS, 'label' => __('STARTTLS (usually port 587)')],

@@ -21,22 +21,22 @@ class UpdateMailSettingsRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request. Host and sender are
-     * only required while sending is switched on.
+     * Get the validation rules that apply to the request. Host is required for SMTP
+     * and the sender for SMTP and sendmail.
      *
      * @return array<string, ValidationRule|Closure|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'enabled' => ['required', 'boolean'],
-            'host' => ['required_if:enabled,true', 'nullable', 'string', 'max:255'],
+            'mailer' => ['required', Rule::in(MailSetting::mailers())],
+            'host' => ['required_if:mailer,smtp', 'nullable', 'string', 'max:255'],
             'port' => ['required', 'integer', 'min:1', 'max:65535'],
             'encryption' => ['required', Rule::in([MailSetting::SSL, MailSetting::TLS])],
             'username' => ['nullable', 'string', 'max:255'],
             // Left blank, the saved password is kept.
             'password' => ['nullable', 'string', 'max:255'],
-            'from_address' => ['required_if:enabled,true', 'nullable', 'email:rfc', 'max:255'],
+            'from_address' => ['required_if:mailer,smtp,sendmail', 'nullable', 'email:rfc', 'max:255'],
             'from_name' => ['nullable', 'string', 'max:150'],
         ];
     }
@@ -44,12 +44,12 @@ class UpdateMailSettingsRequest extends FormRequest
     /**
      * The validated settings. `password` is absent unless a new one was typed.
      *
-     * @return array{enabled: bool, host: string|null, port: int, encryption: string, username: string|null, from_address: string|null, from_name: string|null, password?: string}
+     * @return array{mailer: string, host: string|null, port: int, encryption: string, username: string|null, from_address: string|null, from_name: string|null, password?: string}
      */
     public function settings(): array
     {
         $values = [
-            'enabled' => $this->boolean('enabled'),
+            'mailer' => $this->string('mailer')->toString(),
             'host' => $this->filled('host') ? $this->string('host')->trim()->toString() : null,
             'port' => $this->integer('port'),
             'encryption' => $this->string('encryption')->toString(),
