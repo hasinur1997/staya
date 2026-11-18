@@ -30,7 +30,7 @@ class UserController extends Controller
         $actor = $request->user();
 
         $users = User::query()
-            ->with('roles:id,name')
+            ->with(['roles', 'roles.permissions', 'permissions'])
             ->orderByDesc('is_active')
             ->orderBy('name')
             ->get()

@@ -44,6 +44,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 ])]
 class MessSetting extends Model
 {
+    private const INSTANCE_KEY = 'mess-settings.current';
+
     /** @use HasFactory<MessSettingFactory> */
     use HasFactory;
 
@@ -52,8 +54,30 @@ class MessSetting extends Model
      */
     public static function current(): self
     {
-        return static::query()->find(1)
+        $app = app();
+
+        if ($app->bound(self::INSTANCE_KEY)) {
+            return $app->make(self::INSTANCE_KEY);
+        }
+
+        $settings = static::query()->find(1)
             ?? tap(static::query()->forceCreate(['id' => 1]))->refresh();
+
+        $app->instance(self::INSTANCE_KEY, $settings);
+
+        return $settings;
+    }
+
+    /**
+     * Keep the settings row for the rest of the request, so the many places
+     * that read it share one query. Saving or deleting it forgets the copy.
+     */
+    protected static function booted(): void
+    {
+        $forget = fn () => app()->forgetInstance(self::INSTANCE_KEY);
+
+        static::saved($forget);
+        static::deleted($forget);
     }
 
     /**

@@ -22,6 +22,7 @@ use App\Policies\ReportPolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Date;
@@ -46,6 +47,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        // Surface N+1 queries as errors while developing and testing.
+        Model::preventLazyLoading(! $this->app->isProduction());
+
         $this->configureMorphMap();
         $this->configureAuthMail();
 
