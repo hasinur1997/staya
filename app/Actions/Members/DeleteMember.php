@@ -31,6 +31,8 @@ class DeleteMember
             $files = [$member->nid_file_path, $member->photo_path];
             $user = $member->user;
 
+            DB::table('member_invitations')->where('member_id', $member->id)->update(['member_id' => null]);
+
             $member->delete();
 
             $outcome = match (true) {
@@ -78,6 +80,10 @@ class DeleteMember
             || DB::table('members')->where('reviewed_by', $user->id)->exists()
             || DB::table('grocery_purchases')->where('created_by', $user->id)->orWhere('updated_by', $user->id)->orWhere('voided_by', $user->id)->exists()
             || DB::table('month_closures')->where('closed_by', $user->id)->orWhere('reopened_by', $user->id)->exists()
-            || DB::table('mess_settings')->where('updated_by', $user->id)->exists();
+            || DB::table('mess_settings')->where('updated_by', $user->id)->exists()
+            || DB::table('mail_settings')->where('updated_by', $user->id)->exists()
+            || DB::table('member_invitations')->where('invited_by', $user->id)->exists()
+            || DB::table('meals')->where('recorded_by', $user->id)->exists()
+            || DB::table('deposits')->where('submitted_by', $user->id)->orWhere('reviewed_by', $user->id)->orWhere('reversed_by', $user->id)->exists();
     }
 }

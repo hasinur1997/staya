@@ -45,7 +45,7 @@ class MessSettingsController extends Controller
                 'updated_by' => $settings->updatedBy?->name,
             ],
             'costSplits' => CostSplit::options(),
-            'locales' => $this->localeOptions(),
+            'localeOptions' => $this->localeOptions(),
             'today' => BusinessCalendar::today()->toDateString(),
             'can' => [
                 'update' => $request->user()->can('update', $settings),

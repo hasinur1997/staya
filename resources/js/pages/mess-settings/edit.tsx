@@ -24,7 +24,7 @@ type Props = {
     /** Today in Asia/Dhaka (Y-m-d); the latest allowed fund start date. */
     today: string;
     costSplits: { value: string; label: string }[];
-    locales: { value: string; label: string }[];
+    localeOptions: { value: string; label: string }[];
     can: {
         update: boolean;
         resetData: boolean;
@@ -36,7 +36,7 @@ export default function MessSettingsEdit({
     settings,
     today,
     costSplits,
-    locales,
+    localeOptions,
     can,
 }: Props) {
     const __ = useTranslate();
@@ -313,7 +313,7 @@ export default function MessSettingsEdit({
                             onValueChange={(value) =>
                                 form.setData('default_locale', value)
                             }
-                            options={locales}
+                            options={localeOptions}
                             searchPlaceholder={__('Search')}
                             emptyText={__('Nothing found.')}
                         />

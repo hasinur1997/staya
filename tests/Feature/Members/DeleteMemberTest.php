@@ -6,6 +6,7 @@ use App\Enums\Permission;
 use App\Models\Activity;
 use App\Models\LedgerEntry;
 use App\Models\Member;
+use App\Models\MemberInvitation;
 use App\Models\User;
 use App\Policies\MemberPolicy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -46,6 +47,18 @@ class DeleteMemberTest extends TestCase
 
         // The NID number is free to register again.
         $this->assertFalse(Member::query()->where('nid_number_hash', Member::nidHash('1234567890'))->exists());
+    }
+
+    public function test_a_member_an_invitation_points_at_can_still_be_deleted()
+    {
+        $admin = User::factory()->admin()->create();
+        $member = Member::factory()->rejected()->create();
+        $invitation = MemberInvitation::factory()->create(['member_id' => $member->id, 'invited_by' => $admin->id]);
+
+        $this->actingAs($admin)->delete(route('members.destroy', $member))->assertRedirect(route('members.index'));
+
+        $this->assertModelMissing($member);
+        $this->assertNull($invitation->fresh()->member_id);
     }
 
     public function test_an_account_that_other_records_point_at_is_deactivated_instead()
