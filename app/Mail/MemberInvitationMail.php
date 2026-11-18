@@ -3,13 +3,21 @@
 namespace App\Mail;
 
 use App\Models\MemberInvitation;
+use App\Models\MessSetting;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
 class MemberInvitationMail extends Mailable
 {
-    public function __construct(public MemberInvitation $invitation, public string $url, public string $inviterName) {}
+    /**
+     * The invitee has no account yet, so the email is written in the
+     * default language the Admin set.
+     */
+    public function __construct(public MemberInvitation $invitation, public string $url, public string $inviterName)
+    {
+        $this->locale(MessSetting::defaultLocale());
+    }
 
     public function envelope(): Envelope
     {

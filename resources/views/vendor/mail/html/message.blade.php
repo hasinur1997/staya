@@ -21,7 +21,9 @@
 {{-- Footer --}}
 <x-slot:footer>
 <x-mail::footer>
-© {{ date('Y') }} {{ config('app.name') }}. {{ __('All rights reserved.') }}
+{{ __('This is an automated message from :app. Please do not reply to it.', ['app' => config('app.name')]) }}
+
+© {{ date('Y') }} {{ config('app.name') }}
 </x-mail::footer>
 </x-slot:footer>
 </x-mail::layout>

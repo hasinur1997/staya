@@ -42,6 +42,15 @@ artisan staya:create-owner
 # Rebuild the config, route, event and view caches from the new code.
 artisan optimize
 
+# Emails go nowhere with the log mailer. Warn, but do not block the deploy.
+MAILER="$(artisan config:show mail.default 2>/dev/null | tr -d '[:space:]' || true)"
+case "$MAILER" in
+    log|array|"")
+        echo "WARNING: MAIL_MAILER is '${MAILER:-unknown}', so no real email is sent (invitations, password resets)." >&2
+        echo "         Set MAIL_MAILER=smtp and the MAIL_* values in ENV_FILE, then run: php artisan staya:test-mail you@example.com" >&2
+        ;;
+esac
+
 # Queue workers keep the old code in memory until they are told to restart.
 artisan queue:restart
 

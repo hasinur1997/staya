@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\MemberStatus;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -40,10 +41,19 @@ use Spatie\Permission\Traits\HasRoles;
  */
 #[Fillable(['name', 'name_bn', 'email', 'password'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
-class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
+class User extends Authenticatable implements HasLocalePreference, MustVerifyEmail, PasskeyUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasRoles, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
+
+    /**
+     * Emails to a user (password reset, verification) go out in the default
+     * language the Admin set, as people have no language of their own saved.
+     */
+    public function preferredLocale(): string
+    {
+        return MessSetting::defaultLocale();
+    }
 
     /**
      * Defaults matching the columns, so a model fresh from create() is

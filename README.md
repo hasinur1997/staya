@@ -278,7 +278,16 @@ SESSION_SECURE_COOKIE=true
 QUEUE_CONNECTION=database
 CACHE_STORE=database
 
-MAIL_MAILER=smtp   # then your cPanel mailbox settings
+# Real email (invitations, password reset, verification). Create a mailbox in
+# cPanel → Email Accounts, then look at its "Connect Devices" settings.
+MAIL_MAILER=smtp
+MAIL_HOST=mail.your-domain.example
+MAIL_PORT=465
+MAIL_SCHEME=smtps
+MAIL_USERNAME=no-reply@your-domain.example
+MAIL_PASSWORD=...
+MAIL_FROM_ADDRESS=no-reply@your-domain.example
+MAIL_FROM_NAME="${APP_NAME}"
 
 # First Admin: created on deploy only while no Admin exists (min 8 characters).
 STAYA_OWNER_NAME=Your Name
@@ -291,6 +300,18 @@ After the first login, remove `STAYA_OWNER_PASSWORD` from `ENV_FILE`. Changing t
 Variables, unlike secrets, can be read by anyone with write access to the repository, and the database password and `APP_KEY` are in this file. Keep the repository private and limit who can write to it. If `ENV_FILE` is empty, the deploy keeps whatever `.env` is already on the server. Never change `APP_KEY` after launch: it would invalidate the encrypted NID numbers and every session.
 
 `SSH_KNOWN_HOSTS` pins the server's host key, so the deploy refuses to connect to anything else. Get it from a network you trust.
+
+### Real email
+
+Invitations, password resets and verification links are real emails, so the live site needs working SMTP settings (the `MAIL_*` lines in `ENV_FILE` above). Use a mailbox on your own domain as `MAIL_FROM_ADDRESS` so SPF and DKIM pass (cPanel → **Email Deliverability** shows whether they do); mail from an address on another domain is often marked as spam. Port 465 with `MAIL_SCHEME=smtps` works on most cPanel hosts, or use 587 with `MAIL_SCHEME=null`.
+
+After a deploy, check delivery from the server:
+
+```bash
+php artisan staya:test-mail you@example.com
+```
+
+It sends one email immediately and prints the error if the host, port or password is wrong. A deploy also warns when `MAIL_MAILER` is `log`. Emails are written in the default language set in **Settings → Language**.
 
 ### First deploy
 

@@ -57,6 +57,19 @@ class MessSetting extends Model
     }
 
     /**
+     * The language for anyone who has not chosen one, and for emails: the
+     * Admin's choice if it is still supported, else the configured locale.
+     * Tolerates the settings table not being migrated yet.
+     */
+    public static function defaultLocale(): string
+    {
+        $fallback = (string) config('app.locale');
+        $locale = rescue(fn (): string => static::current()->default_locale, $fallback, false);
+
+        return array_key_exists($locale, config('app.supported_locales', [])) ? $locale : $fallback;
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

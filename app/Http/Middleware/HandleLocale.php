@@ -23,13 +23,10 @@ class HandleLocale
         $locale = $request->cookie('locale');
 
         if (! is_string($locale) || ! array_key_exists($locale, $supported)) {
-            // Tolerates the settings table not being migrated yet.
-            $locale = rescue(fn (): string => MessSetting::current()->default_locale, null, false);
+            $locale = MessSetting::defaultLocale();
         }
 
-        if (is_string($locale) && array_key_exists($locale, $supported)) {
-            App::setLocale($locale);
-        }
+        App::setLocale($locale);
 
         return $next($request);
     }

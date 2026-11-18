@@ -19,7 +19,10 @@ use App\Models\Role;
 use App\Models\User;
 use App\Policies\ReportPolicy;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -43,9 +46,35 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         $this->configureMorphMap();
+        $this->configureAuthMail();
 
         // Monthly figures are not a model; the policy is keyed by their class.
         Gate::policy(MonthlyReport::class, ReportPolicy::class);
+    }
+
+    /**
+     * Password reset and verification emails use the same branded layout as
+     * the invitation. They are written in the notifiable's preferred locale.
+     */
+    protected function configureAuthMail(): void
+    {
+        ResetPassword::toMailUsing(function (User $notifiable, string $token): MailMessage {
+            $url = url(route('password.reset', [
+                'token' => $token,
+                'email' => $notifiable->getEmailForPasswordReset(),
+            ], false));
+
+            return (new MailMessage)
+                ->subject(__('Reset your password'))
+                ->markdown('mail.reset-password', [
+                    'url' => $url,
+                    'expireMinutes' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire'),
+                ]);
+        });
+
+        VerifyEmail::toMailUsing(fn (User $notifiable, string $url): MailMessage => (new MailMessage)
+            ->subject(__('Verify your email address'))
+            ->markdown('mail.verify-email', ['url' => $url]));
     }
 
     /**
