@@ -250,7 +250,7 @@ class MemberInvitationTest extends TestCase
         $this->post(route('invitations.accept', self::TOKEN), $this->accepted())->assertRedirect(route('dashboard'));
         auth()->logout();
 
-        $this->post(route('invitations.accept', self::TOKEN), $this->accepted(['nid_number' => '9876543210', 'password' => 'other-password', 'password_confirmation' => 'other-password']))
+        $this->post(route('invitations.accept', self::TOKEN), $this->accepted(['nid_number' => '9876543210', 'phone' => '01812345678', 'password' => 'other-password', 'password_confirmation' => 'other-password']))
             ->assertRedirect(route('invitations.show', self::TOKEN));
 
         $this->assertSame(1, Member::query()->count());

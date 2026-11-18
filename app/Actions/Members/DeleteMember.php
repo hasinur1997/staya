@@ -35,7 +35,10 @@ class DeleteMember
             $files = $soft ? [] : [$member->nid_file_path, $member->photo_path];
 
             if ($soft) {
-                $member->forceFill(['nid_number_hash' => hash('sha256', 'deleted-member-'.$member->id)])->saveQuietly();
+                $member->forceFill([
+                    'nid_number_hash' => hash('sha256', 'deleted-member-'.$member->id),
+                    'phone' => 'deleted-'.$member->id,
+                ])->saveQuietly();
                 $member->delete();
             } else {
                 DB::table('member_invitations')->where('member_id', $member->id)->update(['member_id' => null]);

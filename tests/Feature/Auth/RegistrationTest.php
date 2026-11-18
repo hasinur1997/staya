@@ -149,6 +149,16 @@ class RegistrationTest extends TestCase
             ->assertSessionHasErrors(['nid_number' => 'This NID number is already registered.']);
     }
 
+    public function test_a_mobile_number_can_only_be_registered_once_in_any_typed_form()
+    {
+        Member::factory()->create(['phone' => '+8801712345678']);
+
+        foreach (['01712345678', '+8801712345678', '8801712345678'] as $typed) {
+            $this->post(route('register.store'), $this->signUp(['phone' => $typed]))
+                ->assertSessionHasErrors(['phone' => 'This mobile number is already registered.']);
+        }
+    }
+
     public function test_seventeen_digit_nid_numbers_are_accepted()
     {
         $this->post(route('register.store'), $this->signUp(['nid_number' => '19901234567890123']))

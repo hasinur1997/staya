@@ -116,6 +116,7 @@ class DeleteMemberTest extends TestCase
         $this->actingAs($admin)->delete(route('members.destroy', $member))->assertRedirect(route('members.index'));
 
         $this->assertSoftDeleted($member);
+        $this->assertNotSame($member->phone, $member->fresh()->phone);
         $this->assertFalse($member->user->fresh()->is_active);
         $this->assertSame($member->id, $deposit->fresh()->member->id);
         $this->assertFalse(Member::query()->where('nid_number_hash', Member::nidHash('1234567890'))->exists());

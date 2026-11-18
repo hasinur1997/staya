@@ -31,7 +31,7 @@ trait MemberValidationRules
             'first_name' => ['required', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
             'name_bn' => ['required', 'string', 'max:150'],
-            'phone' => ['required', 'string', 'regex:/^(?:\+?88)?01[3-9]\d{8}$/'],
+            'phone' => ['required', 'string', 'regex:/^(?:\+?88)?01[3-9]\d{8}$/', $this->uniquePhoneRule($member)],
             'nid_number' => [...$nid, 'string', 'regex:/^(?:\d{10}|\d{13}|\d{17})$/', $this->uniqueNidRule($member)],
             'father_name' => ['required', 'string', 'max:150'],
             'father_name_bn' => ['required', 'string', 'max:150'],
@@ -106,6 +106,28 @@ trait MemberValidationRules
     protected function normalizedPhone(string $phone): string
     {
         return '+880'.substr(preg_replace('/\D/', '', $phone) ?? '', -10);
+    }
+
+    /**
+     * Phone numbers are stored in `+8801XXXXXXXXX` form, so the typed number
+     * is normalized before it is compared.
+     */
+    private function uniquePhoneRule(?Member $member): Closure
+    {
+        return function (string $attribute, mixed $value, Closure $fail) use ($member): void {
+            if (! is_string($value) || preg_match('/^(?:\+?88)?01[3-9]\d{8}$/', $value) !== 1) {
+                return;
+            }
+
+            $taken = Member::query()
+                ->where('phone', $this->normalizedPhone($value))
+                ->when($member, fn ($query) => $query->whereKeyNot($member->id))
+                ->exists();
+
+            if ($taken) {
+                $fail(__('This mobile number is already registered.'));
+            }
+        };
     }
 
     /**
