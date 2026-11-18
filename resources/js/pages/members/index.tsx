@@ -1,3 +1,4 @@
+import { MemberAvatar } from '@/components/member-avatar';
 import { Combobox } from '@/components/ui/combobox';
 import { MemberName } from '@/components/member-name';
 import { Head, router } from '@inertiajs/react';
@@ -71,7 +72,20 @@ export default function MembersIndex({
     };
 
     const name = (member: MemberRow) => (
-        <MemberName id={member.id} name={member.name} linked />
+        <span className="flex items-center gap-3">
+            <MemberAvatar
+                id={member.id}
+                name={member.name}
+                hasPhoto={member.has_photo}
+                version={member.media_version}
+            />
+            <MemberName
+                id={member.id}
+                name={member.name}
+                linked
+                className="font-semibold"
+            />
+        </span>
     );
 
     const status = (member: MemberRow) => (

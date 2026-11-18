@@ -67,6 +67,8 @@ class MemberController extends Controller
                 'name' => $member->full_name,
                 'email' => $member->user->email,
                 'phone' => $member->phone,
+                'has_photo' => $member->photo_path !== null,
+                'media_version' => $member->updated_at?->timestamp,
                 'status' => $member->status->value,
                 'status_label' => $member->status->label(),
                 'joined_on' => $member->latestStay?->joined_on->toDateString(),

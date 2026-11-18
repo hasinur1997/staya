@@ -31,6 +31,7 @@ export default function DepositQueue({ deposits }: Props) {
     const member = (deposit: QueueRow) => (
         <>
             <MemberName
+                avatar
                 id={deposit.member_id}
                 name={deposit.member_name}
                 linked

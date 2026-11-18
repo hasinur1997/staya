@@ -56,7 +56,7 @@ class MealController extends Controller
         $members = Member::query()
             ->whereHas('stays', fn (Builder $stays) => $stays->overlapping($date, $date))
             ->orderBy('first_name')->orderBy('last_name')->orderBy('id')
-            ->get(['id', 'first_name', 'last_name', 'name_bn']);
+            ->get(['id', 'first_name', 'last_name', 'name_bn', 'photo_path', 'updated_at']);
 
         $month = $calculate->handle((int) substr($date, 0, 4), (int) substr($date, 5, 2));
 
@@ -67,6 +67,8 @@ class MealController extends Controller
             'members' => $members->map(fn (Member $member): array => [
                 'id' => $member->id,
                 'name' => $member->full_name,
+                'has_photo' => $member->photo_path !== null,
+                'media_version' => $member->updated_at?->timestamp,
                 'counts' => (object) ($counts[$member->id] ?? []),
             ])->all(),
             'dayTotals' => $meals->groupBy('meal_type_id')->map(fn ($group): int => (int) $group->sum('count'))->all() ?: (object) [],
@@ -176,6 +178,8 @@ class MealController extends Controller
         }
 
         $report = $calculate->handle($year, $number);
+        $photos = Member::withTrashed()->whereIn('id', array_column($report->members, 'member_id'))
+            ->get(['id', 'photo_path', 'updated_at'])->keyBy('id');
         $daysInMonth = (int) substr($last, 8, 2);
 
         return Inertia::render('meals/sheet', [
@@ -191,6 +195,8 @@ class MealController extends Controller
             'rows' => array_map(fn (array $row): array => [
                 'member_id' => $row['member_id'],
                 'name' => $row['name'],
+                'has_photo' => $photos[$row['member_id']]?->photo_path !== null,
+                'media_version' => $photos[$row['member_id']]?->updated_at?->timestamp,
                 'counts' => (object) ($perMember[$row['member_id']] ?? []),
                 'total' => array_sum($perMember[$row['member_id']] ?? []),
                 // Cost is of all meals, so it is left out when one type is shown.

@@ -168,6 +168,7 @@ export default function DepositsShow({ deposit, history, can }: Props) {
                         <dl className="flex flex-col gap-4">
                             <DetailRow label={__('Member')}>
                                 <MemberName
+                                    avatar
                                     id={deposit.member_id}
                                     name={deposit.member_name}
                                     linked={can.viewMember}

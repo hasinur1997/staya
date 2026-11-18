@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import { MemberAvatar } from '@/components/member-avatar';
 import { MemberName } from '@/components/member-name';
 import { Lock, LockOpen, Printer } from 'lucide-react';
 import { useState } from 'react';
@@ -157,17 +158,28 @@ export default function ReportsIndex({
             : []),
     ];
 
+    const memberCell = (row: MonthlyMemberRow) => (
+        <span className="flex items-center gap-3">
+            <MemberAvatar
+                id={row.member_id}
+                name={row.name}
+                hasPhoto={row.has_photo ?? false}
+                version={row.media_version ?? null}
+            />
+            <MemberName
+                id={row.member_id}
+                name={row.name}
+                linked={can.viewAll}
+                className="font-semibold"
+            />
+        </span>
+    );
+
     const columns: ResponsiveColumn<MonthlyMemberRow>[] = [
         {
             key: 'name',
             header: __('Member'),
-            cell: (row) => (
-                <MemberName
-                    id={row.member_id}
-                    name={row.name}
-                    linked={can.viewAll}
-                />
-            ),
+            cell: (row) => memberCell(row),
         },
         {
             key: 'deposits',
@@ -354,13 +366,7 @@ export default function ReportsIndex({
                                 rows={report.members}
                                 rowKey={(row) => row.member_id}
                                 card={(row) => ({
-                                    title: (
-                                        <MemberName
-                                            id={row.member_id}
-                                            name={row.name}
-                                            linked={can.viewAll}
-                                        />
-                                    ),
+                                    title: memberCell(row),
                                     value: signed(row.due_credit),
                                     meta: [
                                         __('Deposited :amount', {
@@ -444,6 +450,7 @@ export default function ReportsIndex({
                                         >
                                             <span className="flex flex-col gap-1">
                                                 <MemberName
+                                                    avatar
                                                     id={deposit.member_id}
                                                     name={deposit.member_name}
                                                     linked={can.viewAll}

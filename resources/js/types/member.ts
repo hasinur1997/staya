@@ -5,6 +5,8 @@ export type MemberRow = {
     name: string;
     email: string;
     phone: string;
+    has_photo: boolean;
+    media_version: number | null;
     status: MemberStatusValue;
     status_label: string;
     /** Y-m-d business date of the latest stay. */

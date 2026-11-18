@@ -1,4 +1,5 @@
 import { Head, router, setLayoutProps, useForm } from '@inertiajs/react';
+import { MemberAvatar } from '@/components/member-avatar';
 import { MemberName } from '@/components/member-name';
 import { useState } from 'react';
 import {
@@ -245,7 +246,19 @@ function MealsDay({
                                 className="flex flex-col gap-2 border-b py-3 md:grid md:items-center md:gap-3"
                                 style={{ gridTemplateColumns: columns }}
                             >
-                                <MemberName id={member.id} name={member.name} />
+                                <span className="flex items-center gap-3">
+                                    <MemberAvatar
+                                        id={member.id}
+                                        name={member.name}
+                                        hasPhoto={member.has_photo}
+                                        version={member.media_version}
+                                    />
+                                    <MemberName
+                                        id={member.id}
+                                        name={member.name}
+                                        className="font-semibold"
+                                    />
+                                </span>
                                 {types.map((type) => {
                                     const id = `meal-${member.id}-${type.id}`;
                                     const locked = !active || !type.is_active;

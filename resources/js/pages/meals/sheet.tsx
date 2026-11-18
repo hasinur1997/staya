@@ -1,4 +1,5 @@
 import { Head, Link, router, setLayoutProps } from '@inertiajs/react';
+import { MemberAvatar } from '@/components/member-avatar';
 import { MemberName } from '@/components/member-name';
 import { Printer } from 'lucide-react';
 import { StatCard } from '@/components/stat-card';
@@ -219,10 +220,20 @@ export default function MealSheet({
                                                 'text-label font-normal',
                                             )}
                                         >
-                                            <MemberName
-                                                id={row.member_id}
-                                                name={row.name}
-                                            />
+                                            <span className="flex items-center gap-3">
+                                                <MemberAvatar
+                                                    id={row.member_id}
+                                                    name={row.name}
+                                                    hasPhoto={row.has_photo}
+                                                    version={row.media_version}
+                                                    className="size-8"
+                                                />
+                                                <MemberName
+                                                    id={row.member_id}
+                                                    name={row.name}
+                                                    className="font-semibold"
+                                                />
+                                            </span>
                                         </th>
                                         {days.map((day) => {
                                             const count = row.counts[day.day];

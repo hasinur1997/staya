@@ -238,6 +238,7 @@ export default function GroceryShow({
                         <dl className="flex flex-col gap-4">
                             <DetailRow label={__('Buyer')}>
                                 <MemberName
+                                    avatar
                                     id={purchase.buyer_member_id}
                                     name={purchase.buyer_name}
                                     linked={can.viewBuyer}
@@ -245,6 +246,7 @@ export default function GroceryShow({
                             </DetailRow>
                             <DetailRow label={__('Paid by')}>
                                 <MemberName
+                                    avatar
                                     id={purchase.paid_by_member_id}
                                     name={purchase.paid_by_name}
                                 />

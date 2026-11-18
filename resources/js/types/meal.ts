@@ -3,6 +3,8 @@ export type MealTypeOption = { id: number; name: string; is_active: boolean };
 export type MealDayMember = {
     id: number;
     name: string;
+    has_photo: boolean;
+    media_version: number | null;
     /** Meal type id to count; missing means none. */
     counts: Record<string, number>;
 };
@@ -20,6 +22,8 @@ export type MealSheetDay = { day: number; weekday: number; total: number };
 export type MealSheetRow = {
     member_id: number;
     name: string;
+    has_photo: boolean;
+    media_version: number | null;
     /** Day of month to meals that day; missing means none. */
     counts: Record<string, number>;
     total: number;

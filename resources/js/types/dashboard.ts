@@ -10,6 +10,9 @@ export type MonthlyMemberRow = {
     share: string;
     /** Deposits minus share: positive is credit, negative is due. */
     due_credit: string;
+    /** Only in the reports page. */
+    has_photo?: boolean;
+    media_version?: number | null;
 };
 
 export type MonthlyFigures = {

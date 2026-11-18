@@ -53,7 +53,11 @@ export default function PayablesIndex({ payables, outstanding }: Props) {
             key: 'member',
             header: __('Owed to'),
             cell: (payable) => (
-                <MemberName id={payable.member_id} name={payable.member_name} />
+                <MemberName
+                    avatar
+                    id={payable.member_id}
+                    name={payable.member_name}
+                />
             ),
         },
         {
@@ -136,6 +140,7 @@ export default function PayablesIndex({ payables, outstanding }: Props) {
                             status: reimburseButton(payable),
                             meta: [
                                 <MemberName
+                                    avatar
                                     id={payable.member_id}
                                     name={payable.member_name}
                                 />,

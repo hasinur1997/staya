@@ -43,6 +43,14 @@ class BuildReport
             fn (array $row): bool => $viewAll ? ($memberId === null || $row['member_id'] === $memberId) : $row['member_id'] === $ownId,
         ));
 
+        $photos = Member::withTrashed()->whereIn('id', array_column($rows, 'member_id'))
+            ->get(['id', 'photo_path', 'updated_at'])->keyBy('id');
+
+        $rows = array_map(fn (array $row): array => $row + [
+            'has_photo' => $photos[$row['member_id']]?->photo_path !== null,
+            'media_version' => $photos[$row['member_id']]?->updated_at?->timestamp,
+        ], $rows);
+
         return [
             'from' => $from,
             'to' => $to,

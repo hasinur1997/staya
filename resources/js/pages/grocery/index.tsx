@@ -92,6 +92,7 @@ export default function GroceryIndex({
             header: __('Buyer'),
             cell: (purchase) => (
                 <MemberName
+                    avatar
                     id={purchase.buyer_member_id}
                     name={purchase.buyer_name}
                 />
@@ -102,6 +103,7 @@ export default function GroceryIndex({
             header: __('Paid by'),
             cell: (purchase) => (
                 <MemberName
+                    avatar
                     id={purchase.paid_by_member_id}
                     name={purchase.paid_by_name}
                 />
@@ -251,12 +253,14 @@ export default function GroceryIndex({
                             status: status(purchase),
                             meta: [
                                 <MemberName
+                                    avatar
                                     id={purchase.buyer_member_id}
                                     name={purchase.buyer_name}
                                 />,
                                 <span>
                                     {__('Paid by')}{' '}
                                     <MemberName
+                                        avatar
                                         id={purchase.paid_by_member_id}
                                         name={purchase.paid_by_name}
                                     />

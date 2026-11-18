@@ -152,7 +152,9 @@ export default function Dashboard({
         {
             key: 'name',
             header: __('Member'),
-            cell: (row) => <MemberName id={row.member_id} name={row.name} />,
+            cell: (row) => (
+                <MemberName avatar id={row.member_id} name={row.name} />
+            ),
         },
         {
             key: 'deposits',
@@ -600,6 +602,7 @@ export default function Dashboard({
                                     card={(row) => ({
                                         title: (
                                             <MemberName
+                                                avatar
                                                 id={row.member_id}
                                                 name={row.name}
                                             />

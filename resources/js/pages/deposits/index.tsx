@@ -107,6 +107,7 @@ export default function DepositsIndex({
                       header: __('Member'),
                       cell: (deposit: DepositRow) => (
                           <MemberName
+                              avatar
                               id={deposit.member_id}
                               name={deposit.member_name}
                           />
@@ -254,6 +255,7 @@ export default function DepositsIndex({
                             meta: can.viewAll
                                 ? [
                                       <MemberName
+                                          avatar
                                           id={deposit.member_id}
                                           name={deposit.member_name}
                                       />,
